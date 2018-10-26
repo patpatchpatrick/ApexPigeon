@@ -21,21 +21,24 @@ public class AlphaPigeon extends ApplicationAdapter {
 	private SpriteBatch batch;
 	private OrthographicCamera camera;
 	Texture img;
-	private Texture dropImage;
-	private Texture bucketImage;
+	private Texture squareObjectImage;
+	private Texture pigeonImage;
 	private Sound dropSound;
 	private Music rainMusic;
 	private Rectangle pigeon;
-	private Array<Rectangle> raindrops;
+	private Array<Rectangle> squareObjects;
 	private long lastDropTime;
+	public ScrollingBackground scrollingBackground;
 
 
 	@Override
 	public void create () {
 
+		this.scrollingBackground = new ScrollingBackground();
+
 		// load images for the droplet and bucket
-		dropImage = new Texture(Gdx.files.internal("droplet.png"));
-		bucketImage = new  Texture(Gdx.files.internal("bucket.png"));
+		squareObjectImage = new Texture(Gdx.files.internal("SquareObjectShape.png"));
+		pigeonImage = new  Texture(Gdx.files.internal("PigeonShape.png"));
 
 		// load the drop sound effect and the rain background "music"
 		dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
@@ -52,23 +55,23 @@ public class AlphaPigeon extends ApplicationAdapter {
 
 		// create a Rectangle to logically represent the bucket
 		pigeon = new Rectangle();
-		pigeon.x = 800 / 2 - 64 / 2;
-		pigeon.y = 20;
-		pigeon.width = 64;
-		pigeon.height = 64;
+		pigeon.x = 20;
+		pigeon.y = 480/2 - 50/2;
+		pigeon.width = 100;
+		pigeon.height = 50;
 
-		// create the raindrops array and spawn the first raindrop
-		raindrops = new Array<Rectangle>();
+		// create the squareObjects array and spawn the first raindrop
+		squareObjects = new Array<Rectangle>();
 		spawnRaindrop();
 	}
 
 	private void spawnRaindrop() {
-		Rectangle raindrop = new Rectangle();
-		raindrop.x = MathUtils.random(0, 800-64);
-		raindrop.y = 480;
-		raindrop.width = 64;
-		raindrop.height = 64;
-		raindrops.add(raindrop);
+		Rectangle squareObject = new Rectangle();
+		squareObject.x = 800;
+		squareObject.y = MathUtils.random(0, 480-64);
+		squareObject.width = 64;
+		squareObject.height = 64;
+		squareObjects.add(squareObject);
 		lastDropTime = TimeUtils.nanoTime();
 	}
 
@@ -81,15 +84,18 @@ public class AlphaPigeon extends ApplicationAdapter {
 		// tell the camera to update its matrices
 		camera.update();
 
+		float deltaTime = Gdx.graphics.getDeltaTime();
+
 		// tell the SpriteBatch to render in the
 		// coordinate system specified by the camera
 		batch.setProjectionMatrix(camera.combined);
 
 		// begin a new batch and draw the bucket and all drops
 		batch.begin();
-		batch.draw(bucketImage, pigeon.x, pigeon.y);
-		for(Rectangle raindrop: raindrops) {
-			batch.draw(dropImage, raindrop.x, raindrop.y);
+		scrollingBackground.updateAndRender(deltaTime, batch);
+		batch.draw(pigeonImage, pigeon.x, pigeon.y);
+		for(Rectangle raindrop: squareObjects) {
+			batch.draw(squareObjectImage, raindrop.x, raindrop.y);
 		}
 		batch.end();
 
@@ -100,25 +106,32 @@ public class AlphaPigeon extends ApplicationAdapter {
 			// the camera unproject method converts touchPos coordinates to the
 			// camera coordinate system
 			camera.unproject(touchPos);
-			pigeon.x = touchPos.x - 64 / 2;
+			pigeon.x = touchPos.x - 100 / 2;
+			pigeon.y = touchPos.y - 50 / 2;
 		}
-		if(Gdx.input.isKeyPressed(Keys.LEFT)) pigeon.x -= 200 * Gdx.graphics.getDeltaTime();
-		if(Gdx.input.isKeyPressed(Keys.RIGHT)) pigeon.x += 200 * Gdx.graphics.getDeltaTime();
+		if(Gdx.input.isKeyPressed(Keys.LEFT)) pigeon.x -= 200 * deltaTime;
+		if(Gdx.input.isKeyPressed(Keys.RIGHT)) pigeon.x += 200 * deltaTime;
+		if(Gdx.input.isKeyPressed(Keys.UP)) pigeon.y += 200 * deltaTime;
+		if(Gdx.input.isKeyPressed(Keys.DOWN)) pigeon.y -= 200 * deltaTime;
+
 
 		// make sure the bucket stays within  the screen bounds
 		if(pigeon.x < 0) pigeon.x = 0;
-		if(pigeon.x > 800 - 64) pigeon.x = 800 - 64;
+		if(pigeon.x > 800 - 100) pigeon.x = 800 - 100;
+		if(pigeon.y < 0) pigeon.y = 0;
+		if(pigeon.y > 480 - 50) pigeon.y = 480 - 50;
+
 
 		// check if we need to create a new raindrop
 		if(TimeUtils.nanoTime() - lastDropTime > 1000000000) spawnRaindrop();
 
-		// move the raindrops, remove any that are beneath the bottom edge of
+		// move the squareObjects, remove any that are beneath the bottom edge of
 		// the screen or that hit the bucket. In the latter case we play back
 		// a sound effect as well.
-		for (Iterator<Rectangle> iter = raindrops.iterator(); iter.hasNext(); ) {
+		for (Iterator<Rectangle> iter = squareObjects.iterator(); iter.hasNext(); ) {
 			Rectangle raindrop = iter.next();
-			raindrop.y -= 200 * Gdx.graphics.getDeltaTime();
-			if(raindrop.y + 64 < 0) iter.remove();
+			raindrop.x -= 200 * Gdx.graphics.getDeltaTime();
+			if(raindrop.x + 64 < 0) iter.remove();
 			if(raindrop.overlaps(pigeon)) {
 				dropSound.play();
 				iter.remove();
@@ -129,10 +142,16 @@ public class AlphaPigeon extends ApplicationAdapter {
 	}
 
 	@Override
+	public void resize(int width, int height) {
+		this.scrollingBackground.resize(width, height);
+		super.resize(width, height);
+	}
+
+	@Override
 	public void dispose () {
 		// dispose of all the native resources
-		dropImage.dispose();
-		bucketImage.dispose();
+		squareObjectImage.dispose();
+		pigeonImage.dispose();
 		dropSound.dispose();
 		rainMusic.dispose();
 		batch.dispose();
