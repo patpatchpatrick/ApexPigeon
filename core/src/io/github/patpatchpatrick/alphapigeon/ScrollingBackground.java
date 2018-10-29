@@ -6,12 +6,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class ScrollingBackground {
 
-    public static final int DEFAULT_SPEED = 80;
+    public static final int DEFAULT_SPEED = 1000;
     public static final int ACCELERATION = 50;
     public static final int GOAL_REACH_ACCELERATION = 200;
 
     Texture backgroundImage;
-    float y1, y2;
+    float x1, x2;
     int speed;  // in pixels/second
     int goalSpeed; // max speed scrolling background will achieve via acceleration
     float imageScale;
@@ -20,10 +20,9 @@ public class ScrollingBackground {
     public ScrollingBackground() {
         backgroundImage = new Texture("CloudBackground.png");
 
-        y1 = 0;
-        y2 = backgroundImage.getHeight();
-        speed = 0;
-        goalSpeed = DEFAULT_SPEED;
+        x1 = 0;
+        x2 = backgroundImage.getWidth();
+        speed = DEFAULT_SPEED;
         speedFixed = true;
         imageScale = 0;
 
@@ -31,34 +30,20 @@ public class ScrollingBackground {
 
     public void updateAndRender(float deltaTime, SpriteBatch batch) {
         //Speed adjustment to reach goal
-        if (speed < goalSpeed) {
-            speed += GOAL_REACH_ACCELERATION * deltaTime;
-            if (speed > goalSpeed) {
-                speed = goalSpeed;
-            }
-        } else if (speed > goalSpeed) {
-            speed -= GOAL_REACH_ACCELERATION * deltaTime;
-            if (speed < goalSpeed) {
-                speed = goalSpeed;
-            }
-        }
 
-        if (!speedFixed)
-            speed += ACCELERATION * deltaTime;
-
-        y1 -= speed * deltaTime;
-        y2 -= speed * deltaTime;
+        x1 -= speed * deltaTime;
+        x2 -= speed * deltaTime;
 
         //if image reaches the bottom  of screen and is not visible, put it back behind the other image
-        if (y1 + backgroundImage.getHeight() <= 0)
-            y1 = y2 + backgroundImage.getHeight();
+        if (x1 + backgroundImage.getWidth() <= 0)
+            x1 = x2 + backgroundImage.getWidth();
 
-        if (y2 + backgroundImage.getHeight() <= 0)
-            y2 = y1 + backgroundImage.getHeight();
+        if (x2 + backgroundImage.getWidth() <= 0)
+            x2 = x1 + backgroundImage.getWidth();
 
         //Render
-        batch.draw(backgroundImage, 0, y1, Gdx.graphics.getWidth(), backgroundImage.getHeight());
-        batch.draw(backgroundImage, 0, y2, Gdx.graphics.getWidth(), backgroundImage.getHeight() );
+        batch.draw(backgroundImage, x1, 0, backgroundImage.getWidth(), Gdx.graphics.getHeight());
+        batch.draw(backgroundImage, x2, 0, backgroundImage.getWidth(), Gdx.graphics.getHeight() );
 
 
 
@@ -70,10 +55,6 @@ public class ScrollingBackground {
 
     public void setSpeed(int goalSpeed){
         this.goalSpeed = goalSpeed;
-    }
-
-    public void setSpeedFixed(boolean speedFixed){
-        this.speedFixed = speedFixed;
     }
 
 }
