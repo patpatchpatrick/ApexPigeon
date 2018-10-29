@@ -25,7 +25,9 @@ public class AlphaPigeon extends ApplicationAdapter {
     Texture img;
     private Texture squareObjectImage;
     private Texture pigeonFlySheet;
+    private Texture backwardsPigeonFlySheet;
     private Animation<TextureRegion> pigeonFlyAnimation;
+    private Animation<TextureRegion> backwardsPigeonFlyAnimation;
     private Sound dropSound;
     private Music rainMusic;
     private Rectangle pigeon;
@@ -46,6 +48,7 @@ public class AlphaPigeon extends ApplicationAdapter {
 
         // Load the pigeon sprite sheet as a Texture
         pigeonFlySheet = new Texture(Gdx.files.internal("PigeonSpriteSheet.png"));
+        backwardsPigeonFlySheet = new Texture(Gdx.files.internal("BackwardsPigeonSpriteSheet.png"));
 
         // Use the split utility method to create a 2D array of TextureRegions. This is
         // possible because this sprite sheet contains frames of equal size and they are
@@ -66,6 +69,26 @@ public class AlphaPigeon extends ApplicationAdapter {
 
         // Initialize the Animation with the frame interval and array of frames
         pigeonFlyAnimation = new Animation<TextureRegion>(0.05f, pigeonFlyFrames);
+
+        // Use the split utility method to create a 2D array of TextureRegions. This is
+        // possible because this sprite sheet contains frames of equal size and they are
+        // all aligned.
+        TextureRegion[][] tmpBackwards = TextureRegion.split(backwardsPigeonFlySheet,
+                backwardsPigeonFlySheet.getWidth() / FRAME_COLS,
+                backwardsPigeonFlySheet.getHeight() / FRAME_ROWS);
+
+        // Place the regions into a 1D array in the correct order, starting from the top
+        // left, going across first. The Animation constructor requires a 1D array.
+        TextureRegion[] backwardsPigeonFlyFrames = new TextureRegion[FRAME_COLS * FRAME_ROWS];
+        int backwardsIndex = 0;
+        for (int i = 0; i < FRAME_ROWS; i++) {
+            for (int j = 0; j < FRAME_COLS; j++) {
+                backwardsPigeonFlyFrames[backwardsIndex++] = tmpBackwards[i][j];
+            }
+        }
+
+        // Initialize the Animation with the frame interval and array of frames
+        backwardsPigeonFlyAnimation = new Animation<TextureRegion>(0.05f, backwardsPigeonFlyFrames);
 
         stateTime = 0f;
 
@@ -120,6 +143,8 @@ public class AlphaPigeon extends ApplicationAdapter {
         stateTime += Gdx.graphics.getDeltaTime();
         // Get current frame of animation for the current stateTime
         TextureRegion currentFrame = pigeonFlyAnimation.getKeyFrame(stateTime, true);
+        // Get current frame of animation for the current stateTime
+        TextureRegion backwardsCurrentFrame = backwardsPigeonFlyAnimation.getKeyFrame(stateTime, true);
 
         // tell the camera to update its matrices
         camera.update();
@@ -134,7 +159,7 @@ public class AlphaPigeon extends ApplicationAdapter {
         batch.begin();
         scrollingBackground.updateAndRender(deltaTime, batch);
         for (Rectangle raindrop : squareObjects) {
-            batch.draw(squareObjectImage, raindrop.x, raindrop.y);
+            batch.draw(backwardsCurrentFrame, raindrop.x, raindrop.y);
         }
         batch.draw(currentFrame, pigeon.x, pigeon.y); // Draw current frame at (50, 50)
         batch.end();
