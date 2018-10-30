@@ -6,22 +6,13 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.Input.Keys;
-
-import java.util.Iterator;
 
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
 import io.github.patpatchpatrick.alphapigeon.resources.HighScore;
+import io.github.patpatchpatrick.alphapigeon.resources.ScrollingBackground;
 
 public class AlphaPigeon extends ApplicationAdapter {
     private SpriteBatch batch;
@@ -56,8 +47,8 @@ public class AlphaPigeon extends ApplicationAdapter {
         rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
 
         // start the playback of the background music immediately
-        rainMusic.setLooping(true);
-        rainMusic.play();
+        //rainMusic.setLooping(true);
+        //rainMusic.play();
 
         // create the camera and the SpriteBatch
         camera = new OrthographicCamera();

@@ -1,4 +1,4 @@
-package io.github.patpatchpatrick.alphapigeon;
+package io.github.patpatchpatrick.alphapigeon.resources;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;

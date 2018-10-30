@@ -21,15 +21,16 @@ public class Dodgeables {
 
     private Pigeon pigeon;
 
-    private Texture backwardsPigeonTexture;
     private Array<Rectangle> backwardsPigeonObjects;
-    private long lastDropTime;
-
     private Animation<TextureRegion> backwardsPigeonFlyAnimation;
     private Animation<TextureRegion> divingPigeonFlyAnimation;
     private Texture backwardsPigeonFlySheet;
-    private Texture divingPigeonFlySheet;
     private static final int FRAME_COLS = 4, FRAME_ROWS = 2;
+
+    private Texture divingPigeonFlySheet;
+
+    private long lastDropTime;
+
 
     private int dodgeableSpeed;
 
@@ -39,9 +40,7 @@ public class Dodgeables {
         this.pigeon = pigeon;
 
         // load images for the backwards bird
-        backwardsPigeonTexture = new Texture(Gdx.files.internal("SquareObjectShape.png"));
         backwardsPigeonObjects = new Array<Rectangle>();
-
 
         // initialize animations
         initializeBackwardsPigeonAnimation();
@@ -146,7 +145,6 @@ public class Dodgeables {
 
     public void dispose(){
         backwardsPigeonFlySheet.dispose();
-        backwardsPigeonTexture.dispose();
     }
 
 }
