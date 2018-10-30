@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -19,85 +20,36 @@ import com.badlogic.gdx.Input.Keys;
 
 import java.util.Iterator;
 
+import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
+import io.github.patpatchpatrick.alphapigeon.resources.HighScore;
+
 public class AlphaPigeon extends ApplicationAdapter {
     private SpriteBatch batch;
     private OrthographicCamera camera;
-    Texture img;
-    private Texture squareObjectImage;
-    private Texture pigeonFlySheet;
-    private Texture backwardsPigeonFlySheet;
-    private Animation<TextureRegion> pigeonFlyAnimation;
-    private Animation<TextureRegion> backwardsPigeonFlyAnimation;
-    private Sound dropSound;
+    public static Sound dropSound;
     private Music rainMusic;
-    private Rectangle pigeon;
-    private Array<Rectangle> squareObjects;
-    private long lastDropTime;
+    private Pigeon pigeon;
+    private Dodgeables dodgeables;
     public ScrollingBackground scrollingBackground;
+    public HighScore highScore;
     private float stateTime;
+
 
     private static final int FRAME_COLS = 4, FRAME_ROWS = 2;
 
     //Variables
-    private int particleSpeed;
     private int particleAcceleration = 0;
 
 
     @Override
     public void create() {
 
-        // Load the pigeon sprite sheet as a Texture
-        pigeonFlySheet = new Texture(Gdx.files.internal("PigeonSpriteSheet.png"));
-        backwardsPigeonFlySheet = new Texture(Gdx.files.internal("BackwardsPigeonSpriteSheet.png"));
-
-        // Use the split utility method to create a 2D array of TextureRegions. This is
-        // possible because this sprite sheet contains frames of equal size and they are
-        // all aligned.
-        TextureRegion[][] tmp = TextureRegion.split(pigeonFlySheet,
-                pigeonFlySheet.getWidth() / FRAME_COLS,
-                pigeonFlySheet.getHeight() / FRAME_ROWS);
-
-        // Place the regions into a 1D array in the correct order, starting from the top
-        // left, going across first. The Animation constructor requires a 1D array.
-        TextureRegion[] pigeonFlyFrames = new TextureRegion[FRAME_COLS * FRAME_ROWS];
-        int index = 0;
-        for (int i = 0; i < FRAME_ROWS; i++) {
-            for (int j = 0; j < FRAME_COLS; j++) {
-                pigeonFlyFrames[index++] = tmp[i][j];
-            }
-        }
-
-        // Initialize the Animation with the frame interval and array of frames
-        pigeonFlyAnimation = new Animation<TextureRegion>(0.05f, pigeonFlyFrames);
-
-        // Use the split utility method to create a 2D array of TextureRegions. This is
-        // possible because this sprite sheet contains frames of equal size and they are
-        // all aligned.
-        TextureRegion[][] tmpBackwards = TextureRegion.split(backwardsPigeonFlySheet,
-                backwardsPigeonFlySheet.getWidth() / FRAME_COLS,
-                backwardsPigeonFlySheet.getHeight() / FRAME_ROWS);
-
-        // Place the regions into a 1D array in the correct order, starting from the top
-        // left, going across first. The Animation constructor requires a 1D array.
-        TextureRegion[] backwardsPigeonFlyFrames = new TextureRegion[FRAME_COLS * FRAME_ROWS];
-        int backwardsIndex = 0;
-        for (int i = 0; i < FRAME_ROWS; i++) {
-            for (int j = 0; j < FRAME_COLS; j++) {
-                backwardsPigeonFlyFrames[backwardsIndex++] = tmpBackwards[i][j];
-            }
-        }
-
-        // Initialize the Animation with the frame interval and array of frames
-        backwardsPigeonFlyAnimation = new Animation<TextureRegion>(0.05f, backwardsPigeonFlyFrames);
-
         stateTime = 0f;
 
-        particleSpeed = 200;
-
         this.scrollingBackground = new ScrollingBackground();
-
-        // load images for the droplet and bucket
-        squareObjectImage = new Texture(Gdx.files.internal("SquareObjectShape.png"));
+        this.highScore = new HighScore();
+        this.pigeon = new Pigeon();
+        this.dodgeables = new Dodgeables(this.pigeon);
 
         // load the drop sound effect and the rain background "music"
         dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
@@ -112,26 +64,8 @@ public class AlphaPigeon extends ApplicationAdapter {
         camera.setToOrtho(false, 800, 480);
         batch = new SpriteBatch();
 
-        // create a Rectangle to logically represent the bucket
-        pigeon = new Rectangle();
-        pigeon.x = 20;
-        pigeon.y = 480 / 2 - 50 / 2;
-        pigeon.width = 100;
-        pigeon.height = 50;
-
-        // create the squareObjects array and spawn the first raindrop
-        squareObjects = new Array<Rectangle>();
-        spawnRaindrop();
-    }
-
-    private void spawnRaindrop() {
-        Rectangle squareObject = new Rectangle();
-        squareObject.x = 800;
-        squareObject.y = MathUtils.random(0, 480 - 64);
-        squareObject.width = 64;
-        squareObject.height = 64;
-        squareObjects.add(squareObject);
-        lastDropTime = TimeUtils.nanoTime();
+        // spawn the first dodgeable
+        dodgeables.spawnBackwardsPigeon();
     }
 
     @Override
@@ -141,10 +75,6 @@ public class AlphaPigeon extends ApplicationAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         stateTime += Gdx.graphics.getDeltaTime();
-        // Get current frame of animation for the current stateTime
-        TextureRegion currentFrame = pigeonFlyAnimation.getKeyFrame(stateTime, true);
-        // Get current frame of animation for the current stateTime
-        TextureRegion backwardsCurrentFrame = backwardsPigeonFlyAnimation.getKeyFrame(stateTime, true);
 
         // tell the camera to update its matrices
         camera.update();
@@ -158,10 +88,10 @@ public class AlphaPigeon extends ApplicationAdapter {
         // begin a new batch and draw the bucket and all drops
         batch.begin();
         scrollingBackground.updateAndRender(deltaTime, batch);
-        for (Rectangle raindrop : squareObjects) {
-            batch.draw(backwardsCurrentFrame, raindrop.x, raindrop.y);
-        }
-        batch.draw(currentFrame, pigeon.x, pigeon.y); // Draw current frame at (50, 50)
+        highScore.updateAndRender(deltaTime, batch);
+        dodgeables.updateAndRender(stateTime, batch);
+        pigeon.updateAndRender(stateTime, batch);
+
         batch.end();
 
         // process user input
@@ -171,42 +101,19 @@ public class AlphaPigeon extends ApplicationAdapter {
             // the camera unproject method converts touchPos coordinates to the
             // camera coordinate system
             camera.unproject(touchPos);
-            pigeon.x = touchPos.x - 100 / 2;
-            pigeon.y = touchPos.y - 50 / 2;
+            pigeon.setCoordinates(touchPos.x - 100 / 2, touchPos.y - 50 / 2);
         }
-        if (Gdx.input.isKeyPressed(Keys.LEFT)) pigeon.x -= 200 * deltaTime;
-        if (Gdx.input.isKeyPressed(Keys.RIGHT)) pigeon.x += 200 * deltaTime;
-        if (Gdx.input.isKeyPressed(Keys.UP)) pigeon.y += 200 * deltaTime;
-        if (Gdx.input.isKeyPressed(Keys.DOWN)) pigeon.y -= 200 * deltaTime;
+        if (Gdx.input.isKeyPressed(Keys.LEFT)) pigeon.moveHorizontal(-200 * deltaTime);
+        if (Gdx.input.isKeyPressed(Keys.RIGHT)) pigeon.moveHorizontal(200 * deltaTime);
+        if (Gdx.input.isKeyPressed(Keys.UP)) pigeon.moveVertical(200 * deltaTime);
+        if (Gdx.input.isKeyPressed(Keys.DOWN)) pigeon.moveVertical(-200 * deltaTime);
 
 
-        // make sure the bucket stays within  the screen bounds
-        if (pigeon.x < 0) pigeon.x = 0;
-        if (pigeon.x > 800 - 100) pigeon.x = 800 - 100;
-        if (pigeon.y < 0) pigeon.y = 0;
-        if (pigeon.y > 480 - 50) pigeon.y = 480 - 50;
-
-
-        // check if we need to create a new raindrop
-        if (TimeUtils.nanoTime() - lastDropTime > 1000000000) spawnRaindrop();
-
-        // move the squareObjects, remove any that are beneath the bottom edge of
-        // the screen or that hit the bucket. In the latter case we play back
-        // a sound effect as well.
-        for (Iterator<Rectangle> iter = squareObjects.iterator(); iter.hasNext(); ) {
-            Rectangle raindrop = iter.next();
-            raindrop.x -= particleSpeed * Gdx.graphics.getDeltaTime();
-            if (raindrop.x + 64 < 0) iter.remove();
-            if (raindrop.overlaps(pigeon)) {
-                dropSound.play();
-                iter.remove();
-            }
-        }
-
-        //Accelerate the particles
-        particleSpeed += particleAcceleration;
-        if (particleSpeed > 2000) particleAcceleration = -1;
-
+        // make sure the pigeon stays within the screen bounds
+        if (pigeon.getX() < 0) pigeon.setXCoordinate(0);
+        if (pigeon.getX() > 800 - 100) pigeon.setXCoordinate(800 - 100);
+        if (pigeon.getY() < 0) pigeon.setYCoordinate(0);
+        if (pigeon.getY() > 480 - 50) pigeon.setYCoordinate(480 - 50);
 
 
     }
@@ -220,10 +127,12 @@ public class AlphaPigeon extends ApplicationAdapter {
     @Override
     public void dispose() {
         // dispose of all the native resources
-        squareObjectImage.dispose();
         dropSound.dispose();
         rainMusic.dispose();
         batch.dispose();
-        pigeonFlySheet.dispose();
+        pigeon.dispose();
+        dodgeables.dispose();
     }
+
+
 }
