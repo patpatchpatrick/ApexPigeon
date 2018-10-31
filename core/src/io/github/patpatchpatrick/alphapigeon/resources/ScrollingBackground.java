@@ -42,8 +42,8 @@ public class ScrollingBackground {
             x2 = x1 + backgroundImage.getWidth();
 
         //Render
-        batch.draw(backgroundImage, x1, 0, backgroundImage.getWidth(), Gdx.graphics.getHeight());
-        batch.draw(backgroundImage, x2, 0, backgroundImage.getWidth(), Gdx.graphics.getHeight() );
+        batch.draw(backgroundImage, x1, 0, backgroundImage.getWidth(), Gdx.graphics.getHeight()/10);
+        batch.draw(backgroundImage, x2, 0, backgroundImage.getWidth(), Gdx.graphics.getHeight()/10 );
 
 
 

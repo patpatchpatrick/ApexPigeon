@@ -8,49 +8,20 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.physics.box2d.Body;
 
 public class Pigeon {
 
-    private Rectangle pigeonRectangle;
-    private Polygon pigeonPolygon;
     private Texture pigeonFlySheet;
     private Texture pigeonTestImage;
     private Animation<TextureRegion> pigeonFlyAnimation;
     private static final int FRAME_COLS = 4, FRAME_ROWS = 2;
     private static final float INITIAL_PIGEON_Y = 480 / 2 - 50 / 2;
     private static final float INITIAL_PIGEON_X = 20;
-    private float pigeonYCoordinate;
-    private float pigeonXCoordinate;
+    Body bodyAlpha;
 
-    Pigeon() {
-
-        //Pigeon sprite
-        pigeonTestImage = new Texture(Gdx.files.internal("PigeonSprite.png"));
-
-        // create a Rectangle to logically represent the pigeon
-        pigeonRectangle = new Rectangle();
-        pigeonRectangle.x = 20;
-        pigeonRectangle.y = 480 / 2 - 50 / 2;
-        pigeonRectangle.width = 100;
-        pigeonRectangle.height = 50;
-
-        // create a polygon for pigeon collision detection
-        // set the origin at 0,0
-        // translate the polygon to its starting position
-        pigeonPolygon = new Polygon();
-        pigeonPolygon.setOrigin(0, 0);
-        float[] vertices = new float[]{
-                10, 10,
-                75 , 50 ,
-                75 , 10
-        };
-        pigeonPolygon.setVertices(vertices);
-        pigeonPolygon.translate(INITIAL_PIGEON_X, INITIAL_PIGEON_Y);
-
-
-
-
-
+    Pigeon(Body body) {
+        bodyAlpha = body;
         initializePigeonAnimation();
 
     }
@@ -80,6 +51,7 @@ public class Pigeon {
         // Initialize the Animation with the frame interval and array of frames
         pigeonFlyAnimation = new Animation<TextureRegion>(0.05f, pigeonFlyFrames);
 
+
     }
 
     public void updateAndRender(float stateTime, SpriteBatch batch) {
@@ -87,50 +59,28 @@ public class Pigeon {
 
         // Get current frame of animation for the current stateTime
         TextureRegion currentFrame = pigeonFlyAnimation.getKeyFrame(stateTime, true);
-        batch.draw(currentFrame, pigeonPolygon.getX(), pigeonPolygon.getY());
-
-        ShapeRenderer shapeRenderer = new ShapeRenderer();
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.polygon(pigeonPolygon.getTransformedVertices());
-        batch.draw(pigeonTestImage, 0, 0);
-        shapeRenderer.end();
-
-
+        batch.draw(currentFrame, bodyAlpha.getPosition().x, bodyAlpha.getPosition().y, 10, 5);
 
     }
 
     public void setCoordinates(float xCoordinate, float yCoordinate) {
-        pigeonPolygon.setPosition(xCoordinate, yCoordinate);
     }
 
     public void setXCoordinate(float xCoordinate){
-        pigeonPolygon.setPosition(xCoordinate, pigeonPolygon.getY());
     }
 
     public void setYCoordinate(float yCoordinate){
-        pigeonPolygon.setPosition(pigeonPolygon.getX(), yCoordinate);
     }
 
 
     public void moveHorizontal(float xCoordinate) {
-        pigeonPolygon.translate(xCoordinate, 0);
+
     }
 
     public void moveVertical(float yCoordinate) {
-        pigeonPolygon.translate(0, yCoordinate);
+
     }
 
-    public float getX() {
-        return pigeonPolygon.getX();
-    }
-
-    public float getY() {
-        return pigeonPolygon.getY();
-    }
-
-    public Rectangle getPigeonRectangle() {
-        return pigeonRectangle;
-    }
 
     public void dispose() {
         pigeonFlySheet.dispose();

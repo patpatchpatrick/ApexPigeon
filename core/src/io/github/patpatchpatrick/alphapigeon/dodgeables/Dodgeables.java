@@ -77,15 +77,16 @@ public class Dodgeables {
         //Check if we need to spawn new dodgeables depending on game time
         spawnDodgeables();
 
+        /**
         for (Iterator<Rectangle> iter = backwardsPigeonObjects.iterator(); iter.hasNext(); ) {
             Rectangle backwardsPigeonRect = iter.next();
             backwardsPigeonRect.x -= dodgeableSpeed * Gdx.graphics.getDeltaTime();
             if (backwardsPigeonRect.x + 64 < 0) iter.remove();
-            if (backwardsPigeonRect.overlaps(pigeon.getPigeonRectangle())) {
+           if (backwardsPigeonRect.overlaps(pigeon.getPigeonRectangle())) {
                 AlphaPigeon.dropSound.play();
                 iter.remove();
             }
-        }
+        }**/
     }
 
     public void initializeBackwardsPigeonAnimation(){
