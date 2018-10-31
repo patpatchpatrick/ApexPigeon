@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class ScrollingBackground {
 
-    public static final int DEFAULT_SPEED = 500;
+    public static final int DEFAULT_SPEED = 10;
     public static final int ACCELERATION = 50;
     public static final int GOAL_REACH_ACCELERATION = 200;
 
@@ -21,7 +21,7 @@ public class ScrollingBackground {
         backgroundImage = new Texture("CloudBackground.png");
 
         x1 = 0;
-        x2 = backgroundImage.getWidth();
+        x2 = backgroundImage.getWidth()/10;
         speed = DEFAULT_SPEED;
         speedFixed = true;
         imageScale = 0;
@@ -35,15 +35,15 @@ public class ScrollingBackground {
         x2 -= speed * deltaTime;
 
         //if image reaches the bottom  of screen and is not visible, put it back behind the other image
-        if (x1 + backgroundImage.getWidth() <= 0)
-            x1 = x2 + backgroundImage.getWidth();
+        if (x1 + backgroundImage.getWidth()/10 <= 0)
+            x1 = x2 + backgroundImage.getWidth()/10;
 
-        if (x2 + backgroundImage.getWidth() <= 0)
-            x2 = x1 + backgroundImage.getWidth();
+        if (x2 + backgroundImage.getWidth()/10 <= 0)
+            x2 = x1 + backgroundImage.getWidth()/10;
 
         //Render
-        batch.draw(backgroundImage, x1, 0, backgroundImage.getWidth(), Gdx.graphics.getHeight()/10);
-        batch.draw(backgroundImage, x2, 0, backgroundImage.getWidth(), Gdx.graphics.getHeight()/10 );
+        batch.draw(backgroundImage, x1, 0, backgroundImage.getWidth()/10, Gdx.graphics.getHeight()/10);
+        batch.draw(backgroundImage, x2, 0, backgroundImage.getWidth()/10, Gdx.graphics.getHeight()/10 );
 
 
 

@@ -7,6 +7,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
@@ -14,6 +18,7 @@ import java.util.Iterator;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.Pigeon;
+import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 
 public class Dodgeables {
 
@@ -21,11 +26,12 @@ public class Dodgeables {
 
     private Pigeon pigeon;
 
-    private Array<Rectangle> backwardsPigeonObjects;
+    private Array<Body> backwardsPigeonObjects;
     private Animation<TextureRegion> backwardsPigeonFlyAnimation;
     private Animation<TextureRegion> divingPigeonFlyAnimation;
     private Texture backwardsPigeonFlySheet;
     private static final int FRAME_COLS = 4, FRAME_ROWS = 2;
+    World gameWorld;
 
     private Texture divingPigeonFlySheet;
 
@@ -34,13 +40,14 @@ public class Dodgeables {
 
     private int dodgeableSpeed;
 
-    public Dodgeables(Pigeon pigeon){
+    public Dodgeables(Pigeon pigeon, World world){
 
         // define the pigeon
         this.pigeon = pigeon;
+        gameWorld = world;
 
         // load images for the backwards bird
-        backwardsPigeonObjects = new Array<Rectangle>();
+        backwardsPigeonObjects = new Array<Body>();
 
         // initialize animations
         initializeBackwardsPigeonAnimation();
@@ -51,12 +58,25 @@ public class Dodgeables {
     }
 
     public void spawnBackwardsPigeon(){
-        Rectangle backwardsPigeonRectangle = new Rectangle();
-        backwardsPigeonRectangle.x = 800;
-        backwardsPigeonRectangle.y = MathUtils.random(0, 480 - 64);
-        backwardsPigeonRectangle.width = 64;
-        backwardsPigeonRectangle.height = 64;
-        backwardsPigeonObjects.add(backwardsPigeonRectangle);
+        BodyDef bdBack = new BodyDef();
+        bdBack.type = BodyDef.BodyType.DynamicBody;
+        bdBack.position.set(80, MathUtils.random(0, 48 - 6));
+// Create our body in the world using our body definition
+        Body bodyBack = gameWorld.createBody(bdBack);
+
+        BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("BackwardsPigeon.json"));
+
+        // 2. Create a FixtureDef, as usual.`
+        FixtureDef fd = new FixtureDef();
+        fd.density = 0.001f;
+        fd.friction = 0.5f;
+        fd.restitution = 0.3f;
+
+        // 3. Create a Body, as usual.`
+        loader.attachFixture(bodyBack, "BackwardsPigeon", fd, 6);
+        bodyBack.applyForceToCenter(-9.0f, 0, true);
+
+        backwardsPigeonObjects.add(bodyBack);
         lastDropTime = TimeUtils.nanoTime();
     }
 
@@ -67,25 +87,23 @@ public class Dodgeables {
 
     public void updateAndRender(float stateTime, SpriteBatch batch){
         // Get current frame of animation for the current stateTime
-        TextureRegion backwardsCurrentFrame = backwardsPigeonFlyAnimation.getKeyFrame(stateTime, true);
+        TextureRegion backwardsCurrentFrame = divingPigeonFlyAnimation.getKeyFrame(stateTime, true);
 
         // Draw all backwards pigeon dodgeables
-        for (Rectangle backwardsPigeon : backwardsPigeonObjects) {
-            batch.draw(backwardsCurrentFrame, backwardsPigeon.x, backwardsPigeon.y);
+        for (Body backwardsPigeon : backwardsPigeonObjects) {
+            batch.draw(backwardsCurrentFrame, backwardsPigeon.getPosition().x, backwardsPigeon.getPosition().y,0, 0, 6, 6, 1, 1, MathUtils.radiansToDegrees * backwardsPigeon.getAngle());
+
         }
 
         //Check if we need to spawn new dodgeables depending on game time
         spawnDodgeables();
 
         /**
-        for (Iterator<Rectangle> iter = backwardsPigeonObjects.iterator(); iter.hasNext(); ) {
-            Rectangle backwardsPigeonRect = iter.next();
+        for (Iterator<Body> iter = backwardsPigeonObjects.iterator(); iter.hasNext(); ) {
+            Body backwardsPigeonRect = iter.next();
             backwardsPigeonRect.x -= dodgeableSpeed * Gdx.graphics.getDeltaTime();
             if (backwardsPigeonRect.x + 64 < 0) iter.remove();
-           if (backwardsPigeonRect.overlaps(pigeon.getPigeonRectangle())) {
-                AlphaPigeon.dropSound.play();
-                iter.remove();
-            }
+            //Add code to remove pigeon if it collides
         }**/
     }
 

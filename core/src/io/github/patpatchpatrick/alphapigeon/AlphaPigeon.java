@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.Input.Keys;
@@ -19,6 +20,8 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+
+import java.util.Iterator;
 
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
@@ -35,11 +38,8 @@ public class AlphaPigeon extends ApplicationAdapter {
     public ScrollingBackground scrollingBackground;
     public HighScore highScore;
     private float stateTime;
-    private Body body;
     private Body bodyAlpha;
     private BodyDef bd;
-
-    private CircleShape circle;
     Box2DDebugRenderer debugRenderer;
     World world;
 
@@ -80,14 +80,12 @@ public class AlphaPigeon extends ApplicationAdapter {
 // BodyDef and FixtureDef don't need disposing, but shapes do.
 
 
-
-
         stateTime = 0f;
 
         this.scrollingBackground = new ScrollingBackground();
         this.highScore = new HighScore();
         this.pigeon = new Pigeon(bodyAlpha);
-        this.dodgeables = new Dodgeables(this.pigeon);
+        this.dodgeables = new Dodgeables(this.pigeon, world);
 
         // load the drop sound effect and the rain background "music"
         dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
@@ -101,9 +99,6 @@ public class AlphaPigeon extends ApplicationAdapter {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 80, 48);
         batch = new SpriteBatch();
-
-        // spawn the first dodgeable
-        dodgeables.spawnBackwardsPigeon();
 
 
     }
@@ -122,7 +117,7 @@ public class AlphaPigeon extends ApplicationAdapter {
         // tell the camera to update its matrices
         camera.update();
 
-        debugRenderer.render(world, camera.combined);
+        //debugRenderer.render(world, camera.combined);
         world.step(1/60f, 6, 2);
         this.pigeon.setCoordinates(bodyAlpha.getPosition().x, bodyAlpha.getPosition().y);
 
@@ -135,6 +130,7 @@ public class AlphaPigeon extends ApplicationAdapter {
         // coordinate system specified by the camera
         batch.setProjectionMatrix(camera.combined);
 
+
         // begin a new batch and draw the bucket and all drops
         batch.begin();
         scrollingBackground.updateAndRender(deltaTime, batch);
@@ -145,6 +141,7 @@ public class AlphaPigeon extends ApplicationAdapter {
         batch.end();
 
 
+
         // process user input
         if (Gdx.input.isTouched()) {
             Vector3 touchPos = new Vector3();
@@ -153,12 +150,12 @@ public class AlphaPigeon extends ApplicationAdapter {
             // camera coordinate system
             camera.unproject(touchPos);
             pigeon.setCoordinates(touchPos.x - 100 / 2, touchPos.y - 50 / 2);
-            bodyAlpha.applyForceToCenter(1.0f, 0.0f, true);
+            bodyAlpha.applyForceToCenter(0.3f * (touchPos.x - bodyAlpha.getPosition().x), 0.3f * (touchPos.y - bodyAlpha.getPosition().y), true);
         }
-        if (Gdx.input.isKeyPressed(Keys.LEFT)) bodyAlpha.applyForceToCenter(-9.0f, 0.0f, true);
-        if (Gdx.input.isKeyPressed(Keys.RIGHT)) bodyAlpha.applyForceToCenter(9.0f, 0.0f, true);
-        if (Gdx.input.isKeyPressed(Keys.UP)) bodyAlpha.applyForceToCenter(0.0f, 9.0f, true);
-        if (Gdx.input.isKeyPressed(Keys.DOWN)) bodyAlpha.applyForceToCenter(0.0f, -9.0f, true);
+        if (Gdx.input.isKeyPressed(Keys.LEFT)) bodyAlpha.applyForceToCenter(-5.0f, 0.0f, true);
+        if (Gdx.input.isKeyPressed(Keys.RIGHT)) bodyAlpha.applyForceToCenter(5.0f, 0.0f, true);
+        if (Gdx.input.isKeyPressed(Keys.UP)) bodyAlpha.applyForceToCenter(0.0f, 5.0f, true);
+        if (Gdx.input.isKeyPressed(Keys.DOWN)) bodyAlpha.applyForceToCenter(0.0f, -5.0f, true);
 
 
         // make sure the pigeon stays within the screen bounds
@@ -203,8 +200,6 @@ public class AlphaPigeon extends ApplicationAdapter {
         batch.dispose();
         pigeon.dispose();
         dodgeables.dispose();
-        circle.dispose();
     }
-
 
 }

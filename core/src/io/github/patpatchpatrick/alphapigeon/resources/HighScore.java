@@ -18,10 +18,11 @@ public class HighScore {
     public void updateAndRender(float deltaTime, SpriteBatch batch){
         //Increase score
         score = score + 9 * deltaTime;
-        scoreString = "Distance: " + score;
+        scoreString = "S co r e   " + score;
 
         scoreBitmapFont.setColor(1.0f, 1.0f, 1.0f, 1.0f);
-        scoreBitmapFont.draw(batch, scoreString, 600, 450);
+        scoreBitmapFont.getData().setScale(0.1f);
+        scoreBitmapFont.draw(batch, scoreString, 60, 45);
     }
 
 

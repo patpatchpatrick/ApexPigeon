@@ -74,7 +74,7 @@ project(":android") {
         natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-arm64-v8a"
         natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86"
         natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86_64"
-        compile group: 'com.badlogicgames.gdx', name: 'gdx-tools', version: '1.9.8'
+        //compile group: 'com.badlogicgames.gdx', name: 'gdx-tools', version: '1.9.8'
         compile "com.badlogicgames.ashley:ashley:1.7.0"
         
     }
