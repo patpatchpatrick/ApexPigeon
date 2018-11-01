@@ -64,7 +64,7 @@ public class AlphaPigeon extends ApplicationAdapter {
 // Create our body in the world using our body definition
         bodyAlpha = world.createBody(bd);
 
-        BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("AlphaPigeon.json"));
+        BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("AlphaWingedPigeon.json"));
 
         // 2. Create a FixtureDef, as usual.`
         FixtureDef fd = new FixtureDef();
