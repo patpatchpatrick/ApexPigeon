@@ -43,51 +43,36 @@ public class AlphaPigeon extends ApplicationAdapter {
     Box2DDebugRenderer debugRenderer;
     World world;
 
-
-    private static final int FRAME_COLS = 4, FRAME_ROWS = 2;
-
-    //Variables
-    private int particleAcceleration = 0;
-
-
     @Override
     public void create() {
 
         world = new World(new Vector2(0, 0), true);
         debugRenderer = new Box2DDebugRenderer();
-        // First we create a body definition
-// We set our body to dynamic, for something like ground which doesn't move we would set it to StaticBody
-// Set our body's starting position in the world
+
+        // create pigeon body, set position in the world
+        // create pigeon fixture, attach the fixture created to the body created with the help of
+        // Box 2D editor
         bd = new BodyDef();
         bd.type = BodyDef.BodyType.DynamicBody;
         bd.position.set(10, 10);
-// Create our body in the world using our body definition
         bodyAlpha = world.createBody(bd);
-
         BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("AlphaWingedPigeon.json"));
-
-        // 2. Create a FixtureDef, as usual.`
         FixtureDef fd = new FixtureDef();
         fd.density = 0.001f;
         fd.friction = 0.5f;
         fd.restitution = 0.3f;
-
-        // 3. Create a Body, as usual.`
         loader.attachFixture(bodyAlpha, "AlphaPigeon", fd, 10);
 
-
-// Remember to dispose of any shapes after you're done with them!
-// BodyDef and FixtureDef don't need disposing, but shapes do.
-
-
+        // set initial time to 0
         stateTime = 0f;
 
+        // initialize game resources
         this.scrollingBackground = new ScrollingBackground();
         this.highScore = new HighScore();
         this.pigeon = new Pigeon(bodyAlpha);
         this.dodgeables = new Dodgeables(this.pigeon, world);
 
-        // load the drop sound effect and the rain background "music"
+        // load the game sound effects and background music
         dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
         rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
 
@@ -109,37 +94,32 @@ public class AlphaPigeon extends ApplicationAdapter {
 
         // clear the screen with a dark blue color
         Gdx.gl.glClearColor(0, 0, 0.2f, 1);
-       Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        // update the state time
+        float deltaTime = Gdx.graphics.getDeltaTime();
+        stateTime += deltaTime;
 
-        stateTime += Gdx.graphics.getDeltaTime();
 
         // tell the camera to update its matrices
         camera.update();
 
-        //debugRenderer.render(world, camera.combined);
-        world.step(1/60f, 6, 2);
+        // debugRenderer.render(world, camera.combined);
+        // step the world
+        world.step(1 / 60f, 6, 2);
         this.pigeon.setCoordinates(bodyAlpha.getPosition().x, bodyAlpha.getPosition().y);
-
-
-
-        float deltaTime = Gdx.graphics.getDeltaTime();
-
 
         // tell the SpriteBatch to render in the
         // coordinate system specified by the camera
         batch.setProjectionMatrix(camera.combined);
 
-
-        // begin a new batch and draw the bucket and all drops
+        // begin a new batch and draw the game world and objects within it
         batch.begin();
         scrollingBackground.updateAndRender(deltaTime, batch);
         highScore.updateAndRender(deltaTime, batch);
         dodgeables.updateAndRender(stateTime, batch);
         pigeon.updateAndRender(stateTime, batch);
-
         batch.end();
-
 
 
         // process user input
@@ -159,29 +139,26 @@ public class AlphaPigeon extends ApplicationAdapter {
 
 
         // make sure the pigeon stays within the screen bounds
-
         if (bodyAlpha.getPosition().x < 0) {
             Vector2 vel = bodyAlpha.getLinearVelocity();
             vel.x = 0f;
-            bodyAlpha.setLinearVelocity(vel);}
+            bodyAlpha.setLinearVelocity(vel);
+        }
         if (bodyAlpha.getPosition().x > 80 - 10) {
             Vector2 vel = bodyAlpha.getLinearVelocity();
             vel.x = 0f;
-            bodyAlpha.setLinearVelocity(vel);}
+            bodyAlpha.setLinearVelocity(vel);
+        }
         if (bodyAlpha.getPosition().y < 0) {
             Vector2 vel = bodyAlpha.getLinearVelocity();
             vel.y = 0f;
-            bodyAlpha.setLinearVelocity(vel);}
+            bodyAlpha.setLinearVelocity(vel);
+        }
         if (bodyAlpha.getPosition().y > 48 - 5) {
             Vector2 vel = bodyAlpha.getLinearVelocity();
             vel.y = 0f;
-            bodyAlpha.setLinearVelocity(vel);}
-
-
-
-
-
-
+            bodyAlpha.setLinearVelocity(vel);
+        }
 
 
     }
@@ -200,6 +177,9 @@ public class AlphaPigeon extends ApplicationAdapter {
         batch.dispose();
         pigeon.dispose();
         dodgeables.dispose();
+        highScore.dispose();
     }
+
+
 
 }
