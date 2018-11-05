@@ -14,26 +14,31 @@ public class HighScore {
     FreeTypeFontGenerator generator;
 
     public HighScore(){
+
+        // set default score and create and set up the font used for the high score display
         score = 0;
         scoreString = "Distance: 0";
         scoreBitmapFont = new BitmapFont();
-    }
-
-    public void updateAndRender(float deltaTime, SpriteBatch batch){
-        //Increase score
-        score = score + 9 * deltaTime;
-        scoreString = "S co r e        " + score;
-
         generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/ARCADECLASSIC.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 12;
-        font12 = generator.generateFont(parameter); // font size 12 pixels
-
-
-
+        font12 = generator.generateFont(parameter);
         font12.setColor(1.0f, 1.0f, 1.0f, 1.0f);
         font12.getData().setScale(0.1f);
+    }
+
+    public void update(float deltaTime){
+        // increase score
+        // the 9 is the default speed that the pigeon initially flies
+        score = score + 9 * deltaTime;
+        scoreString = "S co r e        " + score;
+
+    }
+
+    public void render(SpriteBatch batch){
+        // display score
         font12.draw(batch, scoreString, 60, 45);
+
     }
 
     public void dispose(){

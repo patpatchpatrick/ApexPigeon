@@ -7,54 +7,55 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 public class ScrollingBackground {
 
     public static final int DEFAULT_SPEED = 10;
-    public static final int ACCELERATION = 50;
-    public static final int GOAL_REACH_ACCELERATION = 200;
 
     Texture backgroundImage;
+    // Background image positions
     float x1, x2;
-    int speed;  // in pixels/second
-    int goalSpeed; // max speed scrolling background will achieve via acceleration
+    int speed;
     float imageScale;
     boolean speedFixed;
 
     public ScrollingBackground() {
-        backgroundImage = new Texture("CloudBackground.png");
 
-        x1 = 0;
-        x2 = backgroundImage.getWidth()/10;
+        backgroundImage = new Texture("textures/CloudBackground.png");
+
         speed = DEFAULT_SPEED;
         speedFixed = true;
-        imageScale = 0;
+        imageScale = 10.0f;
+
+        //Set the first background image position to be 0, and the second background image position to be at the end of the first image (scaled down by 10)
+        x1 = 0;
+        x2 = backgroundImage.getWidth()/imageScale;
+
 
     }
 
-    public void updateAndRender(float deltaTime, SpriteBatch batch) {
-        //Speed adjustment to reach goal
-
+    public void update(float deltaTime) {
+        //Speed adjustment for both background images
         x1 -= speed * deltaTime;
         x2 -= speed * deltaTime;
 
         //if image reaches the bottom  of screen and is not visible, put it back behind the other image
-        if (x1 + backgroundImage.getWidth()/10 <= 0)
-            x1 = x2 + backgroundImage.getWidth()/10;
+        if (x1 + backgroundImage.getWidth()/imageScale <= 0)
+            x1 = x2 + backgroundImage.getWidth()/imageScale;
 
-        if (x2 + backgroundImage.getWidth()/10 <= 0)
-            x2 = x1 + backgroundImage.getWidth()/10;
+        if (x2 + backgroundImage.getWidth()/imageScale <= 0)
+            x2 = x1 + backgroundImage.getWidth()/imageScale;
 
+    }
+
+    public void render(SpriteBatch batch) {
         //Render
-        batch.draw(backgroundImage, x1, 0, backgroundImage.getWidth()/10, Gdx.graphics.getHeight()/10);
-        batch.draw(backgroundImage, x2, 0, backgroundImage.getWidth()/10, Gdx.graphics.getHeight()/10 );
-
-
-
+        //batch.draw(backgroundImage, x1, 0, backgroundImage.getWidth()/10, Gdx.graphics.getHeight()/10);
+        //batch.draw(backgroundImage, x2, 0, backgroundImage.getWidth()/10, Gdx.graphics.getHeight()/10 );
     }
 
     public void resize (int width, int height){
         imageScale = width / backgroundImage.getWidth();
     }
 
-    public void setSpeed(int goalSpeed){
-        this.goalSpeed = goalSpeed;
+    public void dispose(){
+        backgroundImage.dispose();
     }
 
 }
