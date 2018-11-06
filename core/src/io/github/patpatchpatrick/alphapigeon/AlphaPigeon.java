@@ -26,6 +26,7 @@ import com.badlogic.gdx.utils.Array;
 import java.util.Iterator;
 
 import io.github.patpatchpatrick.alphapigeon.Screens.GameScreen;
+import io.github.patpatchpatrick.alphapigeon.Screens.MainMenuScreen;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.HighScore;
@@ -52,7 +53,7 @@ public class AlphaPigeon extends Game {
 
         batch = new SpriteBatch();
         font = new BitmapFont();
-        this.setScreen(new GameScreen(this));
+        this.setScreen(new MainMenuScreen(this));
 
     }
 
