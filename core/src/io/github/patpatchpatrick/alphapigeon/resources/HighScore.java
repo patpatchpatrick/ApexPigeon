@@ -12,8 +12,9 @@ public class HighScore {
     private BitmapFont scoreBitmapFont;
     private BitmapFont font12;
     FreeTypeFontGenerator generator;
+    private Boolean pigeonHasNotCrashed = true;
 
-    public HighScore(){
+    public HighScore() {
 
         // set default score and create and set up the font used for the high score display
         score = 0;
@@ -27,26 +28,31 @@ public class HighScore {
         font12.getData().setScale(0.1f);
     }
 
-    public void update(float deltaTime){
+    public void update(float deltaTime) {
         // increase score
         // the 9 is the default speed that the pigeon initially flies
-        score = score + 9 * deltaTime;
-        scoreString = "S co r e        " + score;
+        // if the pigeon has not crashed, keep increasing the score
+        // after the pigeon crashes, stop increasing score
+        if (pigeonHasNotCrashed) {
+            score = score + 9 * deltaTime;
+            scoreString = "S co r e        " + score;
+        }
 
     }
 
-    public void render(SpriteBatch batch){
+    public void render(SpriteBatch batch) {
         // display score
         font12.draw(batch, scoreString, 60, 45);
 
     }
 
-    public void dispose(){
+    public void dispose() {
         generator.dispose();
     }
 
-
-
+    public void stopCounting() {
+        this.pigeonHasNotCrashed = false;
+    }
 
 
 }

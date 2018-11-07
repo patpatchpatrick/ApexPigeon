@@ -1,11 +1,13 @@
 package io.github.patpatchpatrick.alphapigeon.Screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 
@@ -13,7 +15,15 @@ public class MainMenuScreen implements Screen {
     private AlphaPigeon game;
     private OrthographicCamera camera;
     private Texture mainMenuBackground;
-    private Texture startButton;
+    private Texture startButtonSelected;
+    private Texture startButtonNotSelected;
+
+    //Variables
+    private final float imageScale = 10;
+    private final float START_BUTTON_WIDTH = 18f;
+    private final float START_BUTTON_HEIGHT = 7.2f;
+    private final float START_BUTTON_X = 30;
+    private final float START_BUTTON_Y = 12;
 
     public MainMenuScreen(AlphaPigeon game){
         this.game = game;
@@ -25,8 +35,8 @@ public class MainMenuScreen implements Screen {
         camera.setToOrtho(false, 80, 48);
 
         mainMenuBackground = new Texture(Gdx.files.internal("textures/MainMenuScreen.png"));
-        startButton = new Texture(Gdx.files.internal("textures/Start.png"));
-
+        startButtonSelected = new Texture(Gdx.files.internal("textures/StartYellowSelected.png"));
+        startButtonNotSelected = new Texture(Gdx.files.internal("textures/StartYellowNotSelected.png"));
 
 
 
@@ -53,10 +63,28 @@ public class MainMenuScreen implements Screen {
         game.batch.begin();
 
         game.batch.draw(mainMenuBackground, 0, 0, camera.viewportWidth, camera.viewportHeight);
-        game.batch.draw(startButton, 22, 15, 32, 8);
+
+        //Get the mouse coordinates and unproject to the world coordinates
+        Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+        camera.unproject(mousePos);
+
+        //If the mouse is in bounds of the start button, show the selected start button, otherwise show the unselected start button
+        //If the mouse is clicked while in the start button bounds, dispose, then start the game
+        if (mousePos.x > START_BUTTON_X && mousePos.x < START_BUTTON_X + START_BUTTON_WIDTH && mousePos.y > START_BUTTON_Y && mousePos.y < START_BUTTON_Y +  START_BUTTON_HEIGHT ){
+            game.batch.draw(startButtonSelected, START_BUTTON_X, START_BUTTON_Y, START_BUTTON_WIDTH, START_BUTTON_HEIGHT);
+            if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
+                dispose();
+                game.setScreen(new GameScreen(game));
+            }
+        } else {
+            game.batch.draw(startButtonNotSelected, START_BUTTON_X, START_BUTTON_Y, START_BUTTON_WIDTH, START_BUTTON_HEIGHT);
+        }
+
 
 
         game.batch.end();
+
+
 
     }
 
@@ -82,8 +110,9 @@ public class MainMenuScreen implements Screen {
 
     @Override
     public void dispose() {
-        startButton.dispose();
+        startButtonSelected.dispose();
         mainMenuBackground.dispose();
-
+        startButtonNotSelected.dispose();
     }
+
 }
