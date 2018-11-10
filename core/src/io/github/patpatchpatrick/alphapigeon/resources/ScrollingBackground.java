@@ -17,11 +17,11 @@ public class ScrollingBackground {
 
     public ScrollingBackground() {
 
-        backgroundImage = new Texture("textures/CloudBackground.png");
+        backgroundImage = new Texture("textures/CloudPixelArt.png");
 
         speed = DEFAULT_SPEED;
         speedFixed = true;
-        imageScale = 10.0f;
+        imageScale = 10;
 
         //Set the first background image position to be 0, and the second background image position to be at the end of the first image (scaled down by 10)
         x1 = 0;
@@ -46,12 +46,12 @@ public class ScrollingBackground {
 
     public void render(SpriteBatch batch) {
         //Render
-        //batch.draw(backgroundImage, x1, 0, backgroundImage.getWidth()/10, Gdx.graphics.getHeight()/10);
-        //batch.draw(backgroundImage, x2, 0, backgroundImage.getWidth()/10, Gdx.graphics.getHeight()/10 );
+        //batch.draw(backgroundImage, x1, 0, backgroundImage.getWidth()/imageScale, Gdx.graphics.getHeight()/10);
+        //batch.draw(backgroundImage, x2, 0, backgroundImage.getWidth()/imageScale, Gdx.graphics.getHeight()/10 );
     }
 
     public void resize (int width, int height){
-        imageScale = width / backgroundImage.getWidth();
+        //imageScale = width / backgroundImage.getWidth();
     }
 
     public void dispose(){

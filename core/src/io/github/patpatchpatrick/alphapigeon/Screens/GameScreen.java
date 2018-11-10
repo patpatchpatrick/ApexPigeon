@@ -18,7 +18,6 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Manifold;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
@@ -66,16 +65,24 @@ public class GameScreen implements Screen {
         pigeonFixtureDef.density = 0.001f;
         pigeonFixtureDef.friction = 0.5f;
         pigeonFixtureDef.restitution = 0.3f;
+        // set the pigeon filter category and mask for collisions
+        pigeonFixtureDef.filter.categoryBits = game.CATEGORY_PIGEON;
+        pigeonFixtureDef.filter.maskBits = game.MASK_PIGEON;
+        //pigeonFixtureDef.isSensor =  true;
         loader.attachFixture(pigeonBody, "AlphaPigeon", pigeonFixtureDef, 10);
 
         // set initial time to 0
         stateTime = 0f;
 
+        // create the camera
+        camera = new OrthographicCamera();
+        camera.setToOrtho(false, 80, 48);
+
         // initialize game resources
         this.scrollingBackground = new ScrollingBackground();
         this.highScore = new HighScore();
         this.pigeon = new Pigeon(pigeonBody);
-        this.dodgeables = new Dodgeables(this.pigeon, world);
+        this.dodgeables = new Dodgeables(this.pigeon, world, game, camera);
 
         // load the game sound effects and background music
         dropSound = Gdx.audio.newSound(Gdx.files.internal("sounds/drop.wav"));
@@ -84,10 +91,6 @@ public class GameScreen implements Screen {
         // start the playback of the background music immediately
         //rainMusic.setLooping(true);
         //rainMusic.play();
-
-        // create the camera
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, 80, 48);
 
         // create contact listener to listen for if the Pigeon collides with another object
         // if the pigeon collides with another object, the game is over
@@ -227,6 +230,8 @@ public class GameScreen implements Screen {
 
             @Override
             public void beginContact(Contact contact) {
+
+                //If the pigeon is involved in any of the collisions, the pigeon crashed and the game is over.
                 Fixture fixtureA = contact.getFixtureA();
                 Fixture fixtureB = contact.getFixtureB();
                 if (fixtureA.getBody().equals(pigeonBody) || fixtureB.getBody().equals(pigeonBody)){
