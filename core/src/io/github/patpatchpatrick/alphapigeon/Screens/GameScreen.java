@@ -57,24 +57,6 @@ public class GameScreen implements Screen {
         world = new World(new Vector2(0, 0), true);
         debugRenderer = new Box2DDebugRenderer();
 
-        // create pigeon body, set position in the world
-        // create pigeon fixture, attach the fixture created to the body created with the help of
-        // Box 2D editor
-        BodyDef pigeonBodyDef = new BodyDef();
-        pigeonBodyDef.type = BodyDef.BodyType.DynamicBody;
-        pigeonBodyDef.position.set(10, 10);
-        pigeonBody = world.createBody(pigeonBodyDef);
-        BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("json/AlphaPigeonBody.json"));
-        FixtureDef pigeonFixtureDef = new FixtureDef();
-        pigeonFixtureDef.density = 0.001f;
-        pigeonFixtureDef.friction = 0.5f;
-        pigeonFixtureDef.restitution = 0.3f;
-        // set the pigeon filter category and mask for collisions
-        pigeonFixtureDef.filter.categoryBits = game.CATEGORY_PIGEON;
-        pigeonFixtureDef.filter.maskBits = game.MASK_PIGEON;
-        //pigeonFixtureDef.isSensor =  true;
-        loader.attachFixture(pigeonBody, "AlphaPigeon", pigeonFixtureDef, 10);
-
         // set initial time to 0
         stateTime = 0f;
 
@@ -85,8 +67,9 @@ public class GameScreen implements Screen {
         // initialize game resources
         this.scrollingBackground = new ScrollingBackground();
         this.highScore = new HighScore();
-        this.pigeon = new Pigeon(pigeonBody);
+        this.pigeon = new Pigeon(world, game);
         this.dodgeables = new Dodgeables(this.pigeon, world, game, camera);
+        pigeonBody = this.pigeon.getBody();
 
         // load the game sound effects and background music
         dropSound = Gdx.audio.newSound(Gdx.files.internal("sounds/drop.wav"));
@@ -197,12 +180,14 @@ public class GameScreen implements Screen {
             pigeonBody.applyForceToCenter(0.3f * (touchPos.x - pigeonBody.getPosition().x), 0.3f * (touchPos.y - pigeonBody.getPosition().y), true);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
-            pigeonBody.applyForceToCenter(-5.0f, 0.0f, true);
+            pigeonBody.setLinearVelocity(-30.0f, 0);
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
-            pigeonBody.applyForceToCenter(5.0f, 0.0f, true);
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) pigeonBody.applyForceToCenter(0.0f, 5.0f, true);
+            pigeonBody.setLinearVelocity(30.0f, 0);
+        if (Gdx.input.isKeyPressed(Input.Keys.UP))
+            pigeonBody.setLinearVelocity(0, 30.0f);
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
-            pigeonBody.applyForceToCenter(0.0f, -5.0f, true);
+            pigeonBody.setLinearVelocity(0, -30.0f);
+           
 
 
         // make sure the pigeon stays within the screen bounds

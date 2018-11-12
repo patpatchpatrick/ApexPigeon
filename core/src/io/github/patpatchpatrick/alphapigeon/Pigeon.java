@@ -1,5 +1,6 @@
 package io.github.patpatchpatrick.alphapigeon;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -7,6 +8,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.World;
+
+import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 
 public class Pigeon {
 
@@ -14,10 +20,34 @@ public class Pigeon {
     private Animation<TextureRegion> pigeonFlyAnimation;
     private static final int FRAME_COLS = 4, FRAME_ROWS = 2;
     Body pigeonBody;
+    AlphaPigeon game;
+    World world;
 
-    public Pigeon(Body body) {
-        pigeonBody = body;
+    public Pigeon(World world, AlphaPigeon game) {
+
         initializePigeonAnimation();
+
+        this.game =  game;
+        this.world  = world;
+
+        // create pigeon body, set position in the world
+        // create pigeon fixture, attach the fixture created to the body created with the help of
+        // Box 2D editor
+        BodyDef pigeonBodyDef = new BodyDef();
+        pigeonBodyDef.type = BodyDef.BodyType.KinematicBody;
+        pigeonBodyDef.position.set(10, 10);
+        pigeonBody = world.createBody(pigeonBodyDef);
+        BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("json/AlphaPigeonBody.json"));
+        FixtureDef pigeonFixtureDef = new FixtureDef();
+        pigeonFixtureDef.density = 0.001f;
+        pigeonFixtureDef.friction = 0.5f;
+        pigeonFixtureDef.restitution = 0.3f;
+        // set the pigeon filter category and mask for collisions
+        pigeonFixtureDef.filter.categoryBits = game.CATEGORY_PIGEON;
+        pigeonFixtureDef.filter.maskBits = game.MASK_PIGEON;
+        //pigeonFixtureDef.isSensor =  true;
+        loader.attachFixture(pigeonBody, "AlphaPigeon", pigeonFixtureDef, 10);
+
 
     }
 
@@ -59,6 +89,10 @@ public class Pigeon {
         TextureRegion currentFrame = pigeonFlyAnimation.getKeyFrame(stateTime, true);
         batch.draw(currentFrame, pigeonBody.getPosition().x, pigeonBody.getPosition().y, 0, 0, 10, 5f, 1, 1, MathUtils.radiansToDegrees * pigeonBody.getAngle());
 
+    }
+
+    public Body getBody(){
+        return pigeonBody;
     }
 
 

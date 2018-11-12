@@ -325,7 +325,7 @@ public class Dodgeables {
         }
 
         // Initialize the Animation with the frame interval and array of frames
-        levelTwoBirdAnimation = new Animation<TextureRegion>(0.05f, levelTwoBirdFlyFrames);
+        levelTwoBirdAnimation = new Animation<TextureRegion>(0.04f, levelTwoBirdFlyFrames);
 
     }
 
