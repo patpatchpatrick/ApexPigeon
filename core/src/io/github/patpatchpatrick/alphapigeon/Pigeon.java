@@ -21,6 +21,10 @@ public class Pigeon {
 
     }
 
+    public void powerUp(short powerUpType){
+
+    }
+
     private void initializePigeonAnimation() {
 
         // load the pigeon sprite sheet as a Texture

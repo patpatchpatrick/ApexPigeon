@@ -19,10 +19,14 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
+
+import java.util.Iterator;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.Pigeon;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
+import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.HighScore;
 import io.github.patpatchpatrick.alphapigeon.resources.ScrollingBackground;
@@ -47,7 +51,7 @@ public class GameScreen implements Screen {
     final float PIGEON_WIDTH = 10.0f;
     final float PIGEON_HEIGHT = 5.0f;
 
-    public GameScreen(AlphaPigeon game){
+    public GameScreen(AlphaPigeon game) {
         this.game = game;
 
         world = new World(new Vector2(0, 0), true);
@@ -171,10 +175,12 @@ public class GameScreen implements Screen {
 
     }
 
-    public void update(){
+    public void update() {
 
         // step the world
         world.step(1 / 60f, 6, 2);
+
+        sweepDeadBodies();
 
         // update all the game resources
         scrollingBackground.update(deltaTime);
@@ -190,10 +196,13 @@ public class GameScreen implements Screen {
             camera.unproject(touchPos);
             pigeonBody.applyForceToCenter(0.3f * (touchPos.x - pigeonBody.getPosition().x), 0.3f * (touchPos.y - pigeonBody.getPosition().y), true);
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) pigeonBody.applyForceToCenter(-5.0f, 0.0f, true);
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) pigeonBody.applyForceToCenter(5.0f, 0.0f, true);
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
+            pigeonBody.applyForceToCenter(-5.0f, 0.0f, true);
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
+            pigeonBody.applyForceToCenter(5.0f, 0.0f, true);
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) pigeonBody.applyForceToCenter(0.0f, 5.0f, true);
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) pigeonBody.applyForceToCenter(0.0f, -5.0f, true);
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
+            pigeonBody.applyForceToCenter(0.0f, -5.0f, true);
 
 
         // make sure the pigeon stays within the screen bounds
@@ -234,7 +243,33 @@ public class GameScreen implements Screen {
                 //If the pigeon is involved in any of the collisions, the pigeon crashed and the game is over.
                 Fixture fixtureA = contact.getFixtureA();
                 Fixture fixtureB = contact.getFixtureB();
-                if (fixtureA.getBody().equals(pigeonBody) || fixtureB.getBody().equals(pigeonBody)){
+
+                //Boolean collision checks used to determine action to take
+                Boolean pigeonInvolvedInCollision = fixtureA.getBody().equals(pigeonBody) || fixtureB.getBody().equals(pigeonBody);
+                Boolean powerUpShieldInvolvedInCollision = fixtureA.getFilterData().categoryBits == game.CATEGORY_POWERUP_SHIELD || fixtureB.getFilterData().categoryBits == game.CATEGORY_POWERUP_SHIELD;
+                Boolean powerUpInvolvedInCollision = powerUpShieldInvolvedInCollision;
+
+
+                short powerUpType;
+                if (powerUpShieldInvolvedInCollision) {
+                    powerUpType = game.CATEGORY_POWERUP_SHIELD;
+                    // destroy the power up body
+                    if (fixtureA.getFilterData().categoryBits == game.CATEGORY_POWERUP_SHIELD) {
+                        fixtureA.getBody().setUserData(new BodyData(true));
+                    } else if (fixtureB.getFilterData().categoryBits == game.CATEGORY_POWERUP_SHIELD) {
+                        fixtureB.getBody().setUserData(new BodyData(true));
+                    }
+                } else {
+                    //TODO figure out else
+                    powerUpType = game.CATEGORY_PIGEON;
+                }
+
+
+                //If pigeon contacts a power up, power up the pigeon, otherwise if pigeon contacts a different object, the game is over
+                if (pigeonInvolvedInCollision && powerUpInvolvedInCollision) {
+                    pigeon.powerUp(powerUpType);
+
+                } else if (pigeonInvolvedInCollision) {
                     gameOver();
                 }
 
@@ -259,10 +294,32 @@ public class GameScreen implements Screen {
 
     }
 
-    private void gameOver(){
+    private void gameOver() {
 
         // bird has crashed, game is over
         // stop counting the high score
         highScore.stopCounting();
     }
+
+    public void sweepDeadBodies() {
+
+        //Go through and remove all bodies flagged for deletion
+
+        Array bodies = new Array<Body>();
+        world.getBodies(bodies);
+        for (Iterator<Body> iter = bodies.iterator(); iter.hasNext(); ) {
+            Body body = iter.next();
+            if (body != null) {
+                BodyData data = (BodyData) body.getUserData();
+                if (data != null){
+                    if (data.isFlaggedForDelete()) {
+                        world.destroyBody(body);
+                        //body.setUserData(null);
+                        body = null;
+                    }
+                }
+            }
+        }
+    }
+
 }
