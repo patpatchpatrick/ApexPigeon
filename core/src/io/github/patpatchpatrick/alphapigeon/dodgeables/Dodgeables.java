@@ -54,6 +54,13 @@ public class Dodgeables {
     private Texture powerUpShieldSheet;
     private long lastpowerUpShieldSpawnTime;
 
+    //Teleport variables
+    private Array<Body> teleportArray = new  Array<Body>();
+    private Animation<TextureRegion> teleportAnimation;
+    private Texture teleportSheet;
+    private long lastTeleportSpawnTime;
+
+
     public Dodgeables(Pigeon pigeon, World world, AlphaPigeon game, OrthographicCamera camera) {
 
         gameWorld = world;
@@ -66,11 +73,16 @@ public class Dodgeables {
         levelTwoBirdsArray = new Array<Body>();
         powerUpShieldsArray = new Array<Body>();
 
-        // initialize animations
+        // initialize enemy animations
         initializeLevelOneBirdAnimation();
         initializeMeteorAnimation();
         initializeLevelTwoBirdAnimation();
+
+        // initialize powerup animations
         initializePowerUpShieldAnimation();
+
+        // initialize other animations
+        initializeTeleportAnimation();
 
     }
 
@@ -84,6 +96,8 @@ public class Dodgeables {
             spawnLevelTwoBird();
         if (TimeUtils.nanoTime() / MILLION_SCALE - lastpowerUpShieldSpawnTime / MILLION_SCALE > 2000)
             spawnPowerUpShield();
+        if (TimeUtils.nanoTime() / MILLION_SCALE - lastTeleportSpawnTime / MILLION_SCALE > 2000)
+            spawnTeleport();
     }
 
     public void spawnLevelOneBird() {
@@ -197,11 +211,41 @@ public class Dodgeables {
 
     }
 
+    private void spawnTeleport() {
+
+        //spawn a new Teleport
+        BodyDef teleportBodyDef = new BodyDef();
+        teleportBodyDef.type = BodyDef.BodyType.DynamicBody;
+
+        //spawn teleport at random height
+        teleportBodyDef.position.set(camera.viewportWidth, MathUtils.random(0, camera.viewportHeight - 10));
+        Body teleportBody = gameWorld.createBody(teleportBodyDef);
+        BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("json/Teleport.json"));
+        FixtureDef teleportFixtureDef = new FixtureDef();
+        teleportFixtureDef.density = 0.001f;
+        teleportFixtureDef.friction = 0.5f;
+        teleportFixtureDef.restitution = 0.3f;
+        // set the teleport filter categories and masks for collisions
+        teleportFixtureDef.filter.categoryBits = game.CATEGORY_POWERUP_SHIELD;
+        teleportFixtureDef.filter.maskBits = game.MASK_POWERUP;
+        //The JSON loader loaders a fixture 1 pixel by 1 pixel... the animation is 100 px x 100 px, so need to scale by a factor of 10
+        loader.attachFixture(teleportBody, "Teleport", teleportFixtureDef, 10);
+        teleportBody.applyForceToCenter(-9.0f, 0, true);
+
+        //add teleport to teleports array
+        teleportArray.add(teleportBody);
+
+        //keep track of time the teleport shield was spawned
+        lastTeleportSpawnTime = TimeUtils.nanoTime();
+
+    }
+
     public void render(float stateTime, SpriteBatch batch) {
         // get current frame of animation for the current stateTime
         TextureRegion backwardsCurrentFrame = levelOneBirdAnimation.getKeyFrame(stateTime, true);
         TextureRegion levelTwoCurrentFrame = levelTwoBirdAnimation.getKeyFrame(stateTime, true);
         TextureRegion powerUpShieldCurrentFrame = powerUpShieldAnimation.getKeyFrame(stateTime, true);
+        TextureRegion teleportCurrentFrame = teleportAnimation.getKeyFrame(stateTime, true);
 
         // draw all level one birds dodgeables using the current animation frame
         for (Body backwardsPigeon : levelOneBirdsArray) {
@@ -241,6 +285,18 @@ public class Dodgeables {
                 } else {
                     powerUpShieldsArray.removeValue(powerUpShield, false);
                 }
+        }
+
+        // draw all teleport dodgeables using the current animation frame
+        for (Body teleport : teleportArray) {
+
+            // draw the teleport if it is active (hasn't been grabbed by the pigeon), otherwise remove it from the array
+            if (teleport.isActive()){
+                batch.draw(teleportCurrentFrame, teleport.getPosition().x, teleport.getPosition().y,
+                        0, 0, 10f, 10f, 1, 1, MathUtils.radiansToDegrees * teleport.getAngle());
+            } else {
+                teleportArray.removeValue(teleport, false);
+            }
 
         }
 
@@ -369,6 +425,34 @@ public class Dodgeables {
 
     }
 
+    private void initializeTeleportAnimation() {
+
+        // Load the teleport sprite sheet as a Texture
+        teleportSheet = new Texture(Gdx.files.internal("sprites/TeleportSpriteSheet.png"));
+
+        // Use the split utility method to create a 2D array of TextureRegions. This is
+        // possible because this sprite sheet contains frames of equal size and they are
+        // all aligned.
+        TextureRegion[][] tmp = TextureRegion.split(teleportSheet,
+                teleportSheet.getWidth() / 10,
+                teleportSheet.getHeight() / 9);
+
+        // Place the regions into a 1D array in the correct order, starting from the top
+        // left, going across first. The Animation constructor requires a 1D array.
+        TextureRegion[] teleportFrames = new TextureRegion[10 * 9];
+        int index = 0;
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 10; j++) {
+                teleportFrames[index++] = tmp[i][j];
+            }
+        }
+
+        // Initialize the Animation with the frame interval and array of frames
+        teleportAnimation = new Animation<TextureRegion>(0.05f, teleportFrames);
+
+    }
+
+
 
     public void dispose() {
         // Dispose of all textures
@@ -376,6 +460,7 @@ public class Dodgeables {
         levelTwoBirdFlySheet.dispose();
         meteorTextureSpriteSheet.dispose();
         powerUpShieldSheet.dispose();
+        teleportSheet.dispose();
     }
 
 }
