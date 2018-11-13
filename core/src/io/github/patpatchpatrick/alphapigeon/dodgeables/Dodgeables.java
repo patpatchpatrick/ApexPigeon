@@ -242,6 +242,15 @@ public class Dodgeables {
         loader.attachFixture(teleportTwoBody, "Teleport", teleportFixtureDef, 10);
         teleportTwoBody.applyForceToCenter(7.0f, 0, true);
 
+        //Attach data of the opposite teleport to the teleport, so it can be used to transport the pigeon
+        //to the opposite teleport's location
+        BodyData teleportOneData = new BodyData(false);
+        teleportOneData.setOppositeTeleport(teleportTwoBody);
+        BodyData teleportTwoData = new BodyData(false);
+        teleportTwoData.setOppositeTeleport(teleportBody);
+        teleportBody.setUserData(teleportOneData);
+        teleportTwoBody.setUserData(teleportTwoData);
+
 
 
         //add teleport to teleports array
@@ -463,6 +472,10 @@ public class Dodgeables {
         // Initialize the Animation with the frame interval and array of frames
         teleportAnimation = new Animation<TextureRegion>(0.05f, teleportFrames);
 
+    }
+
+    public Array<Body> getTeleportArray(){
+        return teleportArray;
     }
 
 

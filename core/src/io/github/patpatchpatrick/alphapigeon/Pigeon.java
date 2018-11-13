@@ -9,10 +9,12 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.TimeUtils;
 
+import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 
 public class Pigeon {
@@ -39,8 +41,8 @@ public class Pigeon {
 
         initializePigeonAnimation();
 
-        this.game =  game;
-        this.world  = world;
+        this.game = game;
+        this.world = world;
 
         // create pigeon body, set position in the world
         // create pigeon fixture, attach the fixture created to the body created with the help of
@@ -65,15 +67,43 @@ public class Pigeon {
 
     }
 
-    public void powerUp(short powerUpType){
+    //Pigeon actions
+
+    public void powerUp(short powerUpType) {
         //Set the current power up type and the time that the power up was picked up by the pigeon
         currentPowerUp = powerUpType;
         this.currentPowerUpTime = this.stateTime;
     }
 
-    public short getPowerUpType(){
+    public short getPowerUpType() {
         //Return the current type of power up applied to the pigeon
         return currentPowerUp;
+    }
+
+    public void teleport(Fixture teleportFixture) {
+        //Get the teleport data from the teleport fixture that contacted the pigeon
+        final Body teleport = teleportFixture.getBody();
+        BodyData teleportData = (BodyData) teleport.getUserData();
+        final Body oppositeTeleport = teleportData.getOppositeTeleport();
+        final World worldRef = this.world;
+
+        //Move the pigeon to the opposite teleport's location and then destroy both teleports
+        //This must be done using Runnable app.postRunnable so it occurs in the rendering thread which is currently locked
+        //while the world is still stepping
+        //Everything in the postRunnable Runnable is called on the render thread before the game render method is called
+
+        Gdx.app.postRunnable(new Runnable() {
+
+            @Override
+            public void run () {
+                pigeonBody.setTransform(oppositeTeleport.getPosition().x, oppositeTeleport.getPosition().y, oppositeTeleport.getAngle());
+                worldRef.destroyBody(oppositeTeleport);
+                worldRef.destroyBody(teleport);
+            }
+        });
+
+
+
     }
 
     private void initializePigeonAnimation() {
@@ -137,7 +167,7 @@ public class Pigeon {
         TextureRegion pigeonCurrentFrame = pigeonFlyAnimation.getKeyFrame(stateTime, true);
         batch.draw(pigeonCurrentFrame, pigeonBody.getPosition().x, pigeonBody.getPosition().y, 0, 0, 10, 5f, 1, 1, MathUtils.radiansToDegrees * pigeonBody.getAngle());
 
-        if (this.currentPowerUp == game.CATEGORY_POWERUP_SHIELD){
+        if (this.currentPowerUp == game.CATEGORY_POWERUP_SHIELD) {
             // Get current frame of animation for the current stateTime and render it
             TextureRegion powUpShieldCurrentFrame = powerUpShieldAnimation.getKeyFrame(stateTime, true);
             batch.draw(powUpShieldCurrentFrame, pigeonBody.getPosition().x - 2.5f, pigeonBody.getPosition().y - 2.5f, 0, 0, 15f, 10f, 1, 1, MathUtils.radiansToDegrees * pigeonBody.getAngle());
@@ -145,18 +175,18 @@ public class Pigeon {
 
     }
 
-    public void update(float stateTime){
+    public void update(float stateTime) {
         this.stateTime = stateTime;
 
         //Check if power up shield has expired
         //If so, set currentPowerUp back to CATEGORY_PIGEON, which is the default currentPowerUp setting
-        if (this.stateTime - this.currentPowerUpTime > 8){
+        if (this.stateTime - this.currentPowerUpTime > 8) {
             this.currentPowerUp = game.CATEGORY_PIGEON;
         }
 
     }
 
-    public Body getBody(){
+    public Body getBody() {
         return pigeonBody;
     }
 

@@ -233,45 +233,45 @@ public class GameScreen implements Screen {
                 Boolean pigeonInvolvedInCollision = fixtureA.getBody().equals(pigeonBody) || fixtureB.getBody().equals(pigeonBody);
                 Boolean powerUpShieldInvolvedInCollision = fixtureA.getFilterData().categoryBits == game.CATEGORY_POWERUP_SHIELD || fixtureB.getFilterData().categoryBits == game.CATEGORY_POWERUP_SHIELD;
                 Boolean powerUpInvolvedInCollision = powerUpShieldInvolvedInCollision;
-
+                Boolean teleportInvolvedInCollision = fixtureA.getFilterData().categoryBits == game.CATEGORY_TELEPORT || fixtureB.getFilterData().categoryBits == game.CATEGORY_TELEPORT;
 
                 short powerUpType = game.CATEGORY_PIGEON;
-                if (powerUpShieldInvolvedInCollision) {
-                    powerUpType = game.CATEGORY_POWERUP_SHIELD;
-                    // destroy the power up body
-                    if (fixtureA.getFilterData().categoryBits == game.CATEGORY_POWERUP_SHIELD) {
-                        fixtureA.getBody().setUserData(new BodyData(true));
-                    } else if (fixtureB.getFilterData().categoryBits == game.CATEGORY_POWERUP_SHIELD) {
-                        fixtureB.getBody().setUserData(new BodyData(true));
-                    }
-                } else if (pigeonInvolvedInCollision && pigeon.getPowerUpType() == game.CATEGORY_POWERUP_SHIELD) {
-                    // destroy the body that the pigeon touches
-                    if (fixtureA.getFilterData().categoryBits == game.CATEGORY_PIGEON) {
-                        fixtureB.getBody().setUserData(new BodyData(true));
-                    } else if (fixtureB.getFilterData().categoryBits == game.CATEGORY_PIGEON) {
-                        fixtureA.getBody().setUserData(new BodyData(true));
+
+                //Collision logic for pigeon:
+                //First, check if a power up is involved
+                //If so, get the power-up type and power-up the pigeon
+                //If pigeon contacts teleport,  teleport it
+                //If pigeon already has a power-up applied, apply appropriate action depending on the power-up applied
+                //If pigeon has normal contact with an enemy, the game is over
+                if (pigeonInvolvedInCollision) {
+                    if (powerUpInvolvedInCollision) {
+                        if (powerUpShieldInvolvedInCollision) {
+                            powerUpType = game.CATEGORY_POWERUP_SHIELD;
+                        }
+                        destroyPowerUp(fixtureA, fixtureB);
+                        pigeon.powerUp(powerUpType);
+                    } else if (teleportInvolvedInCollision) {
+                        Fixture teleportFixture;
+                        if (fixtureA.getFilterData().categoryBits == game.CATEGORY_TELEPORT){
+                            teleportFixture = fixtureA;
+                        } else {
+                            teleportFixture = fixtureB;
+                        }
+                        pigeon.teleport(teleportFixture);
+                    } else if (pigeon.getPowerUpType() == game.CATEGORY_POWERUP_SHIELD) {
+                        destroyNonPigeonBody(fixtureA, fixtureB);
+                    } else {
+                        // If the pigeon is involved in the collision and does not have a shield applied, the game is over
+                        gameOver();
                     }
 
-                } else {
-                    //TODO figure out else
                 }
 
-
-                if (pigeonInvolvedInCollision && powerUpInvolvedInCollision) {
-                    //If pigeon contacts a powerUp, apply the powerUp
-                    pigeon.powerUp(powerUpType);
-
-                } else if (pigeonInvolvedInCollision && pigeon.getPowerUpType() != game.CATEGORY_POWERUP_SHIELD) {
-                    // If the pigeon is involved in the collision and does not have a shield applied, the game is over
-                    gameOver();
-                }
 
             }
 
             @Override
             public void endContact(Contact contact) {
-                Fixture fixtureA = contact.getFixtureA();
-                Fixture fixtureB = contact.getFixtureB();
                 //Gdx.app.log("endContact", "between " + fixtureA.toString() + " and " + fixtureB.toString());
             }
 
@@ -284,6 +284,30 @@ public class GameScreen implements Screen {
             }
 
         });
+
+    }
+
+    private void destroyPowerUp(Fixture fixtureA, Fixture fixtureB) {
+
+        // if a Power-Up is involved in a collision, determine which fixture was the power-up and destroy it
+
+        if (fixtureA.getFilterData().categoryBits == game.CATEGORY_POWERUP_SHIELD) {
+            fixtureA.getBody().setUserData(new BodyData(true));
+        } else if (fixtureB.getFilterData().categoryBits == game.CATEGORY_POWERUP_SHIELD) {
+            fixtureB.getBody().setUserData(new BodyData(true));
+        }
+
+    }
+
+    private void destroyNonPigeonBody(Fixture fixtureA, Fixture fixtureB) {
+
+        // destroy the body that the pigeon touches
+
+        if (fixtureA.getFilterData().categoryBits == game.CATEGORY_PIGEON) {
+            fixtureB.getBody().setUserData(new BodyData(true));
+        } else if (fixtureB.getFilterData().categoryBits == game.CATEGORY_PIGEON) {
+            fixtureA.getBody().setUserData(new BodyData(true));
+        }
 
     }
 
