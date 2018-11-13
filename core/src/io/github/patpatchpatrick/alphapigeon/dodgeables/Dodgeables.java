@@ -96,8 +96,8 @@ public class Dodgeables {
             spawnLevelTwoBird();
         if (TimeUtils.nanoTime() / MILLION_SCALE - lastpowerUpShieldSpawnTime / MILLION_SCALE > 2000)
             spawnPowerUpShield();
-        if (TimeUtils.nanoTime() / MILLION_SCALE - lastTeleportSpawnTime / MILLION_SCALE > 2000)
-            spawnTeleport();
+        if (TimeUtils.nanoTime() / MILLION_SCALE - lastTeleportSpawnTime / MILLION_SCALE > 50000)
+            spawnTeleports();
     }
 
     public void spawnLevelOneBird() {
@@ -211,12 +211,14 @@ public class Dodgeables {
 
     }
 
-    private void spawnTeleport() {
+    private void spawnTeleports() {
 
-        //spawn a new Teleport
+        //spawn two new teleports that start at opposite ends of the screen (x direction) and
+        //travel in opposite directions
+
+        //spawn first teleport
         BodyDef teleportBodyDef = new BodyDef();
         teleportBodyDef.type = BodyDef.BodyType.DynamicBody;
-
         //spawn teleport at random height
         teleportBodyDef.position.set(camera.viewportWidth, MathUtils.random(0, camera.viewportHeight - 10));
         Body teleportBody = gameWorld.createBody(teleportBodyDef);
@@ -226,14 +228,25 @@ public class Dodgeables {
         teleportFixtureDef.friction = 0.5f;
         teleportFixtureDef.restitution = 0.3f;
         // set the teleport filter categories and masks for collisions
-        teleportFixtureDef.filter.categoryBits = game.CATEGORY_POWERUP_SHIELD;
-        teleportFixtureDef.filter.maskBits = game.MASK_POWERUP;
+        teleportFixtureDef.filter.categoryBits = game.CATEGORY_TELEPORT;
+        teleportFixtureDef.filter.maskBits = game.MASK_TELEPORT;
         //The JSON loader loaders a fixture 1 pixel by 1 pixel... the animation is 100 px x 100 px, so need to scale by a factor of 10
         loader.attachFixture(teleportBody, "Teleport", teleportFixtureDef, 10);
         teleportBody.applyForceToCenter(-9.0f, 0, true);
 
+        //spawn second teleport which starts at the opposite side of screen as the first and travels in the opposite direction
+        BodyDef teleportTwoBodyDef = new BodyDef();
+        teleportTwoBodyDef.type = BodyDef.BodyType.DynamicBody;
+        teleportTwoBodyDef.position.set(0, MathUtils.random(0, camera.viewportHeight - 10));
+        Body teleportTwoBody = gameWorld.createBody(teleportTwoBodyDef);
+        loader.attachFixture(teleportTwoBody, "Teleport", teleportFixtureDef, 10);
+        teleportTwoBody.applyForceToCenter(7.0f, 0, true);
+
+
+
         //add teleport to teleports array
         teleportArray.add(teleportBody);
+        teleportArray.add(teleportTwoBody);
 
         //keep track of time the teleport shield was spawned
         lastTeleportSpawnTime = TimeUtils.nanoTime();

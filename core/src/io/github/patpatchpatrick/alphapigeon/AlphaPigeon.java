@@ -16,14 +16,16 @@ public class AlphaPigeon extends Game {
     public final short CATEGORY_METEOR = 0x0004;
     public final short CATEGORY_LEVEL_TWO_BIRD = 0x0008;
     public final short CATEGORY_POWERUP_SHIELD = 0x0016;
+    public final short CATEGORY_TELEPORT = 0x0032;
 
     // Filter Masks
     public final short MASK_PIGEON = CATEGORY_LEVEL_ONE_BIRD | CATEGORY_METEOR | CATEGORY_LEVEL_TWO_BIRD
-            | CATEGORY_POWERUP_SHIELD;
+            | CATEGORY_POWERUP_SHIELD | CATEGORY_TELEPORT;
     public final short MASK_LEVEL_ONE_BIRD = CATEGORY_PIGEON | CATEGORY_METEOR ;
     public final short MASK_METEOR = CATEGORY_PIGEON | CATEGORY_LEVEL_ONE_BIRD | CATEGORY_LEVEL_TWO_BIRD;
     public final short MASK_LEVEL_TWO_BIRD = CATEGORY_PIGEON | CATEGORY_METEOR;
     public final short MASK_POWERUP = CATEGORY_PIGEON;
+    public final short MASK_TELEPORT = CATEGORY_PIGEON;
 
 
     @Override
