@@ -205,18 +205,30 @@ public class Dodgeables {
 
         // draw all level one birds dodgeables using the current animation frame
         for (Body backwardsPigeon : levelOneBirdsArray) {
-            batch.draw(backwardsCurrentFrame, backwardsPigeon.getPosition().x, backwardsPigeon.getPosition().y, 0, 0, 6, 6, 1, 1, MathUtils.radiansToDegrees * backwardsPigeon.getAngle());
+            if (backwardsPigeon.isActive()) {
+                batch.draw(backwardsCurrentFrame, backwardsPigeon.getPosition().x, backwardsPigeon.getPosition().y, 0, 0, 6, 6, 1, 1, MathUtils.radiansToDegrees * backwardsPigeon.getAngle());
+            } else {
+                levelOneBirdsArray.removeValue(backwardsPigeon, false);
+            }
         }
 
         // get current frame of meteor animation for the current stateTime
         TextureRegion meteorCurrentFrame = meteorAnimation.getKeyFrame(stateTime, true);
         for (Body meteor : meteorArray) {
-            game.batch.draw(meteorCurrentFrame, meteor.getPosition().x, meteor.getPosition().y, 0, 0, METEOR_SCALE, METEOR_SCALE, 1, 1, MathUtils.radiansToDegrees * meteor.getAngle());
+            if (meteor.isActive()) {
+                game.batch.draw(meteorCurrentFrame, meteor.getPosition().x, meteor.getPosition().y, 0, 0, METEOR_SCALE, METEOR_SCALE, 1, 1, MathUtils.radiansToDegrees * meteor.getAngle());
+            } else {
+                meteorArray.removeValue(meteor, false);
+            }
         }
 
         // draw all level one birds dodgeables using the current animation frame
         for (Body speedBird : levelTwoBirdsArray) {
-            batch.draw(levelTwoCurrentFrame, speedBird.getPosition().x, speedBird.getPosition().y - 2f, 0, 2, 12, 12, 1, 1, MathUtils.radiansToDegrees * speedBird.getAngle());
+            if (speedBird.isActive()) {
+                batch.draw(levelTwoCurrentFrame, speedBird.getPosition().x, speedBird.getPosition().y - 2f, 0, 2, 12, 12, 1, 1, MathUtils.radiansToDegrees * speedBird.getAngle());
+            } else {
+                levelTwoBirdsArray.removeValue(speedBird, false);
+            }
         }
 
         // draw all PowerUp shield dodgeables using the current animation frame

@@ -169,6 +169,7 @@ public class GameScreen implements Screen {
         scrollingBackground.update(deltaTime);
         highScore.update(deltaTime);
         dodgeables.update(stateTime);
+        pigeon.update(stateTime);
 
         // process user input
         if (Gdx.input.isTouched()) {
@@ -187,7 +188,6 @@ public class GameScreen implements Screen {
             pigeonBody.setLinearVelocity(0, 30.0f);
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
             pigeonBody.setLinearVelocity(0, -30.0f);
-           
 
 
         // make sure the pigeon stays within the screen bounds
@@ -235,7 +235,7 @@ public class GameScreen implements Screen {
                 Boolean powerUpInvolvedInCollision = powerUpShieldInvolvedInCollision;
 
 
-                short powerUpType;
+                short powerUpType = game.CATEGORY_PIGEON;
                 if (powerUpShieldInvolvedInCollision) {
                     powerUpType = game.CATEGORY_POWERUP_SHIELD;
                     // destroy the power up body
@@ -244,17 +244,25 @@ public class GameScreen implements Screen {
                     } else if (fixtureB.getFilterData().categoryBits == game.CATEGORY_POWERUP_SHIELD) {
                         fixtureB.getBody().setUserData(new BodyData(true));
                     }
+                } else if (pigeonInvolvedInCollision && pigeon.getPowerUpType() == game.CATEGORY_POWERUP_SHIELD) {
+                    // destroy the body that the pigeon touches
+                    if (fixtureA.getFilterData().categoryBits == game.CATEGORY_PIGEON) {
+                        fixtureB.getBody().setUserData(new BodyData(true));
+                    } else if (fixtureB.getFilterData().categoryBits == game.CATEGORY_PIGEON) {
+                        fixtureA.getBody().setUserData(new BodyData(true));
+                    }
+
                 } else {
                     //TODO figure out else
-                    powerUpType = game.CATEGORY_PIGEON;
                 }
 
 
-                //If pigeon contacts a power up, power up the pigeon, otherwise if pigeon contacts a different object, the game is over
                 if (pigeonInvolvedInCollision && powerUpInvolvedInCollision) {
+                    //If pigeon contacts a powerUp, apply the powerUp
                     pigeon.powerUp(powerUpType);
 
-                } else if (pigeonInvolvedInCollision) {
+                } else if (pigeonInvolvedInCollision && pigeon.getPowerUpType() != game.CATEGORY_POWERUP_SHIELD) {
+                    // If the pigeon is involved in the collision and does not have a shield applied, the game is over
                     gameOver();
                 }
 
@@ -296,7 +304,7 @@ public class GameScreen implements Screen {
             Body body = iter.next();
             if (body != null) {
                 BodyData data = (BodyData) body.getUserData();
-                if (data != null){
+                if (data != null) {
                     if (data.isFlaggedForDelete()) {
                         world.destroyBody(body);
                         //body.setUserData(null);

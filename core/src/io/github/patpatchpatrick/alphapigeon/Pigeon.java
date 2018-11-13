@@ -11,6 +11,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 
@@ -22,6 +23,17 @@ public class Pigeon {
     Body pigeonBody;
     AlphaPigeon game;
     World world;
+    private float stateTime;
+
+    //Power Up Variables
+    private short currentPowerUp;
+    private float currentPowerUpTime = 0;
+    private final long MILLION_SCALE = 1000000;
+
+    //Power Up Shield Animation Variables
+    private Texture powerUpShieldSheet;
+    private Animation<TextureRegion> powerUpShieldAnimation;
+
 
     public Pigeon(World world, AlphaPigeon game) {
 
@@ -48,11 +60,20 @@ public class Pigeon {
         //pigeonFixtureDef.isSensor =  true;
         loader.attachFixture(pigeonBody, "AlphaPigeon", pigeonFixtureDef, 10);
 
+        initializePowerUpShieldAnimation();
+
 
     }
 
     public void powerUp(short powerUpType){
+        //Set the current power up type and the time that the power up was picked up by the pigeon
+        currentPowerUp = powerUpType;
+        this.currentPowerUpTime = this.stateTime;
+    }
 
+    public short getPowerUpType(){
+        //Return the current type of power up applied to the pigeon
+        return currentPowerUp;
     }
 
     private void initializePigeonAnimation() {
@@ -82,12 +103,56 @@ public class Pigeon {
 
     }
 
+    private void initializePowerUpShieldAnimation() {
+
+        // load the PowerUp shield sprite sheet as a Texture
+        powerUpShieldSheet = new Texture(Gdx.files.internal("sprites/PUShieldSpriteSheet.png"));
+
+        // Use the split utility method to create a 2D array of TextureRegions. This is
+        // possible because this sprite sheet contains frames of equal size and they are
+        // all aligned.
+        TextureRegion[][] tmp = TextureRegion.split(powerUpShieldSheet,
+                powerUpShieldSheet.getWidth() / 3,
+                powerUpShieldSheet.getHeight() / 1);
+
+        // Place the regions into a 1D array in the correct order, starting from the top
+        // left, going across first. The Animation constructor requires a 1D array.
+        TextureRegion[] shieldTextureRegion = new TextureRegion[3 * 1];
+        int index = 0;
+        for (int i = 0; i < 1; i++) {
+            for (int j = 0; j < 3; j++) {
+                shieldTextureRegion[index++] = tmp[i][j];
+            }
+        }
+
+        // Initialize the Animation with the frame interval and array of frames
+        powerUpShieldAnimation = new Animation<TextureRegion>(0.05f, shieldTextureRegion);
+
+    }
+
     public void render(float stateTime, SpriteBatch batch) {
 
 
         // Get current frame of animation for the current stateTime and render it
-        TextureRegion currentFrame = pigeonFlyAnimation.getKeyFrame(stateTime, true);
-        batch.draw(currentFrame, pigeonBody.getPosition().x, pigeonBody.getPosition().y, 0, 0, 10, 5f, 1, 1, MathUtils.radiansToDegrees * pigeonBody.getAngle());
+        TextureRegion pigeonCurrentFrame = pigeonFlyAnimation.getKeyFrame(stateTime, true);
+        batch.draw(pigeonCurrentFrame, pigeonBody.getPosition().x, pigeonBody.getPosition().y, 0, 0, 10, 5f, 1, 1, MathUtils.radiansToDegrees * pigeonBody.getAngle());
+
+        if (this.currentPowerUp == game.CATEGORY_POWERUP_SHIELD){
+            // Get current frame of animation for the current stateTime and render it
+            TextureRegion powUpShieldCurrentFrame = powerUpShieldAnimation.getKeyFrame(stateTime, true);
+            batch.draw(powUpShieldCurrentFrame, pigeonBody.getPosition().x - 2.5f, pigeonBody.getPosition().y - 2.5f, 0, 0, 15f, 10f, 1, 1, MathUtils.radiansToDegrees * pigeonBody.getAngle());
+        }
+
+    }
+
+    public void update(float stateTime){
+        this.stateTime = stateTime;
+
+        //Check if power up shield has expired
+        //If so, set currentPowerUp back to CATEGORY_PIGEON, which is the default currentPowerUp setting
+        if (this.stateTime - this.currentPowerUpTime > 8){
+            this.currentPowerUp = game.CATEGORY_PIGEON;
+        }
 
     }
 
@@ -98,5 +163,6 @@ public class Pigeon {
 
     public void dispose() {
         pigeonFlySheet.dispose();
+        powerUpShieldSheet.dispose();
     }
 }
