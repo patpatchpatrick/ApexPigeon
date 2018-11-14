@@ -30,26 +30,32 @@ public class Dodgeables {
     private final long MILLION_SCALE = 1000000;
 
     //Level One Bird variables
-    private Array<Body> levelOneBirdsArray;
+    private Array<Body> levelOneBirdsArray = new Array<Body>();
     private Animation<TextureRegion> levelOneBirdAnimation;
     private Texture levelOneBirdFlySheet;
     private long lastLevelOneBirdSpawnTime;
 
     //Meteor global variables
-    private Array<Body> meteorArray;
+    private Array<Body> meteorArray = new Array<Body>();
     private Texture meteorTextureSpriteSheet;
     private Animation<TextureRegion> meteorAnimation;
     private long lastMeteorSpawnTime;
     private final int METEOR_SCALE = 15;
 
     //Level Two Bird variables
-    private Array<Body> levelTwoBirdsArray;
+    private Array<Body> levelTwoBirdsArray = new Array<Body>();
     private Animation<TextureRegion> levelTwoBirdAnimation;
     private Texture levelTwoBirdFlySheet;
     private long lastLevelTwoBirdSpawnTime;
 
+    //Rocket variables
+    private Array<Body> rocketArray = new Array<Body>();
+    private Animation<TextureRegion> rocketAnimation;
+    private Texture rocketSheet;
+    private long lastRocketSpawnTime;
+
     //PowerUp Shield variables
-    private Array<Body> powerUpShieldsArray;
+    private Array<Body> powerUpShieldsArray = new Array<Body>();
     private Animation<TextureRegion> powerUpShieldAnimation;
     private Texture powerUpShieldSheet;
     private long lastpowerUpShieldSpawnTime;
@@ -67,16 +73,11 @@ public class Dodgeables {
         this.game = game;
         this.camera = camera;
 
-        // initialize array of level one birds
-        levelOneBirdsArray = new Array<Body>();
-        meteorArray = new Array<Body>();
-        levelTwoBirdsArray = new Array<Body>();
-        powerUpShieldsArray = new Array<Body>();
-
         // initialize enemy animations
         initializeLevelOneBirdAnimation();
         initializeMeteorAnimation();
         initializeLevelTwoBirdAnimation();
+        initializeRocketAnimation();
 
         // initialize powerup animations
         initializePowerUpShieldAnimation();
@@ -88,13 +89,15 @@ public class Dodgeables {
 
     public void spawnDodgeables() {
         //class to determine if we need to spawn new dodgeables depending on how much time has passed
-        if (TimeUtils.nanoTime() / MILLION_SCALE - lastLevelOneBirdSpawnTime / MILLION_SCALE > 2000)
+        if (TimeUtils.nanoTime() / MILLION_SCALE - lastLevelOneBirdSpawnTime / MILLION_SCALE > 50000)
             spawnLevelOneBird();
-        if (TimeUtils.nanoTime() / MILLION_SCALE - lastMeteorSpawnTime / MILLION_SCALE > 4000)
+        if (TimeUtils.nanoTime() / MILLION_SCALE - lastMeteorSpawnTime / MILLION_SCALE > 50000)
             spawnMeteor();
-        if (TimeUtils.nanoTime() / MILLION_SCALE - lastLevelTwoBirdSpawnTime / MILLION_SCALE > 2000)
+        if (TimeUtils.nanoTime() / MILLION_SCALE - lastLevelTwoBirdSpawnTime / MILLION_SCALE > 50000)
             spawnLevelTwoBird();
-        if (TimeUtils.nanoTime() / MILLION_SCALE - lastpowerUpShieldSpawnTime / MILLION_SCALE > 2000)
+        if (TimeUtils.nanoTime() / MILLION_SCALE - lastRocketSpawnTime / MILLION_SCALE > 2000)
+            spawnRocket();
+        if (TimeUtils.nanoTime() / MILLION_SCALE - lastpowerUpShieldSpawnTime / MILLION_SCALE > 50000)
             spawnPowerUpShield();
         if (TimeUtils.nanoTime() / MILLION_SCALE - lastTeleportSpawnTime / MILLION_SCALE > 50000)
             spawnTeleports();
@@ -182,6 +185,36 @@ public class Dodgeables {
 
     }
 
+    private void spawnRocket() {
+
+        //spawn a new rocket
+        BodyDef rocketBodyDef = new BodyDef();
+        rocketBodyDef.type = BodyDef.BodyType.DynamicBody;
+
+        //spawn rocket at random height
+        rocketBodyDef.position.set(camera.viewportWidth, MathUtils.random(0, camera.viewportHeight - 20));
+        Body rocketBody = gameWorld.createBody(rocketBodyDef);
+        BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("json/Rocket.json"));
+        FixtureDef rocketFixtureDef = new FixtureDef();
+        rocketFixtureDef.density = 0.001f;
+        rocketFixtureDef.friction = 0.5f;
+        rocketFixtureDef.restitution = 0.3f;
+        // set the rocket filter categories and masks for collisions
+        rocketFixtureDef.filter.categoryBits = game.CATEGORY_LEVEL_TWO_BIRD;
+        rocketFixtureDef.filter.maskBits = game.MASK_LEVEL_TWO_BIRD;
+        loader.attachFixture(rocketBody, "Rocket", rocketFixtureDef, 10);
+        rocketBody.setTransform(rocketBody.getPosition(), -90*MathUtils.degreesToRadians);
+        rocketBody.applyForceToCenter(-15.0f, 0, true);
+
+        //add rocket to rockets array
+        rocketArray.add(rocketBody);
+
+        //keep track of time the rocket was spawned
+        lastRocketSpawnTime = TimeUtils.nanoTime();
+
+
+    }
+
     public void spawnPowerUpShield() {
 
         //spawn a new PowerUp Shield
@@ -266,8 +299,10 @@ public class Dodgeables {
         // get current frame of animation for the current stateTime
         TextureRegion backwardsCurrentFrame = levelOneBirdAnimation.getKeyFrame(stateTime, true);
         TextureRegion levelTwoCurrentFrame = levelTwoBirdAnimation.getKeyFrame(stateTime, true);
+        TextureRegion rocketCurrentFrame = rocketAnimation.getKeyFrame(stateTime, true);
         TextureRegion powerUpShieldCurrentFrame = powerUpShieldAnimation.getKeyFrame(stateTime, true);
         TextureRegion teleportCurrentFrame = teleportAnimation.getKeyFrame(stateTime, true);
+
 
         // draw all level one birds dodgeables using the current animation frame
         for (Body backwardsPigeon : levelOneBirdsArray) {
@@ -282,7 +317,7 @@ public class Dodgeables {
         TextureRegion meteorCurrentFrame = meteorAnimation.getKeyFrame(stateTime, true);
         for (Body meteor : meteorArray) {
             if (meteor.isActive()) {
-                game.batch.draw(meteorCurrentFrame, meteor.getPosition().x, meteor.getPosition().y, 0, 0, METEOR_SCALE, METEOR_SCALE, 1, 1, MathUtils.radiansToDegrees * meteor.getAngle());
+                batch.draw(meteorCurrentFrame, meteor.getPosition().x, meteor.getPosition().y, 0, 0, METEOR_SCALE, METEOR_SCALE, 1, 1, MathUtils.radiansToDegrees * meteor.getAngle());
             } else {
                 meteorArray.removeValue(meteor, false);
             }
@@ -294,6 +329,15 @@ public class Dodgeables {
                 batch.draw(levelTwoCurrentFrame, speedBird.getPosition().x, speedBird.getPosition().y - 2f, 0, 2, 12, 12, 1, 1, MathUtils.radiansToDegrees * speedBird.getAngle());
             } else {
                 levelTwoBirdsArray.removeValue(speedBird, false);
+            }
+        }
+
+        // draw all rocket dodgeables using the current animation frame
+        for (Body rocket : rocketArray) {
+            if (rocket.isActive()) {
+                batch.draw(rocketCurrentFrame, rocket.getPosition().x, rocket.getPosition().y, 0, 0, 10, 20, 1, 1, MathUtils.radiansToDegrees * rocket.getAngle());
+            } else {
+                rocketArray.removeValue(rocket, false);
             }
         }
 
@@ -321,6 +365,8 @@ public class Dodgeables {
             }
 
         }
+
+
 
     }
 
@@ -416,6 +462,39 @@ public class Dodgeables {
 
         // Initialize the Animation with the frame interval and array of frames
         levelTwoBirdAnimation = new Animation<TextureRegion>(0.04f, levelTwoBirdFlyFrames);
+
+    }
+
+    private void initializeRocketAnimation() {
+
+        // Load the rocket sprite sheet as a Texture
+        rocketSheet = new Texture(Gdx.files.internal("sprites/RocketSpriteSheet.png"));
+
+        // Use the split utility method to create a 2D array of TextureRegions. This is
+        // possible because this sprite sheet contains frames of equal size and they are
+        // all aligned.
+        TextureRegion[][] tmp = TextureRegion.split(rocketSheet,
+                rocketSheet.getWidth() / 8,
+                rocketSheet.getHeight() / 8);
+
+        // Place the regions into a 1D array in the correct order, starting from the top
+        // left, going across first. The Animation constructor requires a 1D array.
+        TextureRegion[] rocketFireFrames = new TextureRegion[61 * 1];
+        int index = 0;
+        for (int i = 0; i < 7; i++) {
+            for (int j = 0; j < 8; j++) {
+                rocketFireFrames[index++] = tmp[i][j];
+            }
+        }
+        //The rocket prite region only has 61 frames, so for the last row of the 8x8 sprite grid
+        // , only add 5 sprite frames
+        for (int j = 0; j < 5; j++){
+            rocketFireFrames[index++] = tmp[7][j];
+        }
+
+
+        // Initialize the Animation with the frame interval and array of frames
+        rocketAnimation = new Animation<TextureRegion>(0.02f, rocketFireFrames);
 
     }
 
