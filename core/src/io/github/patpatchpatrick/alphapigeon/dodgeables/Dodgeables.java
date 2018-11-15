@@ -53,6 +53,8 @@ public class Dodgeables {
     private Animation<TextureRegion> rocketAnimation;
     private Texture rocketSheet;
     private long lastRocketSpawnTime;
+    private final float ROCKET_WIDTH = 10f;
+    private final float ROCKET_HEIGHT = 20f;
 
     //PowerUp Shield variables
     private Array<Body> powerUpShieldsArray = new Array<Body>();
@@ -61,7 +63,7 @@ public class Dodgeables {
     private long lastpowerUpShieldSpawnTime;
 
     //Teleport variables
-    private Array<Body> teleportArray = new  Array<Body>();
+    private Array<Body> teleportArray = new Array<Body>();
     private Animation<TextureRegion> teleportAnimation;
     private Texture teleportSheet;
     private long lastTeleportSpawnTime;
@@ -191,8 +193,9 @@ public class Dodgeables {
         BodyDef rocketBodyDef = new BodyDef();
         rocketBodyDef.type = BodyDef.BodyType.DynamicBody;
 
-        //spawn rocket at random height
-        rocketBodyDef.position.set(camera.viewportWidth, MathUtils.random(0, camera.viewportHeight - 20));
+        //spawn rocket at random height and subtract the width of the rocket since the rocket is rotated 90 degrees
+        float rocketSpawnHeight = MathUtils.random(ROCKET_WIDTH, camera.viewportHeight);
+        rocketBodyDef.position.set(camera.viewportWidth, rocketSpawnHeight);
         Body rocketBody = gameWorld.createBody(rocketBodyDef);
         BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("json/Rocket.json"));
         FixtureDef rocketFixtureDef = new FixtureDef();
@@ -200,11 +203,32 @@ public class Dodgeables {
         rocketFixtureDef.friction = 0.5f;
         rocketFixtureDef.restitution = 0.3f;
         // set the rocket filter categories and masks for collisions
-        rocketFixtureDef.filter.categoryBits = game.CATEGORY_LEVEL_TWO_BIRD;
-        rocketFixtureDef.filter.maskBits = game.MASK_LEVEL_TWO_BIRD;
+        rocketFixtureDef.filter.categoryBits = game.CATEGORY_ROCKET;
+        rocketFixtureDef.filter.maskBits = game.MASK_ROCKET;
         loader.attachFixture(rocketBody, "Rocket", rocketFixtureDef, 10);
-        rocketBody.setTransform(rocketBody.getPosition(), -90*MathUtils.degreesToRadians);
-        rocketBody.applyForceToCenter(-15.0f, 0, true);
+        rocketBody.setTransform(rocketBody.getPosition(), -90 * MathUtils.degreesToRadians);
+
+        //Determine which torque to apply to rocket depending on if it is spawned on bottom half or top half of screen
+        //If spawned on bottom half, rotate rocket CW and move it upwards (done in the update method)
+        //If spawned on top half, rotate rocket CCW and move it downwards (done in the update method)
+        //Randomize the magnitude of the torque
+        float rocketTorque;
+        boolean rocketSpawnedInBottomHalfScreen = rocketSpawnHeight < camera.viewportHeight / 2;
+        if (rocketSpawnedInBottomHalfScreen) {
+            rocketTorque = MathUtils.random(-4f, -2f);
+        } else {
+            rocketTorque = MathUtils.random(-1f, 0f);
+        }
+
+        //Set torque and spawn data on the rocket body so it can be used in the update method
+        BodyData rocketData = new BodyData(false);
+        rocketData.setRocketData(rocketTorque, false);
+        rocketBody.setUserData(rocketData);
+        rocketBody.applyTorque(rocketTorque, true);
+        // apply the force to the rocket at the height it was spawned and at the end of the rocket
+        // ROCKET_HEIGHT is used  for x coordinate of force instead of ROCKET_WIDTH because the rocket is rotated 90 degrees
+        rocketBody.applyForce(-15.0f, 0, camera.viewportWidth + ROCKET_HEIGHT, rocketSpawnHeight - 5, true);
+
 
         //add rocket to rockets array
         rocketArray.add(rocketBody);
@@ -285,7 +309,6 @@ public class Dodgeables {
         teleportTwoBody.setUserData(teleportTwoData);
 
 
-
         //add teleport to teleports array
         teleportArray.add(teleportBody);
         teleportArray.add(teleportTwoBody);
@@ -344,20 +367,20 @@ public class Dodgeables {
         // draw all PowerUp shield dodgeables using the current animation frame
         for (Body powerUpShield : powerUpShieldsArray) {
 
-                // draw the PowerUp shield if it is active (hasn't been grabbed by the pigeon), otherwise remove it from the array
-                if (powerUpShield.isActive()){
-                    batch.draw(powerUpShieldCurrentFrame, powerUpShield.getPosition().x, powerUpShield.getPosition().y,
-                            0, 0, 8f, 4.8f, 1, 1, MathUtils.radiansToDegrees * powerUpShield.getAngle());
-                } else {
-                    powerUpShieldsArray.removeValue(powerUpShield, false);
-                }
+            // draw the PowerUp shield if it is active (hasn't been grabbed by the pigeon), otherwise remove it from the array
+            if (powerUpShield.isActive()) {
+                batch.draw(powerUpShieldCurrentFrame, powerUpShield.getPosition().x, powerUpShield.getPosition().y,
+                        0, 0, 8f, 4.8f, 1, 1, MathUtils.radiansToDegrees * powerUpShield.getAngle());
+            } else {
+                powerUpShieldsArray.removeValue(powerUpShield, false);
+            }
         }
 
         // draw all teleport dodgeables using the current animation frame
         for (Body teleport : teleportArray) {
 
             // draw the teleport if it is active (hasn't been grabbed by the pigeon), otherwise remove it from the array
-            if (teleport.isActive()){
+            if (teleport.isActive()) {
                 batch.draw(teleportCurrentFrame, teleport.getPosition().x, teleport.getPosition().y,
                         0, 0, 10f, 10f, 1, 1, MathUtils.radiansToDegrees * teleport.getAngle());
             } else {
@@ -367,20 +390,28 @@ public class Dodgeables {
         }
 
 
-
     }
 
     public void update(float stateTime) {
         //Check if we need to spawn new dodgeables depending on game time
         spawnDodgeables();
 
-        /**
-         for (Iterator<Body> iter = levelOneBirdsArray.iterator(); iter.hasNext(); ) {
-         Body backwardsPigeonRect = iter.next();
-         backwardsPigeonRect.x -= dodgeableSpeed * Gdx.graphics.getDeltaTime();
-         if (backwardsPigeonRect.x + 64 < 0) iter.remove();
-         //Add code to remove pigeon if it collides
-         }**/
+        // ROCKETS
+        // If rockets are spawned , accelerate them.  The X force is constant and the Y force
+        // is stored on the rocket body data.  It depends on where the rocket was spawned (see spawnRockets method)
+        if (TimeUtils.nanoTime() / MILLION_SCALE - lastRocketSpawnTime / MILLION_SCALE > 500) {
+            for (Body rocket : rocketArray) {
+                if (rocket.isActive()) {
+                    float forceX = -1f;
+                    BodyData rocketData = (BodyData) rocket.getUserData();
+                    float forceY = rocketData.getRocketYForce();
+                    rocket.applyForceToCenter(forceX, forceY, true);
+                } else {
+                    rocketArray.removeValue(rocket, false);
+                }
+            }
+        }
+
     }
 
     public void initializeLevelOneBirdAnimation() {
@@ -488,7 +519,7 @@ public class Dodgeables {
         }
         //The rocket prite region only has 61 frames, so for the last row of the 8x8 sprite grid
         // , only add 5 sprite frames
-        for (int j = 0; j < 5; j++){
+        for (int j = 0; j < 5; j++) {
             rocketFireFrames[index++] = tmp[7][j];
         }
 
@@ -552,11 +583,6 @@ public class Dodgeables {
         teleportAnimation = new Animation<TextureRegion>(0.05f, teleportFrames);
 
     }
-
-    public Array<Body> getTeleportArray(){
-        return teleportArray;
-    }
-
 
 
     public void dispose() {
