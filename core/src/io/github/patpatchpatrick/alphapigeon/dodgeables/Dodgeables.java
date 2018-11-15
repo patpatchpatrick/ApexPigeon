@@ -56,6 +56,16 @@ public class Dodgeables {
     private final float ROCKET_WIDTH = 10f;
     private final float ROCKET_HEIGHT = 20f;
 
+    //Rocket explosion variables
+    private Array<Body> rocketExplosionArray = new Array<Body>();
+    private Animation<TextureRegion> rocketExplosionAnimation;
+    private Texture rocketExplosionSheet;
+    private long lastRocketExplosionSpawnTime;
+    private final float ROCKET_EXPLOSION_WIDTH = 20f;
+    private final float ROCKET_EXPLOSION_HEIGHT = 20f;
+
+
+
     //PowerUp Shield variables
     private Array<Body> powerUpShieldsArray = new Array<Body>();
     private Animation<TextureRegion> powerUpShieldAnimation;
@@ -80,6 +90,7 @@ public class Dodgeables {
         initializeMeteorAnimation();
         initializeLevelTwoBirdAnimation();
         initializeRocketAnimation();
+        initializeRocketExplosionAnimation();
 
         // initialize powerup animations
         initializePowerUpShieldAnimation();
@@ -323,6 +334,7 @@ public class Dodgeables {
         TextureRegion backwardsCurrentFrame = levelOneBirdAnimation.getKeyFrame(stateTime, true);
         TextureRegion levelTwoCurrentFrame = levelTwoBirdAnimation.getKeyFrame(stateTime, true);
         TextureRegion rocketCurrentFrame = rocketAnimation.getKeyFrame(stateTime, true);
+        TextureRegion rocketExplosionCurrentFrame = rocketExplosionAnimation.getKeyFrame(stateTime, true);
         TextureRegion powerUpShieldCurrentFrame = powerUpShieldAnimation.getKeyFrame(stateTime, true);
         TextureRegion teleportCurrentFrame = teleportAnimation.getKeyFrame(stateTime, true);
 
@@ -359,6 +371,7 @@ public class Dodgeables {
         for (Body rocket : rocketArray) {
             if (rocket.isActive()) {
                 batch.draw(rocketCurrentFrame, rocket.getPosition().x, rocket.getPosition().y, 0, 0, 10, 20, 1, 1, MathUtils.radiansToDegrees * rocket.getAngle());
+                batch.draw(rocketExplosionCurrentFrame, rocket.getPosition().x,  rocket.getPosition().y, 0, 0, 20, 20, 1,  1,  MathUtils.radiansToDegrees * rocket.getAngle());
             } else {
                 rocketArray.removeValue(rocket, false);
             }
@@ -398,7 +411,7 @@ public class Dodgeables {
 
         // ROCKETS
         // If rockets are spawned , accelerate them.  The X force is constant and the Y force
-        // is stored on the rocket body data.  It depends on where the rocket was spawned (see spawnRockets method)
+        // is stored on the rocket body data.  Y force depends on where the rocket was spawned (see spawnRockets method)
         if (TimeUtils.nanoTime() / MILLION_SCALE - lastRocketSpawnTime / MILLION_SCALE > 500) {
             for (Body rocket : rocketArray) {
                 if (rocket.isActive()) {
@@ -526,6 +539,34 @@ public class Dodgeables {
 
         // Initialize the Animation with the frame interval and array of frames
         rocketAnimation = new Animation<TextureRegion>(0.02f, rocketFireFrames);
+
+    }
+
+    private void initializeRocketExplosionAnimation() {
+
+        // Load the rocket explosion sprite sheet as a Texture
+        rocketExplosionSheet = new Texture(Gdx.files.internal("sprites/RocketExplosionSpriteSheet.png"));
+
+        // Use the split utility method to create a 2D array of TextureRegions. This is
+        // possible because this sprite sheet contains frames of equal size and they are
+        // all aligned.
+        TextureRegion[][] tmp = TextureRegion.split(rocketExplosionSheet,
+                rocketExplosionSheet.getWidth() / 6,
+                rocketExplosionSheet.getHeight() / 1);
+
+        // Place the regions into a 1D array in the correct order, starting from the top
+        // left, going across first. The Animation constructor requires a 1D array.
+        TextureRegion[] rocketExplosionFrames = new TextureRegion[6 * 1];
+        int index = 0;
+        for (int i = 0; i < 1; i++) {
+            for (int j = 0; j < 6; j++) {
+                rocketExplosionFrames[index++] = tmp[i][j];
+            }
+        }
+
+
+        // Initialize the Animation with the frame interval and array of frames
+        rocketExplosionAnimation = new Animation<TextureRegion>(0.15f, rocketExplosionFrames);
 
     }
 
