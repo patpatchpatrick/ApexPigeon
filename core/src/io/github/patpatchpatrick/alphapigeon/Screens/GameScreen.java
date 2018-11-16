@@ -225,15 +225,22 @@ public class GameScreen implements Screen {
             @Override
             public void beginContact(Contact contact) {
 
-                //If the pigeon is involved in any of the collisions, the pigeon crashed and the game is over.
-                Fixture fixtureA = contact.getFixtureA();
-                Fixture fixtureB = contact.getFixtureB();
+                //Get fixures and bodies
+                final Fixture fixtureA = contact.getFixtureA();
+                final Fixture fixtureB = contact.getFixtureB();
+                final Body fixtureABody = fixtureA.getBody();
+                Body fixtureBBody = fixtureB.getBody();
+
+                //Get the category of fixtures involved in collision
+                short fixtureACategory = fixtureA.getFilterData().categoryBits;
+                short fixtureBCategory = fixtureB.getFilterData().categoryBits;
 
                 //Boolean collision checks used to determine action to take
-                Boolean pigeonInvolvedInCollision = fixtureA.getBody().equals(pigeonBody) || fixtureB.getBody().equals(pigeonBody);
-                Boolean powerUpShieldInvolvedInCollision = fixtureA.getFilterData().categoryBits == game.CATEGORY_POWERUP_SHIELD || fixtureB.getFilterData().categoryBits == game.CATEGORY_POWERUP_SHIELD;
+                Boolean pigeonInvolvedInCollision = fixtureACategory == game.CATEGORY_PIGEON || fixtureBCategory == game.CATEGORY_PIGEON;
+                Boolean powerUpShieldInvolvedInCollision = fixtureACategory == game.CATEGORY_POWERUP_SHIELD || fixtureBCategory == game.CATEGORY_POWERUP_SHIELD;
                 Boolean powerUpInvolvedInCollision = powerUpShieldInvolvedInCollision;
-                Boolean teleportInvolvedInCollision = fixtureA.getFilterData().categoryBits == game.CATEGORY_TELEPORT || fixtureB.getFilterData().categoryBits == game.CATEGORY_TELEPORT;
+                Boolean teleportInvolvedInCollision = fixtureACategory == game.CATEGORY_TELEPORT || fixtureBCategory == game.CATEGORY_TELEPORT;
+                Boolean rocketInvolvedInCollision = fixtureACategory == game.CATEGORY_ROCKET || fixtureBCategory == game.CATEGORY_ROCKET;
 
                 short powerUpType = game.CATEGORY_PIGEON;
 
@@ -252,7 +259,7 @@ public class GameScreen implements Screen {
                         pigeon.powerUp(powerUpType);
                     } else if (teleportInvolvedInCollision) {
                         Fixture teleportFixture;
-                        if (fixtureA.getFilterData().categoryBits == game.CATEGORY_TELEPORT){
+                        if (fixtureA.getFilterData().categoryBits == game.CATEGORY_TELEPORT) {
                             teleportFixture = fixtureA;
                         } else {
                             teleportFixture = fixtureB;
@@ -264,7 +271,42 @@ public class GameScreen implements Screen {
                         // If the pigeon is involved in the collision and does not have a shield applied, the game is over
                         gameOver();
                     }
+                }
 
+                //Collision logic for rocket
+                //If a rocket is involved in a collision, and the pigeon is not involved, then the
+                //rocket collided with an enemy so it should explode
+                //Spawn a rocket explosion in the position of the fixture that is not the rocket, since
+                //the enemy will explode at collision. Then, destroy the rocket and the enemy it collided with
+                //The spawned rocket and destroyed bodies must be run on a separate thread so the world isn't locked
+                if (rocketInvolvedInCollision) {
+                    if (!pigeonInvolvedInCollision){
+                        final Body fixtureAExplosionBody = fixtureABody;
+                        final Body fixtureBExplosionBody = fixtureBBody;
+                        if (fixtureA.getFilterData().categoryBits == game.CATEGORY_ROCKET){
+                            Gdx.app.postRunnable(new Runnable() {
+
+                                @Override
+                                public void run () {
+                                    dodgeables.spawnRocketExplosion(fixtureBExplosionBody.getWorldCenter().x, fixtureBExplosionBody.getWorldCenter().y);
+                                    destroyBody(fixtureA);
+                                    destroyBody(fixtureB);
+                                }
+                            });
+
+                        } else {
+
+                            Gdx.app.postRunnable(new Runnable() {
+
+                                @Override
+                                public void run () {
+                                    dodgeables.spawnRocketExplosion(fixtureAExplosionBody.getWorldCenter().x, fixtureAExplosionBody.getWorldCenter().y);
+                                    destroyBody(fixtureA);
+                                    destroyBody(fixtureB);
+                                }
+                            });
+                        }
+                    }
                 }
 
 
@@ -309,6 +351,10 @@ public class GameScreen implements Screen {
             fixtureA.getBody().setUserData(new BodyData(true));
         }
 
+    }
+
+    private void destroyBody(Fixture fixture){
+        fixture.getBody().setUserData(new BodyData(true));
     }
 
     private void gameOver() {

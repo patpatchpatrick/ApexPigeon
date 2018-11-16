@@ -61,8 +61,8 @@ public class Dodgeables {
     private Animation<TextureRegion> rocketExplosionAnimation;
     private Texture rocketExplosionSheet;
     private long lastRocketExplosionSpawnTime;
-    private final float ROCKET_EXPLOSION_WIDTH = 20f;
-    private final float ROCKET_EXPLOSION_HEIGHT = 20f;
+    private final float ROCKET_EXPLOSION_WIDTH = 30f;
+    private final float ROCKET_EXPLOSION_HEIGHT = 30f;
 
 
 
@@ -106,7 +106,7 @@ public class Dodgeables {
             spawnLevelOneBird();
         if (TimeUtils.nanoTime() / MILLION_SCALE - lastMeteorSpawnTime / MILLION_SCALE > 50000)
             spawnMeteor();
-        if (TimeUtils.nanoTime() / MILLION_SCALE - lastLevelTwoBirdSpawnTime / MILLION_SCALE > 50000)
+        if (TimeUtils.nanoTime() / MILLION_SCALE - lastLevelTwoBirdSpawnTime / MILLION_SCALE > 2000)
             spawnLevelTwoBird();
         if (TimeUtils.nanoTime() / MILLION_SCALE - lastRocketSpawnTime / MILLION_SCALE > 2000)
             spawnRocket();
@@ -247,6 +247,41 @@ public class Dodgeables {
         //keep track of time the rocket was spawned
         lastRocketSpawnTime = TimeUtils.nanoTime();
 
+    }
+
+    public void spawnRocketExplosion(float explosionPositionX, float explosionPositionY){
+
+        //spawn a new rocket explosion
+        BodyDef rocketExplosionBodyDef = new BodyDef();
+        rocketExplosionBodyDef.type = BodyDef.BodyType.DynamicBody;
+
+        //spawn rocket explosion at the input position (this will be the position of the enemy that was hit
+        // with the rocket.   Move the rocket to the left and downwards so it is centered on the enemy's body
+        rocketExplosionBodyDef.position.set(explosionPositionX - ROCKET_WIDTH * 1.5f, explosionPositionY - ROCKET_HEIGHT/1.5f);
+        Body rocketExplosionBody = gameWorld.createBody(rocketExplosionBodyDef);
+        BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("json/RocketExplosion.json"));
+        FixtureDef rocketExplosionFixtureDef = new FixtureDef();
+        rocketExplosionFixtureDef.density = 0.001f;
+        rocketExplosionFixtureDef.friction = 0.5f;
+        rocketExplosionFixtureDef.restitution = 0.3f;
+        // set the rocket explosion filter categories and masks for collisions
+        rocketExplosionFixtureDef.filter.categoryBits = game.CATEGORY_ROCKET_EXPLOSION;
+        rocketExplosionFixtureDef.filter.maskBits = game.MASK_ROCKET_EXPLOSION;
+        loader.attachFixture(rocketExplosionBody, "RocketExplosion", rocketExplosionFixtureDef, 30);
+        rocketExplosionBody.applyForceToCenter(0, 0, true);
+
+        //Set the time the rocket was exploded on the rocket.  This is used in the update method
+        //to destroy the rocket explosion after a set amount of time
+        BodyData rocketExplosionData = new BodyData(false);
+        rocketExplosionData.setRocketExplosionData(TimeUtils.nanoTime());
+        rocketExplosionBody.setUserData(rocketExplosionData);
+
+        //add rocket explosion to rocket explosions array
+        rocketExplosionArray.add(rocketExplosionBody);
+
+        //keep track of time the bird was spawned
+        lastRocketExplosionSpawnTime = TimeUtils.nanoTime();
+
 
     }
 
@@ -371,9 +406,17 @@ public class Dodgeables {
         for (Body rocket : rocketArray) {
             if (rocket.isActive()) {
                 batch.draw(rocketCurrentFrame, rocket.getPosition().x, rocket.getPosition().y, 0, 0, 10, 20, 1, 1, MathUtils.radiansToDegrees * rocket.getAngle());
-                batch.draw(rocketExplosionCurrentFrame, rocket.getPosition().x,  rocket.getPosition().y, 0, 0, 20, 20, 1,  1,  MathUtils.radiansToDegrees * rocket.getAngle());
             } else {
                 rocketArray.removeValue(rocket, false);
+            }
+        }
+
+        // draw all rocket explosion dodgeables using the current animation frame
+        for (Body rocketExplosion : rocketExplosionArray) {
+            if (rocketExplosion.isActive()) {
+                batch.draw(rocketExplosionCurrentFrame, rocketExplosion.getPosition().x,  rocketExplosion.getPosition().y, 0, 0, ROCKET_EXPLOSION_WIDTH, ROCKET_EXPLOSION_HEIGHT, 1,  1,  MathUtils.radiansToDegrees * rocketExplosion.getAngle());
+            } else {
+                rocketExplosionArray.removeValue(rocketExplosion, false);
             }
         }
 
@@ -422,6 +465,21 @@ public class Dodgeables {
                 } else {
                     rocketArray.removeValue(rocket, false);
                 }
+            }
+        }
+
+        // ROCKET EXPLOSIONS
+        // If rocket explosions are active, check how long they've been active.
+        // If they have been active longer than set time,  destroy them.  
+        for (Body rocketExplosion : rocketExplosionArray){
+            if (rocketExplosion.isActive()) {
+                BodyData rocketExplosionData = (BodyData) rocketExplosion.getUserData();
+                long rocketExplosionTime = rocketExplosionData.getRocketExplosionTime();
+                if (TimeUtils.nanoTime() / MILLION_SCALE - rocketExplosionTime / MILLION_SCALE > 500){
+                    rocketExplosionData.setFlaggedForDelete(true);
+                }
+            } else {
+                rocketExplosionArray.removeValue(rocketExplosion, false);
             }
         }
 

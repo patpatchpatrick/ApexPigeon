@@ -13,6 +13,9 @@ public class BodyData {
     //Rocket Data
     private float rocketYForce = 0f;
 
+    //Rocket Explosion Data
+    private long lastRocketExplosionTime = 99999;
+
 
     public BodyData(boolean flagForDelete) {
         flaggedForDelete = flagForDelete;
@@ -24,6 +27,10 @@ public class BodyData {
         } else {
             return false;
         }
+    }
+
+    public void setFlaggedForDelete(boolean flaggedForDelete){
+        this.flaggedForDelete = flaggedForDelete;
     }
 
     public void setOppositeTeleport(Body oppositeTeleport){
@@ -44,6 +51,14 @@ public class BodyData {
         } else {
             rocketYForce = -0.3f * torque - 0.6f;
         }
+    }
+
+    public void setRocketExplosionData(long lastRocketExplosionTime){
+        this.lastRocketExplosionTime = lastRocketExplosionTime;
+    }
+
+    public long getRocketExplosionTime(){
+        return this.lastRocketExplosionTime;
     }
 
     public float getRocketYForce(){
