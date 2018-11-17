@@ -64,6 +64,13 @@ public class Dodgeables {
     private final float ROCKET_EXPLOSION_WIDTH = 30f;
     private final float ROCKET_EXPLOSION_HEIGHT = 30f;
 
+    //Alien Missile variables
+    private Array<Body> alienMissileArray = new Array<Body>();
+    private Animation<TextureRegion> alienMissileAnimation;
+    private Texture alienMissileSheet;
+    private long lastAlienMissileSpawnTime;
+    private final float ALIEN_MISSILE_WIDTH = 10f;
+    private final float ALIEN_MISSILE_HEIGHT = 10f;
 
 
     //PowerUp Shield variables
@@ -91,6 +98,7 @@ public class Dodgeables {
         initializeLevelTwoBirdAnimation();
         initializeRocketAnimation();
         initializeRocketExplosionAnimation();
+        initializeAlienMissileAnimation();
 
         // initialize powerup animations
         initializePowerUpShieldAnimation();
@@ -99,6 +107,7 @@ public class Dodgeables {
         initializeTeleportAnimation();
 
     }
+
 
     public void spawnDodgeables() {
         //class to determine if we need to spawn new dodgeables depending on how much time has passed
@@ -110,6 +119,8 @@ public class Dodgeables {
             spawnLevelTwoBird();
         if (TimeUtils.nanoTime() / MILLION_SCALE - lastRocketSpawnTime / MILLION_SCALE > 2000)
             spawnRocket();
+        if (TimeUtils.nanoTime() / MILLION_SCALE - lastAlienMissileSpawnTime / MILLION_SCALE > 50000)
+            spawnAlienMissile();
         if (TimeUtils.nanoTime() / MILLION_SCALE - lastpowerUpShieldSpawnTime / MILLION_SCALE > 50000)
             spawnPowerUpShield();
         if (TimeUtils.nanoTime() / MILLION_SCALE - lastTeleportSpawnTime / MILLION_SCALE > 50000)
@@ -249,7 +260,7 @@ public class Dodgeables {
 
     }
 
-    public void spawnRocketExplosion(float explosionPositionX, float explosionPositionY){
+    public void spawnRocketExplosion(float explosionPositionX, float explosionPositionY) {
 
         //spawn a new rocket explosion
         BodyDef rocketExplosionBodyDef = new BodyDef();
@@ -257,7 +268,7 @@ public class Dodgeables {
 
         //spawn rocket explosion at the input position (this will be the position of the enemy that was hit
         // with the rocket.   Move the rocket to the left and downwards so it is centered on the enemy's body
-        rocketExplosionBodyDef.position.set(explosionPositionX - ROCKET_WIDTH * 1.5f, explosionPositionY - ROCKET_HEIGHT/1.5f);
+        rocketExplosionBodyDef.position.set(explosionPositionX - ROCKET_WIDTH * 1.5f, explosionPositionY - ROCKET_HEIGHT / 1.5f);
         Body rocketExplosionBody = gameWorld.createBody(rocketExplosionBodyDef);
         BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("json/RocketExplosion.json"));
         FixtureDef rocketExplosionFixtureDef = new FixtureDef();
@@ -282,6 +293,34 @@ public class Dodgeables {
         //keep track of time the bird was spawned
         lastRocketExplosionSpawnTime = TimeUtils.nanoTime();
 
+
+    }
+
+    private void spawnAlienMissile() {
+
+        //spawn a new alien missile
+        BodyDef alienMissileBodyDef = new BodyDef();
+        alienMissileBodyDef.type = BodyDef.BodyType.DynamicBody;
+
+        //spawn alien missile at random height
+        alienMissileBodyDef.position.set(camera.viewportWidth, MathUtils.random(0, camera.viewportHeight - ALIEN_MISSILE_HEIGHT / 2));
+        Body alienMissileBody = gameWorld.createBody(alienMissileBodyDef);
+        BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("json/AlienMissile.json"));
+        FixtureDef alienMissileFixtureDef = new FixtureDef();
+        alienMissileFixtureDef.density = 0.001f;
+        alienMissileFixtureDef.friction = 0.5f;
+        alienMissileFixtureDef.restitution = 0.3f;
+        // set the alien missile filter categories and masks for collisions
+        alienMissileFixtureDef.filter.categoryBits = game.CATEGORY_ALIEN_MISSILE;
+        alienMissileFixtureDef.filter.maskBits = game.MASK_ALIEN_MISSILE;
+        loader.attachFixture(alienMissileBody, "Alien Missile", alienMissileFixtureDef, ALIEN_MISSILE_HEIGHT);
+        alienMissileBody.applyForceToCenter(-15.0f, 0, true);
+
+        //add alien missile to alien missiles array
+        alienMissileArray.add(alienMissileBody);
+
+        //keep track of time the bird was spawned
+        lastAlienMissileSpawnTime = TimeUtils.nanoTime();
 
     }
 
@@ -370,6 +409,7 @@ public class Dodgeables {
         TextureRegion levelTwoCurrentFrame = levelTwoBirdAnimation.getKeyFrame(stateTime, true);
         TextureRegion rocketCurrentFrame = rocketAnimation.getKeyFrame(stateTime, true);
         TextureRegion rocketExplosionCurrentFrame = rocketExplosionAnimation.getKeyFrame(stateTime, true);
+        TextureRegion alienMissileCurrentFrame = alienMissileAnimation.getKeyFrame(stateTime, true);
         TextureRegion powerUpShieldCurrentFrame = powerUpShieldAnimation.getKeyFrame(stateTime, true);
         TextureRegion teleportCurrentFrame = teleportAnimation.getKeyFrame(stateTime, true);
 
@@ -414,9 +454,18 @@ public class Dodgeables {
         // draw all rocket explosion dodgeables using the current animation frame
         for (Body rocketExplosion : rocketExplosionArray) {
             if (rocketExplosion.isActive()) {
-                batch.draw(rocketExplosionCurrentFrame, rocketExplosion.getPosition().x,  rocketExplosion.getPosition().y, 0, 0, ROCKET_EXPLOSION_WIDTH, ROCKET_EXPLOSION_HEIGHT, 1,  1,  MathUtils.radiansToDegrees * rocketExplosion.getAngle());
+                batch.draw(rocketExplosionCurrentFrame, rocketExplosion.getPosition().x, rocketExplosion.getPosition().y, 0, 0, ROCKET_EXPLOSION_WIDTH, ROCKET_EXPLOSION_HEIGHT, 1, 1, MathUtils.radiansToDegrees * rocketExplosion.getAngle());
             } else {
                 rocketExplosionArray.removeValue(rocketExplosion, false);
+            }
+        }
+
+        // draw all alien missile dodgeables using the current animation frame
+        for (Body alienMissile : alienMissileArray) {
+            if (alienMissile.isActive()) {
+                batch.draw(alienMissileCurrentFrame, alienMissile.getPosition().x, alienMissile.getPosition().y, ALIEN_MISSILE_WIDTH / 2, ALIEN_MISSILE_HEIGHT / 2, ALIEN_MISSILE_WIDTH, ALIEN_MISSILE_HEIGHT, 1, 1, MathUtils.radiansToDegrees * alienMissile.getAngle());
+            } else {
+                alienMissileArray.removeValue(alienMissile, false);
             }
         }
 
@@ -470,14 +519,21 @@ public class Dodgeables {
 
         // ROCKET EXPLOSIONS
         // If rocket explosions are active, check how long they've been active.
-        // If they have been active longer than set time,  destroy them.  
-        for (Body rocketExplosion : rocketExplosionArray){
+        // If they have been active longer than set time,  destroy them.
+        for (Body rocketExplosion : rocketExplosionArray) {
             if (rocketExplosion.isActive()) {
                 BodyData rocketExplosionData = (BodyData) rocketExplosion.getUserData();
-                long rocketExplosionTime = rocketExplosionData.getRocketExplosionTime();
-                if (TimeUtils.nanoTime() / MILLION_SCALE - rocketExplosionTime / MILLION_SCALE > 500){
-                    rocketExplosionData.setFlaggedForDelete(true);
+                if (rocketExplosionData != null) {
+                    long rocketExplosionTime = rocketExplosionData.getRocketExplosionTime();
+                    if (TimeUtils.nanoTime() / MILLION_SCALE - rocketExplosionTime / MILLION_SCALE > 500) {
+                        rocketExplosionData.setFlaggedForDelete(true);
+                    }
+                } else {
+                    if (rocketExplosionData != null) {
+                        rocketExplosionData.setFlaggedForDelete(true);
+                    }
                 }
+
             } else {
                 rocketExplosionArray.removeValue(rocketExplosion, false);
             }
@@ -626,6 +682,32 @@ public class Dodgeables {
         // Initialize the Animation with the frame interval and array of frames
         rocketExplosionAnimation = new Animation<TextureRegion>(0.15f, rocketExplosionFrames);
 
+    }
+
+    private void initializeAlienMissileAnimation() {
+
+        // Load the alien missile sprite sheet as a Texture
+        alienMissileSheet = new Texture(Gdx.files.internal("sprites/AlienGrenadeSpriteSheet.png"));
+
+        // Use the split utility method to create a 2D array of TextureRegions. This is
+        // possible because this sprite sheet contains frames of equal size and they are
+        // all aligned.
+        TextureRegion[][] tmp = TextureRegion.split(alienMissileSheet,
+                alienMissileSheet.getWidth() / 4,
+                alienMissileSheet.getHeight() / 1);
+
+        // Place the regions into a 1D array in the correct order, starting from the top
+        // left, going across first. The Animation constructor requires a 1D array.
+        TextureRegion[] alienFrames = new TextureRegion[4 * 1];
+        int index = 0;
+        for (int i = 0; i < 1; i++) {
+            for (int j = 0; j < 4; j++) {
+                alienFrames[index++] = tmp[i][j];
+            }
+        }
+
+        // Initialize the Animation with the frame interval and array of frames
+        alienMissileAnimation = new Animation<TextureRegion>(0.05f, alienFrames);
     }
 
     private void initializePowerUpShieldAnimation() {
