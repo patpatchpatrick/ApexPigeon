@@ -72,6 +72,14 @@ public class Dodgeables {
     private final float ALIEN_MISSILE_WIDTH = 10f;
     private final float ALIEN_MISSILE_HEIGHT = 10f;
 
+    //Alien Missile Rocket variables
+    private Array<Body> alienMissileExplosionArray = new Array<Body>();
+    private Animation<TextureRegion> alienMissileExplosionAnimation;
+    private Texture alienMissileExplosionSheet;
+    private long lastAlienMissileExplosionSpawnTime;
+    private final float ALIEN_MISSILE_EXPLOSION_WIDTH = 20f;
+    private final float ALIEN_MISSILE_EXPLOSION_HEIGHT = 20f;
+
 
     //PowerUp Shield variables
     private Array<Body> powerUpShieldsArray = new Array<Body>();
@@ -99,6 +107,7 @@ public class Dodgeables {
         initializeRocketAnimation();
         initializeRocketExplosionAnimation();
         initializeAlienMissileAnimation();
+        initializeAlienMissileExplosionAnimation();
 
         // initialize powerup animations
         initializePowerUpShieldAnimation();
@@ -410,6 +419,7 @@ public class Dodgeables {
         TextureRegion rocketCurrentFrame = rocketAnimation.getKeyFrame(stateTime, true);
         TextureRegion rocketExplosionCurrentFrame = rocketExplosionAnimation.getKeyFrame(stateTime, true);
         TextureRegion alienMissileCurrentFrame = alienMissileAnimation.getKeyFrame(stateTime, true);
+        TextureRegion alienMissileExplosionCurrentFrame = alienMissileExplosionAnimation.getKeyFrame(stateTime, true);
         TextureRegion powerUpShieldCurrentFrame = powerUpShieldAnimation.getKeyFrame(stateTime, true);
         TextureRegion teleportCurrentFrame = teleportAnimation.getKeyFrame(stateTime, true);
 
@@ -464,6 +474,7 @@ public class Dodgeables {
         for (Body alienMissile : alienMissileArray) {
             if (alienMissile.isActive()) {
                 batch.draw(alienMissileCurrentFrame, alienMissile.getPosition().x, alienMissile.getPosition().y, ALIEN_MISSILE_WIDTH / 2, ALIEN_MISSILE_HEIGHT / 2, ALIEN_MISSILE_WIDTH, ALIEN_MISSILE_HEIGHT, 1, 1, MathUtils.radiansToDegrees * alienMissile.getAngle());
+                batch.draw(alienMissileExplosionCurrentFrame, alienMissile.getPosition().x - ALIEN_MISSILE_WIDTH/2, alienMissile.getPosition().y - ALIEN_MISSILE_HEIGHT/2, 0, 0, ALIEN_MISSILE_EXPLOSION_WIDTH, ALIEN_MISSILE_EXPLOSION_HEIGHT, 1, 1, 0);
             } else {
                 alienMissileArray.removeValue(alienMissile, false);
             }
@@ -707,7 +718,34 @@ public class Dodgeables {
         }
 
         // Initialize the Animation with the frame interval and array of frames
-        alienMissileAnimation = new Animation<TextureRegion>(0.05f, alienFrames);
+        alienMissileAnimation = new Animation<TextureRegion>(0.06f, alienFrames);
+    }
+
+    private void initializeAlienMissileExplosionAnimation() {
+
+        // Load the alien missile explosion sprite sheet as a Texture
+        alienMissileExplosionSheet = new Texture(Gdx.files.internal("sprites/AlienMissileExplosionSpriteSheet.png"));
+
+        // Use the split utility method to create a 2D array of TextureRegions. This is
+        // possible because this sprite sheet contains frames of equal size and they are
+        // all aligned.
+        TextureRegion[][] tmp = TextureRegion.split(alienMissileExplosionSheet,
+                alienMissileExplosionSheet.getWidth() / 7,
+                alienMissileExplosionSheet.getHeight() / 1);
+
+        // Place the regions into a 1D array in the correct order, starting from the top
+        // left, going across first. The Animation constructor requires a 1D array.
+        TextureRegion[] alienFrames = new TextureRegion[7 * 1];
+        int index = 0;
+        for (int i = 0; i < 1; i++) {
+            for (int j = 0; j < 7; j++) {
+                alienFrames[index++] = tmp[i][j];
+            }
+        }
+
+        // Initialize the Animation with the frame interval and array of frames
+        alienMissileExplosionAnimation = new Animation<TextureRegion>(0.06f, alienFrames);
+
     }
 
     private void initializePowerUpShieldAnimation() {
