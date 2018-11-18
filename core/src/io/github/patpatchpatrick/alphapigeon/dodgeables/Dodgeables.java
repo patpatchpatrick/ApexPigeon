@@ -87,7 +87,7 @@ public class Dodgeables {
     private long lastAlienMissileCornerSpawnTime;
     private final float ALIEN_MISSILE_CORNER_WIDTH = 10f;
     private final float ALIEN_MISSILE_CORNER_HEIGHT = 10f;
-    private final float ALIEN_MISSILE_CORNER_FORCE = 3f;
+    private final float ALIEN_MISSILE_CORNER_FORCE = 5f;
 
 
     //PowerUp Shield variables
@@ -386,11 +386,14 @@ public class Dodgeables {
         //spawn new alien missile corners
         //the corners are the circular missiles that rotates the main missile.  when they are spawned,
         //they travel in 4 different opposite directions away from the main missile
+        //generate a random angle theta and send the missiles in 4 opposite directions depending on random angle theta
+
+        float theta = MathUtils.random(0, 90);
 
         //spawn first alien missile corner
         BodyDef alienCornerBodyDef = new BodyDef();
         alienCornerBodyDef.type = BodyDef.BodyType.DynamicBody;
-        alienCornerBodyDef.position.set(explosionPositionX + ALIEN_MISSILE_WIDTH/2, explosionPositionY + ALIEN_MISSILE_HEIGHT/2);
+        alienCornerBodyDef.position.set(explosionPositionX + ALIEN_MISSILE_WIDTH/2 * MathUtils.cosDeg(theta), explosionPositionY + ALIEN_MISSILE_HEIGHT/2 * MathUtils.sinDeg(theta));
         Body alienCornerBody = gameWorld.createBody(alienCornerBodyDef);
         BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("json/AlienMissileCorner.json"));
         FixtureDef alienCornerFixtureDef = new FixtureDef();
@@ -401,19 +404,54 @@ public class Dodgeables {
         alienCornerFixtureDef.filter.categoryBits = game.CATEGORY_ROCKET_EXPLOSION;
         alienCornerFixtureDef.filter.maskBits = game.MASK_ROCKET_EXPLOSION;
         loader.attachFixture(alienCornerBody, "AlienMissileCorner", alienCornerFixtureDef, ALIEN_MISSILE_CORNER_HEIGHT);
-        alienCornerBody.applyForceToCenter(ALIEN_MISSILE_CORNER_FORCE, ALIEN_MISSILE_CORNER_FORCE, true);
-
+        alienCornerBody.applyForceToCenter(ALIEN_MISSILE_CORNER_FORCE* MathUtils.cosDeg(theta), ALIEN_MISSILE_CORNER_FORCE* MathUtils.sinDeg(theta), true);
+        
         //Set the time the corner was spawned on the corner body.  This is used in the update method
         //to destroy the missile explosion body after a set amount of time
         BodyData alienCornerData = new BodyData(false);
         alienCornerData.setSpawnTime(TimeUtils.nanoTime());
         alienCornerBody.setUserData(alienCornerData);
-
         //add corner to alien corners array
         alienMissileCornerArray.add(alienCornerBody);
 
-        //keep track of time the corner was spawned
-        lastAlienMissileCornerSpawnTime = TimeUtils.nanoTime();
+        BodyDef alienSecondCornerBodyDef = new BodyDef();
+        alienSecondCornerBodyDef.type = BodyDef.BodyType.DynamicBody;
+        alienSecondCornerBodyDef.position.set(explosionPositionX + ALIEN_MISSILE_WIDTH/2* MathUtils.sinDeg(theta), explosionPositionY - ALIEN_MISSILE_HEIGHT/2* MathUtils.cosDeg(theta));
+        Body alienSecondCornerBody = gameWorld.createBody(alienSecondCornerBodyDef);
+        loader.attachFixture(alienSecondCornerBody, "AlienMissileCorner", alienCornerFixtureDef, ALIEN_MISSILE_CORNER_HEIGHT);
+        alienSecondCornerBody.applyForceToCenter(ALIEN_MISSILE_CORNER_FORCE* MathUtils.sinDeg(theta), -ALIEN_MISSILE_CORNER_FORCE* MathUtils.cosDeg(theta), true);
+        BodyData alienSecondCornerData = new BodyData(false);
+        alienSecondCornerData.setSpawnTime(TimeUtils.nanoTime());
+        alienSecondCornerBody.setUserData(alienSecondCornerData);
+        alienMissileCornerArray.add(alienSecondCornerBody);
+
+        BodyDef alienThirdCornerBodyDef = new BodyDef();
+        alienThirdCornerBodyDef.type = BodyDef.BodyType.DynamicBody;
+        alienThirdCornerBodyDef.position.set(explosionPositionX - ALIEN_MISSILE_WIDTH/2* MathUtils.cosDeg(theta), explosionPositionY - ALIEN_MISSILE_HEIGHT/2* MathUtils.sinDeg(theta));
+        Body alienThirdCornerBody = gameWorld.createBody(alienThirdCornerBodyDef);
+        loader.attachFixture(alienThirdCornerBody, "AlienMissileCorner", alienCornerFixtureDef, ALIEN_MISSILE_CORNER_HEIGHT);
+        alienThirdCornerBody.applyForceToCenter(-ALIEN_MISSILE_CORNER_FORCE* MathUtils.cosDeg(theta), -ALIEN_MISSILE_CORNER_FORCE* MathUtils.sinDeg(theta), true);
+        BodyData alienThirdCornerData = new BodyData(false);
+        alienThirdCornerData.setSpawnTime(TimeUtils.nanoTime());
+        alienThirdCornerBody.setUserData(alienThirdCornerData);
+        alienMissileCornerArray.add(alienThirdCornerBody);
+
+        BodyDef alienFourthCornerBodyDef = new BodyDef();
+        alienFourthCornerBodyDef.type = BodyDef.BodyType.DynamicBody;
+        alienFourthCornerBodyDef.position.set(explosionPositionX - ALIEN_MISSILE_WIDTH/2* MathUtils.sinDeg(theta), explosionPositionY + ALIEN_MISSILE_HEIGHT/2* MathUtils.cosDeg(theta));
+        Body alienFourthCornerBody = gameWorld.createBody(alienFourthCornerBodyDef);
+        loader.attachFixture(alienFourthCornerBody, "AlienMissileCorner", alienCornerFixtureDef, ALIEN_MISSILE_CORNER_HEIGHT);
+        alienFourthCornerBody.applyForceToCenter(-ALIEN_MISSILE_CORNER_FORCE* MathUtils.sinDeg(theta), ALIEN_MISSILE_CORNER_FORCE* MathUtils.cosDeg(theta), true);
+        BodyData alienFourthCornerData = new BodyData(false);
+        alienFourthCornerData.setSpawnTime(TimeUtils.nanoTime());
+        alienFourthCornerBody.setUserData(alienFourthCornerData);
+        alienMissileCornerArray.add(alienFourthCornerBody);
+        
+        
+        
+        
+        
+        
 
 
     }
