@@ -72,13 +72,22 @@ public class Dodgeables {
     private final float ALIEN_MISSILE_WIDTH = 10f;
     private final float ALIEN_MISSILE_HEIGHT = 10f;
 
-    //Alien Missile Rocket variables
+    //Alien Missile Explosion variables
     private Array<Body> alienMissileExplosionArray = new Array<Body>();
     private Animation<TextureRegion> alienMissileExplosionAnimation;
     private Texture alienMissileExplosionSheet;
     private long lastAlienMissileExplosionSpawnTime;
     private final float ALIEN_MISSILE_EXPLOSION_WIDTH = 20f;
     private final float ALIEN_MISSILE_EXPLOSION_HEIGHT = 20f;
+
+    //Alien Missile Corner variables
+    private Array<Body> alienMissileCornerArray = new Array<Body>();
+    private Animation<TextureRegion> alienMissileCornerAnimation;
+    private Texture alienMissileCornerSheet;
+    private long lastAlienMissileCornerSpawnTime;
+    private final float ALIEN_MISSILE_CORNER_WIDTH = 10f;
+    private final float ALIEN_MISSILE_CORNER_HEIGHT = 10f;
+    private final float ALIEN_MISSILE_CORNER_FORCE = 3f;
 
 
     //PowerUp Shield variables
@@ -108,6 +117,7 @@ public class Dodgeables {
         initializeRocketExplosionAnimation();
         initializeAlienMissileAnimation();
         initializeAlienMissileExplosionAnimation();
+        initializeAlienMissileCornerAnimation();
 
         // initialize powerup animations
         initializePowerUpShieldAnimation();
@@ -369,9 +379,44 @@ public class Dodgeables {
         //keep track of time the missile was spawned
         lastAlienMissileExplosionSpawnTime = TimeUtils.nanoTime();
 
-
     }
 
+    public void spawnAlienMissileCorners(float explosionPositionX, float explosionPositionY){
+
+        //spawn new alien missile corners
+        //the corners are the circular missiles that rotates the main missile.  when they are spawned,
+        //they travel in 4 different opposite directions away from the main missile
+
+        //spawn first alien missile corner
+        BodyDef alienCornerBodyDef = new BodyDef();
+        alienCornerBodyDef.type = BodyDef.BodyType.DynamicBody;
+        alienCornerBodyDef.position.set(explosionPositionX + ALIEN_MISSILE_WIDTH/2, explosionPositionY + ALIEN_MISSILE_HEIGHT/2);
+        Body alienCornerBody = gameWorld.createBody(alienCornerBodyDef);
+        BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("json/AlienMissileCorner.json"));
+        FixtureDef alienCornerFixtureDef = new FixtureDef();
+        alienCornerFixtureDef.density = 0.001f;
+        alienCornerFixtureDef.friction = 0.5f;
+        alienCornerFixtureDef.restitution = 0.3f;
+        // set the alien corner filter categories and masks for collisions
+        alienCornerFixtureDef.filter.categoryBits = game.CATEGORY_ROCKET_EXPLOSION;
+        alienCornerFixtureDef.filter.maskBits = game.MASK_ROCKET_EXPLOSION;
+        loader.attachFixture(alienCornerBody, "AlienMissileCorner", alienCornerFixtureDef, ALIEN_MISSILE_CORNER_HEIGHT);
+        alienCornerBody.applyForceToCenter(ALIEN_MISSILE_CORNER_FORCE, ALIEN_MISSILE_CORNER_FORCE, true);
+
+        //Set the time the corner was spawned on the corner body.  This is used in the update method
+        //to destroy the missile explosion body after a set amount of time
+        BodyData alienCornerData = new BodyData(false);
+        alienCornerData.setSpawnTime(TimeUtils.nanoTime());
+        alienCornerBody.setUserData(alienCornerData);
+
+        //add corner to alien corners array
+        alienMissileCornerArray.add(alienCornerBody);
+
+        //keep track of time the corner was spawned
+        lastAlienMissileCornerSpawnTime = TimeUtils.nanoTime();
+
+
+    }
     public void spawnPowerUpShield() {
 
         //spawn a new PowerUp Shield
@@ -459,6 +504,7 @@ public class Dodgeables {
         TextureRegion rocketExplosionCurrentFrame = rocketExplosionAnimation.getKeyFrame(stateTime, true);
         TextureRegion alienMissileCurrentFrame = alienMissileAnimation.getKeyFrame(stateTime, true);
         TextureRegion alienMissileExplosionCurrentFrame = alienMissileExplosionAnimation.getKeyFrame(stateTime, true);
+        TextureRegion alienCornerCurrentFrame = alienMissileCornerAnimation.getKeyFrame(stateTime, true);
         TextureRegion powerUpShieldCurrentFrame = powerUpShieldAnimation.getKeyFrame(stateTime, true);
         TextureRegion teleportCurrentFrame = teleportAnimation.getKeyFrame(stateTime, true);
 
@@ -524,6 +570,15 @@ public class Dodgeables {
                 batch.draw(alienMissileExplosionCurrentFrame, alienMissileExplosion.getPosition().x, alienMissileExplosion.getPosition().y, 0, 0, ALIEN_MISSILE_EXPLOSION_WIDTH, ALIEN_MISSILE_EXPLOSION_HEIGHT, 1, 1, 0);
             } else {
                 alienMissileExplosionArray.removeValue(alienMissileExplosion, false);
+            }
+        }
+
+        // draw all alien corner dodgeables using the current animation frame
+        for (Body alienCorner : alienMissileCornerArray) {
+            if (alienCorner.isActive()) {
+                batch.draw(alienCornerCurrentFrame, alienCorner.getPosition().x, alienCorner.getPosition().y, 0, 0, ALIEN_MISSILE_CORNER_WIDTH, ALIEN_MISSILE_CORNER_HEIGHT, 1, 1, 0);
+            } else {
+                alienMissileCornerArray.removeValue(alienCorner, false);
             }
         }
 
@@ -599,6 +654,7 @@ public class Dodgeables {
 
         // Alien Missile
         // If missiles are spawned , explode them after a set amount of time.
+        // Exploding the missiles shoots the 4 missile corners in opposing directions away from the center of missile
         for (Body alienMissile : alienMissileArray) {
             if (alienMissile.isActive()) {
                 BodyData missileData = (BodyData) alienMissile.getUserData();
@@ -607,6 +663,7 @@ public class Dodgeables {
                     if (TimeUtils.nanoTime() / MILLION_SCALE - missileSpawnTime / MILLION_SCALE > 2000) {
                         missileData.setFlaggedForDelete(true);
                         spawnAlienMissileExplosion(alienMissile.getPosition().x, alienMissile.getPosition().y);
+                        spawnAlienMissileCorners(alienMissile.getPosition().x, alienMissile.getPosition().y);
                     }
                 } else {
                     if (missileData != null) {
@@ -836,6 +893,32 @@ public class Dodgeables {
         // Initialize the Animation with the frame interval and array of frames
         alienMissileExplosionAnimation = new Animation<TextureRegion>(0.06f, alienFrames);
 
+    }
+
+    private void initializeAlienMissileCornerAnimation() {
+
+        // Load the alien missile sprite sheet as a Texture
+        alienMissileCornerSheet = new Texture(Gdx.files.internal("sprites/AlienMissileCorner.png"));
+
+        // Use the split utility method to create a 2D array of TextureRegions. This is
+        // possible because this sprite sheet contains frames of equal size and they are
+        // all aligned.
+        TextureRegion[][] tmp = TextureRegion.split(alienMissileCornerSheet,
+                alienMissileCornerSheet.getWidth() / 1,
+                alienMissileCornerSheet.getHeight() / 1);
+
+        // Place the regions into a 1D array in the correct order, starting from the top
+        // left, going across first. The Animation constructor requires a 1D array.
+        TextureRegion[] alienFrames = new TextureRegion[1 * 1];
+        int index = 0;
+        for (int i = 0; i < 1; i++) {
+            for (int j = 0; j < 1; j++) {
+                alienFrames[index++] = tmp[i][j];
+            }
+        }
+
+        // Initialize the Animation with the frame interval and array of frames
+        alienMissileCornerAnimation = new Animation<TextureRegion>(1f, alienFrames);
     }
 
     private void initializePowerUpShieldAnimation() {
