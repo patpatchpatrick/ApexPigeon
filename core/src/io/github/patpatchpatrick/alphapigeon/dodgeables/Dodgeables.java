@@ -88,6 +88,15 @@ public class Dodgeables {
     private final float ALIEN_MISSILE_CORNER_WIDTH = 10f;
     private final float ALIEN_MISSILE_CORNER_HEIGHT = 10f;
     private final float ALIEN_MISSILE_CORNER_FORCE = 5f;
+    private final float ALIEN_MISSILE_CORNER_EXPLOSION_FUSE_TIME = 1000;
+
+    //Alien Missile Corner Explosion variables
+    private Array<Body> alienMissileCornerExplosionArray = new Array<Body>();
+    private Animation<TextureRegion> alienMissileCornerExplosionAnimation;
+    private Texture alienMissileCornerExplosionSheet;
+    private long lastAlienMissileCornerExplosionSpawnTime;
+    private final float ALIEN_MISSILE_CORNER_EXPLOSION_WIDTH = 10f;
+    private final float ALIEN_MISSILE_CORNER_EXPLOSION_HEIGHT = 10f;
 
 
     //PowerUp Shield variables
@@ -446,15 +455,44 @@ public class Dodgeables {
         alienFourthCornerData.setSpawnTime(TimeUtils.nanoTime());
         alienFourthCornerBody.setUserData(alienFourthCornerData);
         alienMissileCornerArray.add(alienFourthCornerBody);
-        
-        
-        
-        
-        
-        
+
+    }
+
+    public void spawnAlienMissileCornerExplosions(float explosionPositionX, float explosionPositionY){
+
+        //spawn new alien missile explosions
+        BodyDef alienExplosionBodyDef = new BodyDef();
+        alienExplosionBodyDef.type = BodyDef.BodyType.DynamicBody;
+
+        //spawn alien explosion at the input position (this will be the position of the center of the alien missile.
+        alienExplosionBodyDef.position.set(explosionPositionX, explosionPositionY);
+        Body alienMissileExplosionBody = gameWorld.createBody(alienExplosionBodyDef);
+        BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("json/AlienMissileExplosion.json"));
+        FixtureDef alienExplosionFixtureDef = new FixtureDef();
+        alienExplosionFixtureDef.density = 0.001f;
+        alienExplosionFixtureDef.friction = 0.5f;
+        alienExplosionFixtureDef.restitution = 0.3f;
+        // set the alien explosion filter categories and masks for collisions
+        alienExplosionFixtureDef.filter.categoryBits = game.CATEGORY_ROCKET_EXPLOSION;
+        alienExplosionFixtureDef.filter.maskBits = game.MASK_ROCKET_EXPLOSION;
+        loader.attachFixture(alienMissileExplosionBody, "Alien Missile Explosion", alienExplosionFixtureDef, ALIEN_MISSILE_CORNER_EXPLOSION_HEIGHT);
+        alienMissileExplosionBody.applyForceToCenter(0, 0, true);
+
+        //Set the time the missile was exploded on the missile explosion  body.  This is used in the update method
+        //to destroy the missile explosion body after a set amount of time
+        BodyData alienMissileExplosionData = new BodyData(false);
+        alienMissileExplosionData.setExplosionData(TimeUtils.nanoTime());
+        alienMissileExplosionBody.setUserData(alienMissileExplosionData);
+
+        //add missile explosion to alien missile explosions array
+        alienMissileCornerExplosionArray.add(alienMissileExplosionBody);
+
+        //keep track of time the missile was spawned
+        lastAlienMissileCornerExplosionSpawnTime = TimeUtils.nanoTime();
 
 
     }
+
     public void spawnPowerUpShield() {
 
         //spawn a new PowerUp Shield
@@ -620,6 +658,15 @@ public class Dodgeables {
             }
         }
 
+        // draw all alien missile corner explosion dodgeables using the current animation frame
+        for (Body alienMissileCornerExplosion : alienMissileCornerExplosionArray) {
+            if (alienMissileCornerExplosion.isActive()) {
+                batch.draw(alienMissileExplosionCurrentFrame, alienMissileCornerExplosion.getPosition().x, alienMissileCornerExplosion.getPosition().y, 0, 0, ALIEN_MISSILE_CORNER_EXPLOSION_WIDTH, ALIEN_MISSILE_CORNER_EXPLOSION_HEIGHT, 1, 1, 0);
+            } else {
+                alienMissileCornerExplosionArray.removeValue(alienMissileCornerExplosion, false);
+            }
+        }
+
         // draw all PowerUp shield dodgeables using the current animation frame
         for (Body powerUpShield : powerUpShieldsArray) {
 
@@ -732,6 +779,50 @@ public class Dodgeables {
 
             } else {
                 alienMissileExplosionArray.removeValue(alienMissileExplosion, false);
+            }
+        }
+
+        // Alien Corner Missile
+        // If missiles are spawned , explode them after a set amount of time.
+        // Exploding the missiles shoots the 4 missile corners in opposing directions away from the center of missile
+        for (Body alienCornerMissile : alienMissileCornerArray) {
+            if (alienCornerMissile.isActive()) {
+                BodyData missileData = (BodyData) alienCornerMissile.getUserData();
+                if (missileData != null) {
+                    long missileSpawnTime = missileData.getSpawnTime();
+                    if (TimeUtils.nanoTime() / MILLION_SCALE - missileSpawnTime / MILLION_SCALE > ALIEN_MISSILE_CORNER_EXPLOSION_FUSE_TIME) {
+                        missileData.setFlaggedForDelete(true);
+                        spawnAlienMissileCornerExplosions(alienCornerMissile.getPosition().x, alienCornerMissile.getPosition().y);
+                    }
+                } else {
+                    if (missileData != null) {
+                        missileData.setFlaggedForDelete(true);
+                    }
+                }
+
+            } else {
+                alienMissileCornerArray.removeValue(alienCornerMissile, false);
+            }
+        }
+
+        // Alien Corner Missile Explosions
+        // If missiles explosions are spawned , destroy them after a set amount of time.
+        for (Body alienCornerMissileExplosion : alienMissileCornerExplosionArray) {
+            if (alienCornerMissileExplosion.isActive()) {
+                BodyData missileExplosionData = (BodyData) alienCornerMissileExplosion.getUserData();
+                if (missileExplosionData != null) {
+                    long missileExplosionSpawnTime = missileExplosionData.getExplosionTime();
+                    if (TimeUtils.nanoTime() / MILLION_SCALE - missileExplosionSpawnTime / MILLION_SCALE > 500) {
+                        missileExplosionData.setFlaggedForDelete(true);
+                    }
+                } else {
+                    if (missileExplosionData != null) {
+                        missileExplosionData.setFlaggedForDelete(true);
+                    }
+                }
+
+            } else {
+                alienMissileExplosionArray.removeValue(alienCornerMissileExplosion, false);
             }
         }
 
