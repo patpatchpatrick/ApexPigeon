@@ -7,6 +7,8 @@ public class BodyData {
 
     private Boolean flaggedForDelete;
 
+    private long spawnTime= 9999;
+
     //Teleport Data
     private Body oppositeTeleport;
 
@@ -53,11 +55,19 @@ public class BodyData {
         }
     }
 
-    public void setRocketExplosionData(long lastRocketExplosionTime){
+    public void setSpawnTime(long spawnTime){
+        this.spawnTime = spawnTime;
+    }
+
+    public long getSpawnTime(){
+        return this.spawnTime;
+    }
+
+    public void setExplosionData(long lastRocketExplosionTime){
         this.lastRocketExplosionTime = lastRocketExplosionTime;
     }
 
-    public long getRocketExplosionTime(){
+    public long getExplosionTime(){
         return this.lastRocketExplosionTime;
     }
 
