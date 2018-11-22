@@ -34,13 +34,16 @@ public class Dodgeables {
     private Animation<TextureRegion> levelOneBirdAnimation;
     private Texture levelOneBirdFlySheet;
     private long lastLevelOneBirdSpawnTime;
+    private final float LEVEL_ONE_BIRD_WIDTH = 6f;
+    private final float LEVEL_ONE_BIRD_HEIGHT = 6f;
 
     //Meteor global variables
     private Array<Body> meteorArray = new Array<Body>();
     private Texture meteorTextureSpriteSheet;
     private Animation<TextureRegion> meteorAnimation;
     private long lastMeteorSpawnTime;
-    private final int METEOR_SCALE = 15;
+    private final float METEOR_WIDTH = 80f;
+    private final float METEOR_HEIGHT = METEOR_WIDTH / 2;
 
     //Level Two Bird variables
     private Array<Body> levelTwoBirdsArray = new Array<Body>();
@@ -104,12 +107,16 @@ public class Dodgeables {
     private Animation<TextureRegion> powerUpShieldAnimation;
     private Texture powerUpShieldSheet;
     private long lastpowerUpShieldSpawnTime;
+    private final float POWER_UP_SHIELD_WIDTH = 8f;
+    private final float POWER_UP_SHIELD_HEIGHT = 4.8f;
 
     //Teleport variables
     private Array<Body> teleportArray = new Array<Body>();
     private Animation<TextureRegion> teleportAnimation;
     private Texture teleportSheet;
     private long lastTeleportSpawnTime;
+    private final float TELEPORT_WIDTH = 10f;
+    private final float TELEPORT_HEIGHT = 10f;
 
 
     public Dodgeables(Pigeon pigeon, World world, AlphaPigeon game, OrthographicCamera camera) {
@@ -141,11 +148,11 @@ public class Dodgeables {
         //class to determine if we need to spawn new dodgeables depending on how much time has passed
         if (TimeUtils.nanoTime() / MILLION_SCALE - lastLevelOneBirdSpawnTime / MILLION_SCALE > 50000)
             spawnLevelOneBird();
-        if (TimeUtils.nanoTime() / MILLION_SCALE - lastMeteorSpawnTime / MILLION_SCALE > 50000)
+        if (TimeUtils.nanoTime() / MILLION_SCALE - lastMeteorSpawnTime / MILLION_SCALE > 2000)
             spawnMeteor();
-        if (TimeUtils.nanoTime() / MILLION_SCALE - lastLevelTwoBirdSpawnTime / MILLION_SCALE > 2000)
+        if (TimeUtils.nanoTime() / MILLION_SCALE - lastLevelTwoBirdSpawnTime / MILLION_SCALE > 10000)
             spawnLevelTwoBird();
-        if (TimeUtils.nanoTime() / MILLION_SCALE - lastRocketSpawnTime / MILLION_SCALE > 2000)
+        if (TimeUtils.nanoTime() / MILLION_SCALE - lastRocketSpawnTime / MILLION_SCALE > 10000)
             spawnRocket();
         if (TimeUtils.nanoTime() / MILLION_SCALE - lastAlienMissileSpawnTime / MILLION_SCALE > 50000)
             spawnAlienMissile();
@@ -161,7 +168,7 @@ public class Dodgeables {
         levelOneBirdBodyDef.type = BodyDef.BodyType.DynamicBody;
 
         //spawn bird at random height
-        levelOneBirdBodyDef.position.set(camera.viewportWidth, MathUtils.random(0, camera.viewportHeight - 6));
+        levelOneBirdBodyDef.position.set(camera.viewportWidth, MathUtils.random(0, camera.viewportHeight - LEVEL_ONE_BIRD_HEIGHT));
         Body levelOneBirdBody = gameWorld.createBody(levelOneBirdBodyDef);
         BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("json/LevelOnePigeon.json"));
         FixtureDef levelOneBirdFixtureDef = new FixtureDef();
@@ -171,7 +178,7 @@ public class Dodgeables {
         // set the bird filter categories and masks for collisions
         levelOneBirdFixtureDef.filter.categoryBits = game.CATEGORY_LEVEL_ONE_BIRD;
         levelOneBirdFixtureDef.filter.maskBits = game.MASK_LEVEL_ONE_BIRD;
-        loader.attachFixture(levelOneBirdBody, "BackwardsPigeon", levelOneBirdFixtureDef, 6);
+        loader.attachFixture(levelOneBirdBody, "BackwardsPigeon", levelOneBirdFixtureDef, LEVEL_ONE_BIRD_HEIGHT);
         levelOneBirdBody.applyForceToCenter(-9.0f, 0, true);
 
         //add bird to level one birds array
@@ -188,8 +195,9 @@ public class Dodgeables {
         meteorBodyDef.type = BodyDef.BodyType.DynamicBody;
 
         //spawn meteor at random width
-        meteorBodyDef.position.set(MathUtils.random(0, camera.viewportWidth), camera.viewportHeight);
+        meteorBodyDef.position.set(MathUtils.random(0 - METEOR_WIDTH/2, camera.viewportWidth), camera.viewportHeight + METEOR_HEIGHT/2);
         Body meteorBody = gameWorld.createBody(meteorBodyDef);
+        meteorBody.setTransform(meteorBody.getPosition().x, meteorBody.getPosition().y, MathUtils.degreesToRadians*-15);
         BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("json/Meteor.json"));
         FixtureDef meteorFixtureDef = new FixtureDef();
         meteorFixtureDef.density = 0.05f;
@@ -198,8 +206,8 @@ public class Dodgeables {
         // set the meteor filter categories and masks for collisions
         meteorFixtureDef.filter.categoryBits = game.CATEGORY_METEOR;
         meteorFixtureDef.filter.maskBits = game.MASK_METEOR;
-        loader.attachFixture(meteorBody, "Meteor", meteorFixtureDef, METEOR_SCALE);
-        meteorBody.applyForceToCenter(-900.0f, -900.0f, true);
+        loader.attachFixture(meteorBody, "Meteor", meteorFixtureDef, METEOR_WIDTH);
+        meteorBody.applyForceToCenter(-3000.0f, -3000.0f, true);
 
         //add meteor to meteors array
         meteorArray.add(meteorBody);
@@ -500,7 +508,7 @@ public class Dodgeables {
         powerUpShieldBodyDef.type = BodyDef.BodyType.DynamicBody;
 
         //spawn PowerUp shield at random height
-        powerUpShieldBodyDef.position.set(camera.viewportWidth, MathUtils.random(0, camera.viewportHeight - 6));
+        powerUpShieldBodyDef.position.set(camera.viewportWidth, MathUtils.random(0, camera.viewportHeight - POWER_UP_SHIELD_HEIGHT));
         Body powerUpShieldBody = gameWorld.createBody(powerUpShieldBodyDef);
         BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("json/PowerUpShield.json"));
         FixtureDef powerUpShieldFixtureDef = new FixtureDef();
@@ -511,7 +519,7 @@ public class Dodgeables {
         powerUpShieldFixtureDef.filter.categoryBits = game.CATEGORY_POWERUP_SHIELD;
         powerUpShieldFixtureDef.filter.maskBits = game.MASK_POWERUP;
         //The JSON loader loaders a fixture 1 pixel by 1 pixel... the animation is 80 px x 48 px, so need to scale by a factor of 8 since the width is the limiting factor
-        loader.attachFixture(powerUpShieldBody, "PowerUpShield", powerUpShieldFixtureDef, 8);
+        loader.attachFixture(powerUpShieldBody, "PowerUpShield", powerUpShieldFixtureDef, POWER_UP_SHIELD_WIDTH);
         powerUpShieldBody.applyForceToCenter(-9.0f, 0, true);
 
         //add PowerUp shield to shields array
@@ -531,7 +539,7 @@ public class Dodgeables {
         BodyDef teleportBodyDef = new BodyDef();
         teleportBodyDef.type = BodyDef.BodyType.DynamicBody;
         //spawn teleport at random height
-        teleportBodyDef.position.set(camera.viewportWidth, MathUtils.random(0, camera.viewportHeight - 10));
+        teleportBodyDef.position.set(camera.viewportWidth, MathUtils.random(0, camera.viewportHeight - TELEPORT_HEIGHT));
         Body teleportBody = gameWorld.createBody(teleportBodyDef);
         BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("json/Teleport.json"));
         FixtureDef teleportFixtureDef = new FixtureDef();
@@ -542,15 +550,15 @@ public class Dodgeables {
         teleportFixtureDef.filter.categoryBits = game.CATEGORY_TELEPORT;
         teleportFixtureDef.filter.maskBits = game.MASK_TELEPORT;
         //The JSON loader loaders a fixture 1 pixel by 1 pixel... the animation is 100 px x 100 px, so need to scale by a factor of 10
-        loader.attachFixture(teleportBody, "Teleport", teleportFixtureDef, 10);
+        loader.attachFixture(teleportBody, "Teleport", teleportFixtureDef, TELEPORT_HEIGHT);
         teleportBody.applyForceToCenter(-9.0f, 0, true);
 
         //spawn second teleport which starts at the opposite side of screen as the first and travels in the opposite direction
         BodyDef teleportTwoBodyDef = new BodyDef();
         teleportTwoBodyDef.type = BodyDef.BodyType.DynamicBody;
-        teleportTwoBodyDef.position.set(0, MathUtils.random(0, camera.viewportHeight - 10));
+        teleportTwoBodyDef.position.set(0, MathUtils.random(0, camera.viewportHeight - TELEPORT_HEIGHT));
         Body teleportTwoBody = gameWorld.createBody(teleportTwoBodyDef);
-        loader.attachFixture(teleportTwoBody, "Teleport", teleportFixtureDef, 10);
+        loader.attachFixture(teleportTwoBody, "Teleport", teleportFixtureDef, TELEPORT_HEIGHT);
         teleportTwoBody.applyForceToCenter(7.0f, 0, true);
 
         //Attach data of the opposite teleport to the teleport, so it can be used to transport the pigeon
@@ -576,6 +584,7 @@ public class Dodgeables {
         // get current frame of animation for the current stateTime
         TextureRegion backwardsCurrentFrame = levelOneBirdAnimation.getKeyFrame(stateTime, true);
         TextureRegion levelTwoCurrentFrame = levelTwoBirdAnimation.getKeyFrame(stateTime, true);
+        TextureRegion meteorCurrentFrame = meteorAnimation.getKeyFrame(stateTime, true);
         TextureRegion rocketCurrentFrame = rocketAnimation.getKeyFrame(stateTime, true);
         TextureRegion rocketExplosionCurrentFrame = rocketExplosionAnimation.getKeyFrame(stateTime, true);
         TextureRegion alienMissileCurrentFrame = alienMissileAnimation.getKeyFrame(stateTime, true);
@@ -588,17 +597,16 @@ public class Dodgeables {
         // draw all level one birds dodgeables using the current animation frame
         for (Body backwardsPigeon : levelOneBirdsArray) {
             if (backwardsPigeon.isActive()) {
-                batch.draw(backwardsCurrentFrame, backwardsPigeon.getPosition().x, backwardsPigeon.getPosition().y, 0, 0, 6, 6, 1, 1, MathUtils.radiansToDegrees * backwardsPigeon.getAngle());
+                batch.draw(backwardsCurrentFrame, backwardsPigeon.getPosition().x, backwardsPigeon.getPosition().y, 0, 0, LEVEL_ONE_BIRD_WIDTH, LEVEL_ONE_BIRD_HEIGHT, 1, 1, MathUtils.radiansToDegrees * backwardsPigeon.getAngle());
             } else {
                 levelOneBirdsArray.removeValue(backwardsPigeon, false);
             }
         }
 
-        // get current frame of meteor animation for the current stateTime
-        TextureRegion meteorCurrentFrame = meteorAnimation.getKeyFrame(stateTime, true);
+        // draw all meteors using the current animation frame
         for (Body meteor : meteorArray) {
             if (meteor.isActive()) {
-                batch.draw(meteorCurrentFrame, meteor.getPosition().x, meteor.getPosition().y, 0, 0, METEOR_SCALE, METEOR_SCALE, 1, 1, MathUtils.radiansToDegrees * meteor.getAngle());
+                batch.draw(meteorCurrentFrame, meteor.getPosition().x, meteor.getPosition().y, 0, 0, METEOR_WIDTH, METEOR_HEIGHT, 1, 1, MathUtils.radiansToDegrees * meteor.getAngle());
             } else {
                 meteorArray.removeValue(meteor, false);
             }
@@ -673,7 +681,7 @@ public class Dodgeables {
             // draw the PowerUp shield if it is active (hasn't been grabbed by the pigeon), otherwise remove it from the array
             if (powerUpShield.isActive()) {
                 batch.draw(powerUpShieldCurrentFrame, powerUpShield.getPosition().x, powerUpShield.getPosition().y,
-                        0, 0, 8f, 4.8f, 1, 1, MathUtils.radiansToDegrees * powerUpShield.getAngle());
+                        0, 0, POWER_UP_SHIELD_WIDTH, POWER_UP_SHIELD_HEIGHT, 1, 1, MathUtils.radiansToDegrees * powerUpShield.getAngle());
             } else {
                 powerUpShieldsArray.removeValue(powerUpShield, false);
             }
@@ -685,7 +693,7 @@ public class Dodgeables {
             // draw the teleport if it is active (hasn't been grabbed by the pigeon), otherwise remove it from the array
             if (teleport.isActive()) {
                 batch.draw(teleportCurrentFrame, teleport.getPosition().x, teleport.getPosition().y,
-                        0, 0, 10f, 10f, 1, 1, MathUtils.radiansToDegrees * teleport.getAngle());
+                        0, 0, TELEPORT_WIDTH, TELEPORT_HEIGHT, 1, 1, MathUtils.radiansToDegrees * teleport.getAngle());
             } else {
                 teleportArray.removeValue(teleport, false);
             }
@@ -858,23 +866,29 @@ public class Dodgeables {
 
     private void initializeMeteorAnimation() {
 
-        meteorTextureSpriteSheet = new Texture(Gdx.files.internal("textures/Meteor.png"));
+        meteorTextureSpriteSheet = new Texture(Gdx.files.internal("sprites/MeteorSpriteSheet.png"));
 
         // Use the split utility method to create a 2D array of TextureRegions. This is
         // possible because this sprite sheet contains frames of equal size and they are
         // all aligned.
         TextureRegion[][] tmpMeteor = TextureRegion.split(meteorTextureSpriteSheet,
-                meteorTextureSpriteSheet.getWidth() / 1,
-                meteorTextureSpriteSheet.getHeight() / 1);
+                meteorTextureSpriteSheet.getWidth() / 8,
+                meteorTextureSpriteSheet.getHeight() / 8);
 
         // Place the regions into a 1D array in the correct order, starting from the top
         // left, going across first. The Animation constructor requires a 1D array.
-        TextureRegion[] meteorFrames = new TextureRegion[1 * 1];
+        TextureRegion[] meteorFrames = new TextureRegion[61 * 1];
         int meteorIndex = 0;
-        for (int i = 0; i < 1; i++) {
-            for (int j = 0; j < 1; j++) {
+        for (int i = 0; i < 7; i++) {
+            for (int j = 0; j < 8; j++) {
                 meteorFrames[meteorIndex++] = tmpMeteor[i][j];
             }
+        }
+
+        //The meteor sprite region only has 61 frames, so for the last row of the 8x8 sprite grid
+        // , only add 5 sprite frames
+        for (int j = 0; j < 5; j++) {
+            meteorFrames[meteorIndex++] = tmpMeteor[7][j];
         }
 
         // Initialize the Animation with the frame interval and array of frames
@@ -1113,6 +1127,12 @@ public class Dodgeables {
         meteorTextureSpriteSheet.dispose();
         powerUpShieldSheet.dispose();
         teleportSheet.dispose();
+        alienMissileSheet.dispose();
+        alienMissileExplosionSheet.dispose();
+        alienMissileCornerSheet.dispose();
+        alienMissileCornerExplosionSheet.dispose();
+        rocketExplosionSheet.dispose();
+        rocketSheet.dispose();
     }
 
 }
