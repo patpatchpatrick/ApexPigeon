@@ -101,6 +101,12 @@ public class Dodgeables {
     private final float ALIEN_MISSILE_CORNER_EXPLOSION_WIDTH = 10f;
     private final float ALIEN_MISSILE_CORNER_EXPLOSION_HEIGHT = 10f;
 
+    //UFO Energy Ball variables
+    private Array<Body> energyBallArray = new Array<Body>();
+    private Animation<TextureRegion> energyBallAnimation;
+    private Texture energyBallSheet;
+    private float energyBallWidth = 5f;
+    private float energyBallHeight = 5f;
 
     //PowerUp Shield variables
     private Array<Body> powerUpShieldsArray = new Array<Body>();
@@ -134,6 +140,7 @@ public class Dodgeables {
         initializeAlienMissileAnimation();
         initializeAlienMissileExplosionAnimation();
         initializeAlienMissileCornerAnimation();
+        initializeEnergyBallAnimation();
 
         // initialize powerup animations
         initializePowerUpShieldAnimation();
@@ -146,15 +153,15 @@ public class Dodgeables {
 
     public void spawnDodgeables() {
         //class to determine if we need to spawn new dodgeables depending on how much time has passed
-        if (TimeUtils.nanoTime() / MILLION_SCALE - lastLevelOneBirdSpawnTime / MILLION_SCALE > 50000)
+        if (TimeUtils.nanoTime() / MILLION_SCALE - lastLevelOneBirdSpawnTime / MILLION_SCALE > 2000)
             spawnLevelOneBird();
-        if (TimeUtils.nanoTime() / MILLION_SCALE - lastMeteorSpawnTime / MILLION_SCALE > 2000)
+        if (TimeUtils.nanoTime() / MILLION_SCALE - lastMeteorSpawnTime / MILLION_SCALE > 10000)
             spawnMeteor();
         if (TimeUtils.nanoTime() / MILLION_SCALE - lastLevelTwoBirdSpawnTime / MILLION_SCALE > 10000)
             spawnLevelTwoBird();
         if (TimeUtils.nanoTime() / MILLION_SCALE - lastRocketSpawnTime / MILLION_SCALE > 10000)
             spawnRocket();
-        if (TimeUtils.nanoTime() / MILLION_SCALE - lastAlienMissileSpawnTime / MILLION_SCALE > 50000)
+        if (TimeUtils.nanoTime() / MILLION_SCALE - lastAlienMissileSpawnTime / MILLION_SCALE > 10000)
             spawnAlienMissile();
         if (TimeUtils.nanoTime() / MILLION_SCALE - lastpowerUpShieldSpawnTime / MILLION_SCALE > 50000)
             spawnPowerUpShield();
@@ -350,7 +357,7 @@ public class Dodgeables {
         alienMissileFixtureDef.filter.categoryBits = game.CATEGORY_ALIEN_MISSILE;
         alienMissileFixtureDef.filter.maskBits = game.MASK_ALIEN_MISSILE;
         loader.attachFixture(alienMissileBody, "Alien Missile", alienMissileFixtureDef, ALIEN_MISSILE_HEIGHT);
-        alienMissileBody.applyForceToCenter(-15.0f, 0, true);
+        alienMissileBody.applyForceToCenter(-40.0f, 0, true);
 
         //add alien missile to alien missiles array
         alienMissileArray.add(alienMissileBody);
@@ -590,6 +597,7 @@ public class Dodgeables {
         TextureRegion alienMissileCurrentFrame = alienMissileAnimation.getKeyFrame(stateTime, true);
         TextureRegion alienMissileExplosionCurrentFrame = alienMissileExplosionAnimation.getKeyFrame(stateTime, true);
         TextureRegion alienCornerCurrentFrame = alienMissileCornerAnimation.getKeyFrame(stateTime, true);
+        TextureRegion energyBallCurrentFrame = energyBallAnimation.getKeyFrame(stateTime, true);
         TextureRegion powerUpShieldCurrentFrame = powerUpShieldAnimation.getKeyFrame(stateTime, true);
         TextureRegion teleportCurrentFrame = teleportAnimation.getKeyFrame(stateTime, true);
 
@@ -598,6 +606,7 @@ public class Dodgeables {
         for (Body backwardsPigeon : levelOneBirdsArray) {
             if (backwardsPigeon.isActive()) {
                 batch.draw(backwardsCurrentFrame, backwardsPigeon.getPosition().x, backwardsPigeon.getPosition().y, 0, 0, LEVEL_ONE_BIRD_WIDTH, LEVEL_ONE_BIRD_HEIGHT, 1, 1, MathUtils.radiansToDegrees * backwardsPigeon.getAngle());
+                //batch.draw(energyBallCurrentFrame, backwardsPigeon.getPosition().x, backwardsPigeon.getPosition().y, 0, 0, energyBallWidth, energyBallHeight, 1, 1, MathUtils.radiansToDegrees * backwardsPigeon.getAngle());
             } else {
                 levelOneBirdsArray.removeValue(backwardsPigeon, false);
             }
@@ -715,8 +724,10 @@ public class Dodgeables {
                 if (rocket.isActive()) {
                     float forceX = -1f;
                     BodyData rocketData = (BodyData) rocket.getUserData();
-                    float forceY = rocketData.getRocketYForce();
-                    rocket.applyForceToCenter(forceX, forceY, true);
+                    if (rocketData  != null){
+                        float forceY = rocketData.getRocketYForce();
+                        rocket.applyForceToCenter(forceX, forceY, true);
+                    }
                 } else {
                     rocketArray.removeValue(rocket, false);
                 }
@@ -1062,6 +1073,34 @@ public class Dodgeables {
 
         // Initialize the Animation with the frame interval and array of frames
         alienMissileCornerAnimation = new Animation<TextureRegion>(1f, alienFrames);
+    }
+
+    private void initializeEnergyBallAnimation() {
+
+        // Load the energy ball sprite sheet as a Texture
+        energyBallSheet = new Texture(Gdx.files.internal("sprites/EnergyBallSpriteSheet.png"));
+
+        // Use the split utility method to create a 2D array of TextureRegions. This is
+        // possible because this sprite sheet contains frames of equal size and they are
+        // all aligned.
+        TextureRegion[][] tmp = TextureRegion.split(energyBallSheet,
+                energyBallSheet.getWidth() / 3,
+                energyBallSheet.getHeight() / 2);
+
+        // Place the regions into a 1D array in the correct order, starting from the top
+        // left, going across first. The Animation constructor requires a 1D array.
+        TextureRegion[] frames = new TextureRegion[3 * 2];
+        int index = 0;
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 3; j++) {
+                frames[index++] = tmp[i][j];
+            }
+        }
+
+        // Initialize the Animation with the frame interval and array of frames
+        energyBallAnimation = new Animation<TextureRegion>(0.05f, frames);
+
+
     }
 
     private void initializePowerUpShieldAnimation() {
