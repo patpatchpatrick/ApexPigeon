@@ -105,8 +105,15 @@ public class Dodgeables {
     private Array<Body> energyBallArray = new Array<Body>();
     private Animation<TextureRegion> energyBallAnimation;
     private Texture energyBallSheet;
-    private float energyBallWidth = 5f;
-    private float energyBallHeight = 5f;
+    private float energyBallWidth = 80f;
+    private float energyBallHeight = 40f;
+
+    //UFO Energy Beam variables
+    private Array<Body> energyBeamArray = new Array<Body>();
+    private Animation<TextureRegion> energyBeamAnimation;
+    private Texture energyBeamSheet;
+    private float energyBeamWidth = 80f;
+    private float energyBeamHeight = 40f;
 
     //PowerUp Shield variables
     private Array<Body> powerUpShieldsArray = new Array<Body>();
@@ -141,6 +148,7 @@ public class Dodgeables {
         initializeAlienMissileExplosionAnimation();
         initializeAlienMissileCornerAnimation();
         initializeEnergyBallAnimation();
+        initializeEnergyBeamAnimation();
 
         // initialize powerup animations
         initializePowerUpShieldAnimation();
@@ -598,15 +606,17 @@ public class Dodgeables {
         TextureRegion alienMissileExplosionCurrentFrame = alienMissileExplosionAnimation.getKeyFrame(stateTime, true);
         TextureRegion alienCornerCurrentFrame = alienMissileCornerAnimation.getKeyFrame(stateTime, true);
         TextureRegion energyBallCurrentFrame = energyBallAnimation.getKeyFrame(stateTime, true);
+        TextureRegion energyBeamCurrentFrame = energyBeamAnimation.getKeyFrame(stateTime, true);
         TextureRegion powerUpShieldCurrentFrame = powerUpShieldAnimation.getKeyFrame(stateTime, true);
         TextureRegion teleportCurrentFrame = teleportAnimation.getKeyFrame(stateTime, true);
 
+        //batch.draw(energyBallCurrentFrame, 0, 5, 0, 0, energyBallWidth, energyBallHeight, 1, 1, 0);
+        batch.draw(energyBeamCurrentFrame, 0, 5, 0, 0, energyBeamWidth, energyBeamHeight, 1, 1, 0);
 
         // draw all level one birds dodgeables using the current animation frame
         for (Body backwardsPigeon : levelOneBirdsArray) {
             if (backwardsPigeon.isActive()) {
-                batch.draw(backwardsCurrentFrame, backwardsPigeon.getPosition().x, backwardsPigeon.getPosition().y, 0, 0, LEVEL_ONE_BIRD_WIDTH, LEVEL_ONE_BIRD_HEIGHT, 1, 1, MathUtils.radiansToDegrees * backwardsPigeon.getAngle());
-                //batch.draw(energyBallCurrentFrame, backwardsPigeon.getPosition().x, backwardsPigeon.getPosition().y, 0, 0, energyBallWidth, energyBallHeight, 1, 1, MathUtils.radiansToDegrees * backwardsPigeon.getAngle());
+                //batch.draw(backwardsCurrentFrame, backwardsPigeon.getPosition().x, backwardsPigeon.getPosition().y, 0, 0, LEVEL_ONE_BIRD_WIDTH, LEVEL_ONE_BIRD_HEIGHT, 1, 1, MathUtils.radiansToDegrees * backwardsPigeon.getAngle());
             } else {
                 levelOneBirdsArray.removeValue(backwardsPigeon, false);
             }
@@ -1078,7 +1088,7 @@ public class Dodgeables {
     private void initializeEnergyBallAnimation() {
 
         // Load the energy ball sprite sheet as a Texture
-        energyBallSheet = new Texture(Gdx.files.internal("sprites/EnergyBallSpriteSheet.png"));
+        energyBallSheet = new Texture(Gdx.files.internal("sprites/EnergyBallLongSpriteSheet.png"));
 
         // Use the split utility method to create a 2D array of TextureRegions. This is
         // possible because this sprite sheet contains frames of equal size and they are
@@ -1099,6 +1109,34 @@ public class Dodgeables {
 
         // Initialize the Animation with the frame interval and array of frames
         energyBallAnimation = new Animation<TextureRegion>(0.05f, frames);
+
+
+    }
+
+    private void initializeEnergyBeamAnimation() {
+
+        // Load the energy beam sprite sheet as a Texture
+        energyBallSheet = new Texture(Gdx.files.internal("sprites/EnergyBeamSpriteSheet.png"));
+
+        // Use the split utility method to create a 2D array of TextureRegions. This is
+        // possible because this sprite sheet contains frames of equal size and they are
+        // all aligned.
+        TextureRegion[][] tmp = TextureRegion.split(energyBallSheet,
+                energyBallSheet.getWidth() / 3,
+                energyBallSheet.getHeight() / 4);
+
+        // Place the regions into a 1D array in the correct order, starting from the top
+        // left, going across first. The Animation constructor requires a 1D array.
+        TextureRegion[] frames = new TextureRegion[3 * 4];
+        int index = 0;
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 3; j++) {
+                frames[index++] = tmp[i][j];
+            }
+        }
+
+        // Initialize the Animation with the frame interval and array of frames
+        energyBeamAnimation = new Animation<TextureRegion>(0.05f, frames);
 
 
     }
