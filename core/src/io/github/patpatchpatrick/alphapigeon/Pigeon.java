@@ -48,7 +48,7 @@ public class Pigeon {
         // create pigeon fixture, attach the fixture created to the body created with the help of
         // Box 2D editor
         BodyDef pigeonBodyDef = new BodyDef();
-        pigeonBodyDef.type = BodyDef.BodyType.KinematicBody;
+        pigeonBodyDef.type = BodyDef.BodyType.DynamicBody;
         pigeonBodyDef.position.set(10, 10);
         pigeonBody = world.createBody(pigeonBodyDef);
         BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("json/AlphaPigeonBody.json"));
@@ -61,6 +61,8 @@ public class Pigeon {
         pigeonFixtureDef.filter.maskBits = game.MASK_PIGEON;
         //pigeonFixtureDef.isSensor =  true;
         loader.attachFixture(pigeonBody, "AlphaPigeon", pigeonFixtureDef, 10);
+        //Set fixed rotation to body... pigeon should not rotate
+        pigeonBody.setFixedRotation(true);
 
         initializePowerUpShieldAnimation();
 

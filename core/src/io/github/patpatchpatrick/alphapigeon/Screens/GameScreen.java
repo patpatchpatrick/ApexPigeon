@@ -181,13 +181,13 @@ public class GameScreen implements Screen {
             pigeonBody.applyForceToCenter(0.3f * (touchPos.x - pigeonBody.getPosition().x), 0.3f * (touchPos.y - pigeonBody.getPosition().y), true);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
-            pigeonBody.setLinearVelocity(-30.0f, 0);
+            pigeonBody.applyForceToCenter(-9f, 0,  true);
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
-            pigeonBody.setLinearVelocity(30.0f, 0);
+            pigeonBody.applyForceToCenter(9f, 0,  true);
         if (Gdx.input.isKeyPressed(Input.Keys.UP))
-            pigeonBody.setLinearVelocity(0, 30.0f);
+            pigeonBody.applyForceToCenter(0, 9f,  true);
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
-            pigeonBody.setLinearVelocity(0, -30.0f);
+            pigeonBody.applyForceToCenter(0, -9f,  true);
 
 
         // make sure the pigeon stays within the screen bounds
