@@ -55,22 +55,26 @@ public class Dodgeables {
 
 
     public void spawnDodgeables() {
+
+        //Get current time in milliseconds
+        long currentTimeInMillis = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        
         //class to determine if we need to spawn new dodgeables depending on how much time has passed
-        if (TimeUtils.nanoTime() / GameVariables.MILLION_SCALE - birds.getLastLevelOneBirdSpawnTime() / GameVariables.MILLION_SCALE > 50000)
+        if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() / GameVariables.MILLION_SCALE > 50000)
             birds.spawnLevelOneBird();
-        if (TimeUtils.nanoTime() / GameVariables.MILLION_SCALE - meteors.getLastMeteorSpawnTime() / GameVariables.MILLION_SCALE > 10000)
+        if (currentTimeInMillis - meteors.getLastMeteorSpawnTime() / GameVariables.MILLION_SCALE > 10000)
             meteors.spawnMeteor();
-        if (TimeUtils.nanoTime() / GameVariables.MILLION_SCALE - birds.getLastLevelTwoBirdSpawnTime() / GameVariables.MILLION_SCALE > 10000)
+        if (currentTimeInMillis - birds.getLastLevelTwoBirdSpawnTime() / GameVariables.MILLION_SCALE > 10000)
             birds.spawnLevelTwoBird();
-        if (TimeUtils.nanoTime() / GameVariables.MILLION_SCALE - rockets.getLastRocketSpawnTime() / GameVariables.MILLION_SCALE > 10000)
+        if (currentTimeInMillis - rockets.getLastRocketSpawnTime() / GameVariables.MILLION_SCALE > 10000)
             rockets.spawnRocket();
-        if (TimeUtils.nanoTime() / GameVariables.MILLION_SCALE - alienMissiles.getLastAlienMissileSpawnTime() / GameVariables.MILLION_SCALE > 10000)
+        if (currentTimeInMillis - alienMissiles.getLastAlienMissileSpawnTime() / GameVariables.MILLION_SCALE > 10000)
             alienMissiles.spawnAlienMissile();
-        if (TimeUtils.nanoTime() / GameVariables.MILLION_SCALE - powerUps.getLastpowerUpShieldSpawnTime() / GameVariables.MILLION_SCALE > 50000)
+        if (currentTimeInMillis - powerUps.getLastpowerUpShieldSpawnTime() / GameVariables.MILLION_SCALE > 50000)
             powerUps.spawnPowerUpShield();
-        if (TimeUtils.nanoTime() / GameVariables.MILLION_SCALE - teleports.getLastTeleportSpawnTime() / GameVariables.MILLION_SCALE > 50000)
+        if (currentTimeInMillis - teleports.getLastTeleportSpawnTime() / GameVariables.MILLION_SCALE > 50000)
             teleports.spawnTeleports();
-        if (TimeUtils.nanoTime() / GameVariables.MILLION_SCALE - ufos.getLastUfoSpawnTime() / GameVariables.MILLION_SCALE > 10000)
+        if (currentTimeInMillis - ufos.getLastUfoSpawnTime() / GameVariables.MILLION_SCALE > 5000)
             ufos.spawnUfo();
     }
 
@@ -102,7 +106,7 @@ public class Dodgeables {
         teleports.update();
         powerUps.update();
         meteors.update();
-        ufos.update();
+        ufos.update(stateTime);
 
     }
 

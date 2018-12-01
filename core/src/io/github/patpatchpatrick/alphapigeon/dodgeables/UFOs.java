@@ -29,7 +29,10 @@ public class UFOs {
     private Texture ufoSheet;
     private final float UFO_WIDTH = 15f;
     private final float UFO_HEIGHT = UFO_WIDTH;
-    private long lastUfoSpawnTime;
+    private float lastUfoSpawnTime;
+
+    //UFO tracking variables
+    private boolean ufoIsSpawned = false;
 
 
     //UFO Energy Ball variables
@@ -101,7 +104,7 @@ public class UFOs {
 
     }
 
-    public void update(){
+    public void update(float stateTime){
 
         energyBallWidth = energyBallWidth + 0.2f;
         energyBallHeight = energyBallWidth /2;
@@ -113,9 +116,13 @@ public class UFOs {
             }
         }
 
+        if (ufoIsSpawned){
+        }
+
     }
 
     public void spawnUfo(){
+
         //spawn a new ufo
         BodyDef ufoBodyDef = new BodyDef();
         ufoBodyDef.type = BodyDef.BodyType.DynamicBody;
@@ -129,8 +136,8 @@ public class UFOs {
         ufoFixtureDef.friction = 0.5f;
         ufoFixtureDef.restitution = 0.3f;
         // set the ufo filter categories and masks for collisions
-        ufoFixtureDef.filter.categoryBits = game.CATEGORY_LEVEL_ONE_BIRD;
-        ufoFixtureDef.filter.maskBits = game.MASK_LEVEL_ONE_BIRD;
+        ufoFixtureDef.filter.categoryBits = game.CATEGORY_UFO;
+        ufoFixtureDef.filter.maskBits = game.MASK_UFO;
         loader.attachFixture(ufoBody, "Ufo", ufoFixtureDef, UFO_HEIGHT);
         ufoBody.applyForceToCenter(-9.0f, 0, true);
 
@@ -139,6 +146,8 @@ public class UFOs {
 
         //keep track of time the ufo was spawned
         lastUfoSpawnTime = TimeUtils.nanoTime();
+
+        ufoIsSpawned = true;
     }
 
     private void initializeUfoAnimation() {
@@ -254,7 +263,7 @@ public class UFOs {
 
     }
 
-    public long getLastUfoSpawnTime(){
+    public float getLastUfoSpawnTime(){
         return lastUfoSpawnTime;
     }
 
