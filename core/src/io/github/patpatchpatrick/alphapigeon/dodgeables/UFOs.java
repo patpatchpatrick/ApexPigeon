@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
+import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
 public class UFOs {
 
@@ -34,7 +35,6 @@ public class UFOs {
     //UFO tracking variables
     private boolean ufoIsSpawned = false;
 
-
     //UFO Energy Ball variables
     private Array<Body> energyBallArray = new Array<Body>();
     private Animation<TextureRegion> energyBallAnimation;
@@ -42,6 +42,7 @@ public class UFOs {
     private float energyBallWidth = 5f;
     private float energyBallHeight = energyBallWidth/2;
     private float energyBallFrameNumber = 0;
+    private boolean energyBallIsSpawned = false;
     private boolean energyBallSizeEqualsBeamSize = false;
     private boolean energyBeamAnimationComplete = false;
 
@@ -81,21 +82,29 @@ public class UFOs {
         TextureRegion energyBeamStaticCurrentFrame = energyBeamStaticAnimation.getKeyFrame(stateTime, true);
         TextureRegion energyBeamCurrentFrame = energyBeamAnimation.getKeyFrame(stateTime, true);
 
-        if (!energyBallSizeEqualsBeamSize){
-            batch.draw(energyBallCurrentFrame, -2 + ENERGY_BEAM_WIDTH - energyBallWidth, 5 + ENERGY_BEAM_HEIGHT/2 - energyBallHeight/2, 0, 0, energyBallWidth, energyBallHeight, 1, 1, 0);
-        } else if (!energyBeamAnimationComplete) {
-            batch.draw(energyBeamCurrentFrame, -2, 5, 0, 0, ENERGY_BEAM_WIDTH, ENERGY_BEAM_HEIGHT, 1, 1, 0);
-        } else {
-            batch.draw(energyBallCurrentFrame, -2 , 5, 0, 0, ENERGY_BEAM_WIDTH, ENERGY_BEAM_HEIGHT, 1, 1, 0);
-            batch.draw(energyBeamStaticCurrentFrame, -2, 5, 0, 0, ENERGY_BEAM_STATIC_WIDTH, ENERGY_BEAM_STATIC_HEIGHT, 1, 1,0);
-            batch.draw(energyBeamCurrentFrame, -2, 5, 0, 0, ENERGY_BEAM_WIDTH, ENERGY_BEAM_HEIGHT, 1, 1, 0);
-
-        }
-
         // draw all ufos using the current animation frame
         for (Body ufo : ufoArray) {
             if (ufo.isActive()) {
                 batch.draw(ufoCurrentFrame, ufo.getPosition().x, ufo.getPosition().y, 0, 0, UFO_WIDTH, UFO_HEIGHT, 1, 1, MathUtils.radiansToDegrees * ufo.getAngle());
+                //Energy ball/beam render method
+                if (energyBallIsSpawned){
+
+                    //Get positions of UFOs and EnergyBeams relative to UFOs
+                    float ufoXPosition = ufo.getPosition().x;
+                    float ufoYPosition = ufo.getPosition().y + UFO_HEIGHT/2;
+                    float energyBeamXPosition  = ufoXPosition - ENERGY_BEAM_WIDTH;
+                    float energyBeamYPosition = ufoYPosition - ENERGY_BEAM_HEIGHT/2;
+
+                    if (!energyBallSizeEqualsBeamSize){
+                        batch.draw(energyBallCurrentFrame, ufo.getPosition().x - energyBallWidth, ufoYPosition - energyBallHeight/2, 0, 0, energyBallWidth, energyBallHeight, 1, 1, 0);
+                    } else if (!energyBeamAnimationComplete) {
+                        batch.draw(energyBeamCurrentFrame, energyBeamXPosition, energyBeamYPosition, 0, 0, ENERGY_BEAM_WIDTH, ENERGY_BEAM_HEIGHT, 1, 1, 0);
+                    } else {
+                        batch.draw(energyBallCurrentFrame, energyBeamXPosition , energyBeamYPosition, 0, 0, ENERGY_BEAM_WIDTH, ENERGY_BEAM_HEIGHT, 1, 1, 0);
+                        batch.draw(energyBeamStaticCurrentFrame, energyBeamXPosition, energyBeamYPosition, 0, 0, ENERGY_BEAM_STATIC_WIDTH, ENERGY_BEAM_STATIC_HEIGHT, 1, 1,0);
+                        batch.draw(energyBeamCurrentFrame, energyBeamXPosition, energyBeamYPosition, 0, 0, ENERGY_BEAM_WIDTH, ENERGY_BEAM_HEIGHT, 1, 1, 0);
+                    }
+                }
             } else {
                 ufoArray.removeValue(ufo, false);
             }
@@ -117,6 +126,9 @@ public class UFOs {
         }
 
         if (ufoIsSpawned){
+            if (TimeUtils.nanoTime() / GameVariables.MILLION_SCALE - stateTime > 5000){
+                spawnEnergyBall();
+            }
         }
 
     }
@@ -148,6 +160,10 @@ public class UFOs {
         lastUfoSpawnTime = TimeUtils.nanoTime();
 
         ufoIsSpawned = true;
+    }
+
+    public void spawnEnergyBall(){
+        energyBallIsSpawned = true;
     }
 
     private void initializeUfoAnimation() {

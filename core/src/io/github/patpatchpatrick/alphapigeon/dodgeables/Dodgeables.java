@@ -74,7 +74,7 @@ public class Dodgeables {
             powerUps.spawnPowerUpShield();
         if (currentTimeInMillis - teleports.getLastTeleportSpawnTime() / GameVariables.MILLION_SCALE > 50000)
             teleports.spawnTeleports();
-        if (currentTimeInMillis - ufos.getLastUfoSpawnTime() / GameVariables.MILLION_SCALE > 5000)
+        if (currentTimeInMillis - ufos.getLastUfoSpawnTime() / GameVariables.MILLION_SCALE > 15000)
             ufos.spawnUfo();
     }
 
