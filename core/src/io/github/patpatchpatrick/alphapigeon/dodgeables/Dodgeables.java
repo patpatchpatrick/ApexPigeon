@@ -49,14 +49,14 @@ public class Dodgeables {
         teleports = new Teleports(gameWorld, game, camera);
         powerUps = new PowerUps(gameWorld, game, camera);
         meteors = new Meteors(gameWorld, game, camera);
-        ufos = new UFOs();
+        ufos = new UFOs(gameWorld, game, camera);
 
     }
 
 
     public void spawnDodgeables() {
         //class to determine if we need to spawn new dodgeables depending on how much time has passed
-        if (TimeUtils.nanoTime() / GameVariables.MILLION_SCALE - birds.getLastLevelOneBirdSpawnTime() / GameVariables.MILLION_SCALE > 2000)
+        if (TimeUtils.nanoTime() / GameVariables.MILLION_SCALE - birds.getLastLevelOneBirdSpawnTime() / GameVariables.MILLION_SCALE > 50000)
             birds.spawnLevelOneBird();
         if (TimeUtils.nanoTime() / GameVariables.MILLION_SCALE - meteors.getLastMeteorSpawnTime() / GameVariables.MILLION_SCALE > 10000)
             meteors.spawnMeteor();
@@ -70,6 +70,8 @@ public class Dodgeables {
             powerUps.spawnPowerUpShield();
         if (TimeUtils.nanoTime() / GameVariables.MILLION_SCALE - teleports.getLastTeleportSpawnTime() / GameVariables.MILLION_SCALE > 50000)
             teleports.spawnTeleports();
+        if (TimeUtils.nanoTime() / GameVariables.MILLION_SCALE - ufos.getLastUfoSpawnTime() / GameVariables.MILLION_SCALE > 10000)
+            ufos.spawnUfo();
     }
 
     public void spawnRocketExplosion(float explosionPositionX, float explosionPositionY){
