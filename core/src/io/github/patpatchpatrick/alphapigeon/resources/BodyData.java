@@ -1,6 +1,8 @@
 package io.github.patpatchpatrick.alphapigeon.resources;
 import com.badlogic.gdx.physics.box2d.Body;
 
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.EnergyBall;
+
 public class BodyData {
 
     // Class used to store data on bodies
@@ -9,14 +11,16 @@ public class BodyData {
 
     private long spawnTime= 9999;
 
-    //Teleport Data
+    //TELEPORT DATA
     private Body oppositeTeleport;
 
-    //Rocket Data
+    //ROCKET DATA
     private float rocketYForce = 0f;
-
-    //Rocket Explosion Data
     private long lastRocketExplosionTime = 99999;
+
+    //UFO DATA
+    private boolean ufoEnergyBallSpawned = false;
+    private EnergyBall energyBall;
 
 
     public BodyData(boolean flagForDelete) {
@@ -35,6 +39,16 @@ public class BodyData {
         this.flaggedForDelete = flaggedForDelete;
     }
 
+    public void setSpawnTime(long spawnTime){
+        this.spawnTime = spawnTime;
+    }
+
+    public long getSpawnTime(){
+        return this.spawnTime;
+    }
+
+    //TELEPORT DATA
+
     public void setOppositeTeleport(Body oppositeTeleport){
         // Method used for teleport bodies, to store info about its counterpart teleport
         this.oppositeTeleport = oppositeTeleport;
@@ -45,6 +59,8 @@ public class BodyData {
         return oppositeTeleport;
     }
 
+    //ROCKET DATA
+
     public void setRocketData(float torque, boolean rocketSpawnedInBottomHalfOfScreen){
         // Based on the rockets torque and where the rocket is spawned, calculate what force should
         // be applied to rocket in the Y direction
@@ -53,14 +69,6 @@ public class BodyData {
         } else {
             rocketYForce = -0.3f * torque - 0.6f;
         }
-    }
-
-    public void setSpawnTime(long spawnTime){
-        this.spawnTime = spawnTime;
-    }
-
-    public long getSpawnTime(){
-        return this.spawnTime;
     }
 
     public void setExplosionData(long lastRocketExplosionTime){
@@ -74,6 +82,26 @@ public class BodyData {
     public float getRocketYForce(){
         return rocketYForce;
     }
+
+    //UFO DATA
+
+    public void setUfoEnergyBallIsSpawned(boolean ballSpawned){
+        this.ufoEnergyBallSpawned = ballSpawned;
+    }
+
+    public boolean ufoEnergyBallIsSpawned(){
+        return this.ufoEnergyBallSpawned;
+    }
+
+    public void  setEnergyBall(EnergyBall energyBall){
+        this.energyBall = energyBall;
+    }
+
+    public EnergyBall getEnergyBall(){
+        return this.energyBall;
+    }
+
+
 
 
 }
