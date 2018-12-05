@@ -55,7 +55,7 @@ public class GameScreen implements Screen {
         this.game = game;
 
         world = new World(new Vector2(0, 0), true);
-        //debugRenderer = new Box2DDebugRenderer();
+        debugRenderer = new Box2DDebugRenderer();
 
         // set initial time to 0
         stateTime = 0f;
@@ -104,7 +104,7 @@ public class GameScreen implements Screen {
         // tell the camera to update its matrices
         camera.update();
 
-        //debugRenderer.render(world, camera.combined);
+        debugRenderer.render(world, camera.combined);
         // tell the SpriteBatch to render in the
         // coordinate system specified by the camera
         game.batch.setProjectionMatrix(camera.combined);

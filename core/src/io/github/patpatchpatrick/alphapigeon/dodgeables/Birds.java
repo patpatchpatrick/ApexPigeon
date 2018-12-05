@@ -57,7 +57,7 @@ public class Birds {
         // draw all level one birds dodgeables using the current animation frame
         for (Body backwardsPigeon : levelOneBirdsArray) {
             if (backwardsPigeon.isActive()) {
-                //batch.draw(backwardsCurrentFrame, backwardsPigeon.getPosition().x, backwardsPigeon.getPosition().y, 0, 0, LEVEL_ONE_BIRD_WIDTH, LEVEL_ONE_BIRD_HEIGHT, 1, 1, MathUtils.radiansToDegrees * backwardsPigeon.getAngle());
+                batch.draw(backwardsCurrentFrame, backwardsPigeon.getPosition().x, backwardsPigeon.getPosition().y, 0, 0, LEVEL_ONE_BIRD_WIDTH, LEVEL_ONE_BIRD_HEIGHT, 1, 1, MathUtils.radiansToDegrees * backwardsPigeon.getAngle());
             } else {
                 levelOneBirdsArray.removeValue(backwardsPigeon, false);
             }

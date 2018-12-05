@@ -20,7 +20,10 @@ public class BodyData {
 
     //UFO DATA
     private boolean ufoEnergyBallSpawned = false;
+    private boolean ufoEnergyBeamIsSpawned = false;
     private EnergyBall energyBall;
+    private float energyBeamDirection;
+    private Body ufo;
 
 
     public BodyData(boolean flagForDelete) {
@@ -101,6 +104,29 @@ public class BodyData {
         return this.energyBall;
     }
 
+    public void setUfo(Body ufo){
+        this.ufo = ufo;
+    }
+
+    public Body getUfo(Body ufo){
+        return this.ufo;
+    }
+
+    public void setEnergyBeamSpawned(Boolean energyBeamIsSpawned){
+        this.ufoEnergyBeamIsSpawned = energyBeamIsSpawned;
+    }
+
+    public Boolean getEnergyBeamIsSpawned(){
+        return this.ufoEnergyBeamIsSpawned;
+    }
+
+    public void setEnergyBeamDirection(float energyBeamDirection){
+        this.energyBeamDirection = energyBeamDirection;
+    }
+
+    public float getEnergyBeamDirection(){
+        return this.energyBeamDirection;
+    }
 
 
 
