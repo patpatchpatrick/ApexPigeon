@@ -9,13 +9,15 @@ public class EnergyBall implements MovingObject {
     private boolean isCharged = false;
     private float frameNumber = 0;
     private boolean animationIsComplete = false;
+    private float direction;
 
     public EnergyBall() {
     }
 
-    public EnergyBall(float width, float height) {
+    public EnergyBall(float width, float height, float direction) {
         this.width = width;
         this.height = height;
+        this.direction = direction;
     }
 
 
@@ -62,6 +64,14 @@ public class EnergyBall implements MovingObject {
 
     public boolean animationIsComplete(){
         return this.animationIsComplete;
+    }
+
+    public void setDirection(float direction){
+        this.direction =  direction;
+    }
+
+    public float getDirection(){
+        return this.direction;
     }
 
 }

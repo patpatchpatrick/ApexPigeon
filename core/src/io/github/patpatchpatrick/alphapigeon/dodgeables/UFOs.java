@@ -97,22 +97,37 @@ public class UFOs {
                     EnergyBall energyBall = ufoData.getEnergyBall();
                     float energyBallWidth = energyBall.getWidth();
                     float energyBallHeight = energyBall.getHeight();
+                    float energyBallDirection = energyBall.getDirection();
                     Boolean energyBallIsCharged = energyBall.isCharged();
                     Boolean energyBallAnimationIsComplete = energyBall.animationIsComplete();
+
 
                     //Get positions of UFOs and EnergyBeams relative to UFOs
                     float ufoXPosition = ufo.getPosition().x;
                     float ufoYPosition = ufo.getPosition().y + UFO_HEIGHT / 2;
-                    float energyBeamXPosition = ufoXPosition - ENERGY_BEAM_WIDTH;
+                    float energyBeamXPosition = 0;
                     float energyBeamYPosition = ufoYPosition - ENERGY_BEAM_HEIGHT / 2;
+                    float energyBeamXScale = 1;
+                    float energyBallXPosition = 0;
+                    float energyBallYPosition = ufoYPosition - energyBallHeight / 2;
+
+
+                    if (energyBallDirection == ENERGY_BEAM_LEFT){
+                        energyBallXPosition = ufoXPosition - energyBallWidth;
+                        energyBeamXPosition = ufoXPosition - ENERGY_BEAM_WIDTH;
+                    } else if (energyBallDirection == ENERGY_BEAM_RIGHT){
+                        energyBallXPosition = ufoXPosition + UFO_WIDTH + 1f - (0.88f) * energyBallWidth;
+                        energyBeamXPosition = ufoXPosition + UFO_WIDTH;
+                        energyBeamXScale = -1;
+                    }
 
                     // If the energy ball is not fully charged, render it using its current width and height
                     // If the ball is fully charged, render the energy ball to beam transition animation
                     // If the transition animation is complete, render the energy beam
                     if (!energyBallIsCharged) {
-                        batch.draw(energyBallCurrentFrame, ufo.getPosition().x - energyBallWidth, ufoYPosition - energyBallHeight / 2, 0, 0, energyBallWidth, energyBallHeight, 1, 1, 0);
+                        batch.draw(energyBallCurrentFrame, energyBallXPosition, energyBallYPosition, 0, 0, energyBallWidth, energyBallHeight, 1, 1, 0);
                     } else if (!energyBallAnimationIsComplete) {
-                        batch.draw(energyBeamCurrentFrame, energyBeamXPosition, energyBeamYPosition, 0, 0, ENERGY_BEAM_WIDTH, ENERGY_BEAM_HEIGHT, 1, 1, 0);
+                        batch.draw(energyBeamCurrentFrame, energyBeamXPosition, energyBeamYPosition, ENERGY_BEAM_WIDTH/2, ENERGY_BEAM_HEIGHT/2, ENERGY_BEAM_WIDTH, ENERGY_BEAM_HEIGHT, energyBeamXScale, 1, 0);
                     }
                 }
             } else {
@@ -170,7 +185,7 @@ public class UFOs {
                     if (!ufoData.ufoEnergyBallIsSpawned()) {
                         long ufoSpawnTime = ufoData.getSpawnTime();
                         if (currentTimeInMillis - ufoSpawnTime > 5000) {
-                            spawnEnergyBall(ufoData);
+                            spawnEnergyBall(ufoData, ENERGY_BEAM_RIGHT);
                         }
                     } else {
                         EnergyBall energyBall = ufoData.getEnergyBall();
@@ -182,7 +197,7 @@ public class UFOs {
                                 if (energyBall.getFrameNumber() > 12f && !energyBeamIsSpawned) {
                                     energyBall.setAnimationIsComplete(true);
                                     ufoData.setEnergyBeamSpawned(true);
-                                    spawnEnergyBeam(ufo, ENERGY_BEAM_LEFT);
+                                    spawnEnergyBeam(ufo, ufoData);
                                 }
                             } else {
                                 energyBall.increaseWidth(0.2f);
@@ -239,20 +254,23 @@ public class UFOs {
         ufoArray.add(ufoBody);
     }
 
-    public void spawnEnergyBall(BodyData ufoData) {
+    public void spawnEnergyBall(BodyData ufoData, float direction) {
         //Spawn a UFO energy ball
         //The energy ball is what spawns next to the UFO before the energy beam is launched
         //The energy ball slowly grows in size over time until it has enough energy to shoot the beam
-        ufoData.setEnergyBall(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT));
+        //The direction input is the side of the UFO that the energy ball/beam will shoot from
+        ufoData.setEnergyBall(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, direction));
         ufoData.setUfoEnergyBallIsSpawned(true);
     }
 
-    private void spawnEnergyBeam(Body ufo, float energyBeamDirection) {
+    private void spawnEnergyBeam(Body ufo, BodyData ufoData) {
 
         //spawn a new energybeam
         BodyDef energyBeamBodyDef = new BodyDef();
         energyBeamBodyDef.type = BodyDef.BodyType.DynamicBody;
         Body energyBeamBody = null;
+        //get the direction of the beam from the direction of the energy ball attached to the UFO
+        float energyBeamDirection = ufoData.getEnergyBall().getDirection();
 
         if (energyBeamDirection == ENERGY_BEAM_LEFT){
 
