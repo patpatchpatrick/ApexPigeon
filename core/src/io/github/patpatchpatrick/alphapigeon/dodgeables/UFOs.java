@@ -49,10 +49,12 @@ public class UFOs {
     private Texture energyBeamSheet;
     private final float ENERGY_BEAM_WIDTH = 80f;
     private final float ENERGY_BEAM_HEIGHT = 40f;
+    private final float ENERGY_BEAM_VERTICAL_WIDTH = 40f;
+    private final float ENERGY_BEAM_VERTICAL_HEIGHT = 80f;
     private final float ENERGY_BEAM_LEFT = 0f;
     private final float ENERGY_BEAM_RIGHT = 1f;
     private final float ENERGY_BEAM_TOP = 2f;
-    private final float ENERGY_BEAM_BOTTOM = 3f;
+    private final float ENERGY_BEAM_DOWN = 3f;
 
     //UFO Static Energy Beam variables
     private Animation<TextureRegion> energyBeamStaticAnimation;
@@ -110,15 +112,22 @@ public class UFOs {
                     float energyBeamXScale = 1;
                     float energyBallXPosition = 0;
                     float energyBallYPosition = ufoYPosition - energyBallHeight / 2;
+                    float energyBeamRotation = 0;
 
 
-                    if (energyBallDirection == ENERGY_BEAM_LEFT){
+                    if (energyBallDirection == ENERGY_BEAM_LEFT) {
                         energyBallXPosition = ufoXPosition - energyBallWidth;
                         energyBeamXPosition = ufoXPosition - ENERGY_BEAM_WIDTH;
-                    } else if (energyBallDirection == ENERGY_BEAM_RIGHT){
+                    } else if (energyBallDirection == ENERGY_BEAM_RIGHT) {
                         energyBallXPosition = ufoXPosition + UFO_WIDTH + 1f - (0.88f) * energyBallWidth;
                         energyBeamXPosition = ufoXPosition + UFO_WIDTH;
                         energyBeamXScale = -1;
+                    } else if (energyBallDirection == ENERGY_BEAM_DOWN) {
+                        energyBallXPosition = ufoXPosition + 8f - (0.94f) * energyBallWidth;
+                        energyBallYPosition = ufoYPosition - UFO_WIDTH/4 - (0.6f) * energyBallHeight;
+                        energyBeamXPosition = ufoXPosition - 32f;
+                        energyBeamYPosition = ufoYPosition - 62f;
+                        energyBeamRotation = 90;
                     }
 
                     // If the energy ball is not fully charged, render it using its current width and height
@@ -127,7 +136,7 @@ public class UFOs {
                     if (!energyBallIsCharged) {
                         batch.draw(energyBallCurrentFrame, energyBallXPosition, energyBallYPosition, 0, 0, energyBallWidth, energyBallHeight, 1, 1, 0);
                     } else if (!energyBallAnimationIsComplete) {
-                        batch.draw(energyBeamCurrentFrame, energyBeamXPosition, energyBeamYPosition, ENERGY_BEAM_WIDTH/2, ENERGY_BEAM_HEIGHT/2, ENERGY_BEAM_WIDTH, ENERGY_BEAM_HEIGHT, energyBeamXScale, 1, 0);
+                        batch.draw(energyBeamCurrentFrame, energyBeamXPosition, energyBeamYPosition, ENERGY_BEAM_WIDTH / 2, ENERGY_BEAM_HEIGHT / 2, ENERGY_BEAM_WIDTH, ENERGY_BEAM_HEIGHT, energyBeamXScale, 1, energyBeamRotation);
                     }
                 }
             } else {
@@ -141,26 +150,34 @@ public class UFOs {
                 BodyData energyBeamData = (BodyData) energyBeam.getUserData();
                 float energyBeamDirection = 0;
                 float energyBeamXScale;
-
-                // Based on the energy beams direction, determine what the image scale should be
-                // determine if the image should be flipped or not depending on the direction of the beam
-                if (energyBeamData != null){
-                    energyBeamDirection = energyBeamData.getEnergyBeamDirection();
-                }
-                if (energyBeamDirection == ENERGY_BEAM_RIGHT){
-                    energyBeamXScale = -1;
-                } else  {
-                    energyBeamXScale = 1;
-                }
+                float energyBeamRotation = 0;
 
                 float energyBeamXPosition = energyBeam.getPosition().x;
                 float energyBeamYPosition = energyBeam.getPosition().y;
 
+                // Based on the energy beams direction, determine what the image scale should be
+                // determine if the image should be flipped or not depending on the direction of the beam
+                if (energyBeamData != null) {
+                    energyBeamDirection = energyBeamData.getEnergyBeamDirection();
+                }
+                if (energyBeamDirection == ENERGY_BEAM_RIGHT) {
+                    energyBeamXScale = -1;
+                } else if (energyBeamDirection == ENERGY_BEAM_DOWN) {
+                    energyBeamXScale = 1;
+                    energyBeamRotation = 90;
+                    energyBeamXPosition = energyBeamXPosition - ENERGY_BEAM_VERTICAL_WIDTH/2 + 0.5f;
+                    energyBeamYPosition =  energyBeamYPosition + ENERGY_BEAM_VERTICAL_WIDTH/2 - 2f;
+
+                } else {
+                    energyBeamXScale = 1;
+                }
+
+
                 // overlay the energy ball, the energy beam animation and the static energy beam to
                 // complete the energy beam animation
-                batch.draw(energyBallCurrentFrame, energyBeamXPosition, energyBeamYPosition, ENERGY_BEAM_WIDTH/2, ENERGY_BEAM_HEIGHT/2, ENERGY_BEAM_WIDTH, ENERGY_BEAM_HEIGHT, energyBeamXScale, 1, 0);
-                batch.draw(energyBeamStaticCurrentFrame, energyBeamXPosition, energyBeamYPosition, ENERGY_BEAM_WIDTH/2, ENERGY_BEAM_HEIGHT/2, ENERGY_BEAM_WIDTH, ENERGY_BEAM_HEIGHT, energyBeamXScale, 1, 0);
-                batch.draw(energyBeamCurrentFrame, energyBeamXPosition, energyBeamYPosition, ENERGY_BEAM_WIDTH/2, ENERGY_BEAM_HEIGHT/2, ENERGY_BEAM_WIDTH, ENERGY_BEAM_HEIGHT, energyBeamXScale, 1, 0);
+                batch.draw(energyBallCurrentFrame, energyBeamXPosition, energyBeamYPosition, ENERGY_BEAM_WIDTH / 2, ENERGY_BEAM_HEIGHT / 2, ENERGY_BEAM_WIDTH, ENERGY_BEAM_HEIGHT, energyBeamXScale, 1, energyBeamRotation);
+                batch.draw(energyBeamStaticCurrentFrame, energyBeamXPosition, energyBeamYPosition, ENERGY_BEAM_WIDTH / 2, ENERGY_BEAM_HEIGHT / 2, ENERGY_BEAM_WIDTH, ENERGY_BEAM_HEIGHT, energyBeamXScale, 1, energyBeamRotation);
+                batch.draw(energyBeamCurrentFrame, energyBeamXPosition, energyBeamYPosition, ENERGY_BEAM_WIDTH / 2, ENERGY_BEAM_HEIGHT / 2, ENERGY_BEAM_WIDTH, ENERGY_BEAM_HEIGHT, energyBeamXScale, 1, energyBeamRotation);
             } else {
                 energyBeamArray.removeValue(energyBeam, false);
             }
@@ -185,7 +202,7 @@ public class UFOs {
                     if (!ufoData.ufoEnergyBallIsSpawned()) {
                         long ufoSpawnTime = ufoData.getSpawnTime();
                         if (currentTimeInMillis - ufoSpawnTime > 5000) {
-                            spawnEnergyBall(ufoData, ENERGY_BEAM_RIGHT);
+                            spawnEnergyBall(ufoData, ENERGY_BEAM_DOWN);
                         }
                     } else {
                         EnergyBall energyBall = ufoData.getEnergyBall();
@@ -272,7 +289,7 @@ public class UFOs {
         //get the direction of the beam from the direction of the energy ball attached to the UFO
         float energyBeamDirection = ufoData.getEnergyBall().getDirection();
 
-        if (energyBeamDirection == ENERGY_BEAM_LEFT){
+        if (energyBeamDirection == ENERGY_BEAM_LEFT) {
 
             // Get ufo positions to determine where to spawn the energy beam
             float ufoXPosition = ufo.getPosition().x;
@@ -293,7 +310,7 @@ public class UFOs {
             energyBeamFixtureDef.filter.maskBits = game.MASK_UFO;
             loader.attachFixture(energyBeamBody, "EnergyBeam", energyBeamFixtureDef, ENERGY_BEAM_WIDTH);
 
-        } else if (energyBeamDirection == ENERGY_BEAM_RIGHT){
+        } else if (energyBeamDirection == ENERGY_BEAM_RIGHT) {
 
             // Get ufo positions to determine where to spawn the energy beam
             float ufoXPosition = ufo.getPosition().x;
@@ -313,6 +330,28 @@ public class UFOs {
             energyBeamFixtureDef.filter.categoryBits = game.CATEGORY_UFO;
             energyBeamFixtureDef.filter.maskBits = game.MASK_UFO;
             loader.attachFixture(energyBeamBody, "EnergyBeamRight", energyBeamFixtureDef, ENERGY_BEAM_WIDTH);
+
+        } else if (energyBeamDirection == ENERGY_BEAM_DOWN) {
+
+            // Get ufo positions to determine where to spawn the energy beam
+            float ufoXPosition = ufo.getPosition().x;
+            float ufoYPosition = ufo.getPosition().y + UFO_HEIGHT/2;
+            float energyBeamXPosition = ufoXPosition + UFO_WIDTH / 2 - ENERGY_BEAM_VERTICAL_WIDTH / 2;
+            float energyBeamYPosition = ufoYPosition - ENERGY_BEAM_VERTICAL_HEIGHT;
+
+            //spawn energybeam
+            energyBeamBodyDef.position.set(energyBeamXPosition, energyBeamYPosition);
+            energyBeamBody = gameWorld.createBody(energyBeamBodyDef);
+            BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("json/EnergyBeamDown.json"));
+            FixtureDef energyBeamFixtureDef = new FixtureDef();
+            energyBeamFixtureDef.density = 0.001f;
+            energyBeamFixtureDef.friction = 0.5f;
+            energyBeamFixtureDef.restitution = 0.3f;
+            // set the energybeam filter categories and masks for collisions
+            energyBeamFixtureDef.filter.categoryBits = game.CATEGORY_UFO;
+            energyBeamFixtureDef.filter.maskBits = game.MASK_UFO;
+            loader.attachFixture(energyBeamBody, "EnergyBeamDown", energyBeamFixtureDef, ENERGY_BEAM_VERTICAL_WIDTH);
+
 
         }
 
