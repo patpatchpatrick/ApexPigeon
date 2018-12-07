@@ -117,6 +117,15 @@ public class Rockets {
             }
         }
 
+
+        //DESTROY ROCKETS OUT OF PLAY
+        for (Body rocket : rocketArray){
+            if (rocket.getPosition().x < 0 - ROCKET_WIDTH ){
+                rocketArray.removeValue(rocket, false);
+                gameWorld.destroyBody(rocket);
+            }
+        }
+
     }
 
     public void spawnRocket() {
@@ -166,7 +175,7 @@ public class Rockets {
         rocketArray.add(rocketBody);
 
         //keep track of time the rocket was spawned
-        lastRocketSpawnTime = TimeUtils.nanoTime();
+        lastRocketSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
 
     }
 

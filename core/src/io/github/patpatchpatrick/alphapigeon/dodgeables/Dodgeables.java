@@ -1,5 +1,6 @@
 package io.github.patpatchpatrick.alphapigeon.dodgeables;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.physics.box2d.World;
@@ -30,9 +31,16 @@ public class Dodgeables {
     private float startTime = 0f;
     //WAVE TIMES in milliseconds
     private final float WAVE_0 = 0f;
-    private final float WAVE_1 = 60000;
-    private final float WAVE_2 = WAVE_1 * 2;
-    private final float BIRD_SPAWN_DURATION_WAVE_0 = 2000;
+    private final float WAVE_1 = 10000;
+    private final float WAVE_2 = 20000;
+    private final float WAVE_3 = 800000;
+    //Time durations in between spawns for dodgeables (milliseconds)
+    private final float L1BIRD_SPAWN_DURATION_WAVE_0 = 2000;
+    private final float L1BIRD_SPAWN_DURATION_WAVE_1 = 2000;
+    private final float L1BIRD_SPAWN_DURATION_WAVE_2 = 2000;
+    private final float L2BIRD_SPAWN_DURATION_WAVE_1 = 4000;
+    private final float L2BIRD_SPAWN_DURATION_WAVE_2 = 4000;
+    private final float ROCKET_SPAWN_DURATION_WAVE_2 = 4000;
 
     public Dodgeables(Pigeon pigeon, World world, AlphaPigeon game, OrthographicCamera camera) {
 
@@ -59,32 +67,70 @@ public class Dodgeables {
         //Get current time in milliseconds
         long currentTimeInMillis = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
         float totalGameTime = currentTimeInMillis - startTime;
+        float powerUpShieldInterval = powerUps.getPowerUpShieldIntervalTime();
 
 
         if (totalGameTime > WAVE_0 && totalGameTime < WAVE_1) {
 
-            if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() / GameVariables.MILLION_SCALE > BIRD_SPAWN_DURATION_WAVE_0)
+            if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() > L1BIRD_SPAWN_DURATION_WAVE_0){
                 birds.spawnLevelOneBird();
+            }
+            if (currentTimeInMillis - powerUps.getLastpowerUpShieldSpawnTime() > powerUpShieldInterval) {
+                Gdx.app.log("MyTag", "" + currentTimeInMillis);
+                Gdx.app.log("MyTag", "" + powerUps.getLastpowerUpShieldSpawnTime());
+                Gdx.app.log("MyTag", "" + powerUpShieldInterval);
+                powerUps.spawnPowerUpShield();
+            }
 
-        } else if (totalGameTime > WAVE_1){
+
+        } else if (totalGameTime >= WAVE_1 && totalGameTime < WAVE_2) {
+
+            if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() > L1BIRD_SPAWN_DURATION_WAVE_1){
+                birds.spawnLevelOneBird();
+            }
+            if (currentTimeInMillis - birds.getLastLevelTwoBirdSpawnTime() > L2BIRD_SPAWN_DURATION_WAVE_1){
+                birds.spawnLevelTwoBird();
+            }
+            if (currentTimeInMillis - powerUps.getLastpowerUpShieldSpawnTime() > powerUpShieldInterval){
+                powerUps.spawnPowerUpShield();
+            }
+
+
+        } else if (totalGameTime >= WAVE_2 && totalGameTime < WAVE_3) {
+
+            if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() > L1BIRD_SPAWN_DURATION_WAVE_1){
+                birds.spawnLevelOneBird();
+            }
+            if (currentTimeInMillis - birds.getLastLevelTwoBirdSpawnTime() > L2BIRD_SPAWN_DURATION_WAVE_1){
+                birds.spawnLevelTwoBird();
+            }
+            if (currentTimeInMillis - powerUps.getLastpowerUpShieldSpawnTime() > powerUpShieldInterval){
+                powerUps.spawnPowerUpShield();
+            }
+            if (currentTimeInMillis - rockets.getLastRocketSpawnTime() > ROCKET_SPAWN_DURATION_WAVE_2){
+                rockets.spawnRocket();
+            }
+
+
+
 
         } else {
 
-            if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() / GameVariables.MILLION_SCALE > 2000)
+            if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() > 2000)
                 birds.spawnLevelOneBird();
-            if (currentTimeInMillis - meteors.getLastMeteorSpawnTime() / GameVariables.MILLION_SCALE > 1000000)
+            if (currentTimeInMillis - meteors.getLastMeteorSpawnTime() > 1000000)
                 meteors.spawnMeteor();
-            if (currentTimeInMillis - birds.getLastLevelTwoBirdSpawnTime() / GameVariables.MILLION_SCALE > 1000000)
+            if (currentTimeInMillis - birds.getLastLevelTwoBirdSpawnTime() > 1000000)
                 birds.spawnLevelTwoBird();
-            if (currentTimeInMillis - rockets.getLastRocketSpawnTime() / GameVariables.MILLION_SCALE > 1000000)
+            if (currentTimeInMillis - rockets.getLastRocketSpawnTime() > 1000000)
                 rockets.spawnRocket();
-            if (currentTimeInMillis - alienMissiles.getLastAlienMissileSpawnTime() / GameVariables.MILLION_SCALE > 1000000)
+            if (currentTimeInMillis - alienMissiles.getLastAlienMissileSpawnTime() > 1000000)
                 alienMissiles.spawnAlienMissile();
-            if (currentTimeInMillis - powerUps.getLastpowerUpShieldSpawnTime() / GameVariables.MILLION_SCALE > 5000000)
+            if (currentTimeInMillis - powerUps.getLastpowerUpShieldSpawnTime() > 5000000)
                 powerUps.spawnPowerUpShield();
-            if (currentTimeInMillis - teleports.getLastTeleportSpawnTime() / GameVariables.MILLION_SCALE > 5000000)
+            if (currentTimeInMillis - teleports.getLastTeleportSpawnTime() > 5000000)
                 teleports.spawnTeleports();
-            if (currentTimeInMillis - ufos.getLastUfoSpawnTime() / GameVariables.MILLION_SCALE > 1500000)
+            if (currentTimeInMillis - ufos.getLastUfoSpawnTime() > 1500000)
                 ufos.spawnUfo();
 
         }

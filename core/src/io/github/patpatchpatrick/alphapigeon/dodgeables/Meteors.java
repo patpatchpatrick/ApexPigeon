@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
+import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
 public class Meteors {
 
@@ -86,7 +87,7 @@ public class Meteors {
         meteorArray.add(meteorBody);
 
         //keep track of time the meteor was spawned
-        lastMeteorSpawnTime = TimeUtils.nanoTime();
+        lastMeteorSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
 
     }
 

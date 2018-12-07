@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
+import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
 public class PowerUps {
 
@@ -31,6 +32,11 @@ public class PowerUps {
     private final float POWER_UP_SHIELD_WIDTH = 8f;
     private final float POWER_UP_SHIELD_HEIGHT = 4.8f;
 
+    //Shield intervals between spawns
+    private final float SHIELD_INITIAL_SPAWN_INTERVAL_START_RANGE = 20000;
+    private final float SHIELD_INITIAL_SPAWN_INTERVAL_END_RANGE = 60000;
+    private float shieldRandomSpawnInterval;
+
     public PowerUps(World gameWorld, AlphaPigeon game, OrthographicCamera camera){
         this.gameWorld = gameWorld;
         this.game = game;
@@ -38,6 +44,10 @@ public class PowerUps {
 
         // initialize powerup animations
         initializePowerUpShieldAnimation();
+
+        // set the initial shield spawn interval to a random number between 20 seconds and 60 seconds
+        shieldRandomSpawnInterval = MathUtils.random(SHIELD_INITIAL_SPAWN_INTERVAL_START_RANGE, SHIELD_INITIAL_SPAWN_INTERVAL_END_RANGE);
+
 
     }
 
@@ -59,7 +69,16 @@ public class PowerUps {
 
     }
 
-    public void update(){}
+    public void update(){
+
+        for (Body powerUpShield : powerUpShieldsArray){
+            if (powerUpShield.getPosition().x < 0 - POWER_UP_SHIELD_WIDTH ){
+                powerUpShieldsArray.removeValue(powerUpShield, false);
+                gameWorld.destroyBody(powerUpShield);
+            }
+        }
+
+    }
 
     public void spawnPowerUpShield() {
 
@@ -86,7 +105,7 @@ public class PowerUps {
         powerUpShieldsArray.add(powerUpShieldBody);
 
         //keep track of time the PowerUp shield was spawned
-        lastpowerUpShieldSpawnTime = TimeUtils.nanoTime();
+        lastpowerUpShieldSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
 
     }
 
@@ -116,6 +135,10 @@ public class PowerUps {
         powerUpShieldAnimation = new Animation<TextureRegion>(0.08f, powerUpShieldFrames);
 
 
+    }
+
+    public float getPowerUpShieldIntervalTime(){
+        return this.shieldRandomSpawnInterval;
     }
 
     public long getLastpowerUpShieldSpawnTime(){

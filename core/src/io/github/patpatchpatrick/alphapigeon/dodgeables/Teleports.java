@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
+import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
 public class Teleports {
 
@@ -109,7 +110,7 @@ public class Teleports {
         teleportArray.add(teleportTwoBody);
 
         //keep track of time the teleport shield was spawned
-        lastTeleportSpawnTime = TimeUtils.nanoTime();
+        lastTeleportSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
 
     }
 

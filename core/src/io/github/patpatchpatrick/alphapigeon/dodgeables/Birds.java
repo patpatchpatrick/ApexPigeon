@@ -1,5 +1,6 @@
 package io.github.patpatchpatrick.alphapigeon.dodgeables;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -15,8 +16,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
-import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
+import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
 public class Birds {
 
@@ -31,6 +32,7 @@ public class Birds {
     private long lastLevelOneBirdSpawnTime;
     private final float LEVEL_ONE_BIRD_WIDTH = 6f;
     private final float LEVEL_ONE_BIRD_HEIGHT = 6f;
+    private final float LEVEL_ONE_FORCE_X = -9.0f;
 
     //Level Two Bird variables
     private Array<Body> levelTwoBirdsArray = new Array<Body>();
@@ -39,6 +41,7 @@ public class Birds {
     private long lastLevelTwoBirdSpawnTime;
     private final float LEVEL_TWO_BIRD_WIDTH = 12f;
     private final float LEVEL_TWO_BIRD_HEIGHT = 12f;
+    private final float LEVEL_TWO_FORCE_X = -25.0f;
 
     public Birds(World gameWorld, AlphaPigeon game, OrthographicCamera camera){
 
@@ -114,13 +117,13 @@ public class Birds {
         levelOneBirdFixtureDef.filter.categoryBits = game.CATEGORY_LEVEL_ONE_BIRD;
         levelOneBirdFixtureDef.filter.maskBits = game.MASK_LEVEL_ONE_BIRD;
         loader.attachFixture(levelOneBirdBody, "BackwardsPigeon", levelOneBirdFixtureDef, LEVEL_ONE_BIRD_HEIGHT);
-        levelOneBirdBody.applyForceToCenter(-9.0f, 0, true);
+        levelOneBirdBody.applyForceToCenter(LEVEL_ONE_FORCE_X, 0, true);
 
         //add bird to level one birds array
         levelOneBirdsArray.add(levelOneBirdBody);
 
         //keep track of time the bird was spawned
-        lastLevelOneBirdSpawnTime = TimeUtils.nanoTime();
+        lastLevelOneBirdSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
 
     }
 
@@ -141,13 +144,13 @@ public class Birds {
         levelTwoBirdFixtureDef.filter.categoryBits = game.CATEGORY_LEVEL_TWO_BIRD;
         levelTwoBirdFixtureDef.filter.maskBits = game.MASK_LEVEL_TWO_BIRD;
         loader.attachFixture(levelTwoBirdBody, "LevelTwoBird", levelTwoBirdFixtureDef, LEVEL_TWO_BIRD_WIDTH);
-        levelTwoBirdBody.applyForceToCenter(-15.0f, 0, true);
+        levelTwoBirdBody.applyForceToCenter(LEVEL_TWO_FORCE_X, 0, true);
 
         //add bird to level two birds array
         levelTwoBirdsArray.add(levelTwoBirdBody);
 
         //keep track of time the bird was spawned
-        lastLevelTwoBirdSpawnTime = TimeUtils.nanoTime();
+        lastLevelTwoBirdSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
     }
 
     private void initializeLevelOneBirdAnimation() {

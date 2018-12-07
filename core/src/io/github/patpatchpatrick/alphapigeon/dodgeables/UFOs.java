@@ -272,7 +272,7 @@ public class UFOs {
         ufoBody.applyForceToCenter(-9.0f, 0, true);
 
         //keep track of time the ufo was spawned
-        lastUfoSpawnTime = TimeUtils.nanoTime();
+        lastUfoSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
         long ufoSpawnTimeMillis = lastUfoSpawnTime / GameVariables.MILLION_SCALE;
 
         BodyData ufoBodyData = new BodyData(false);

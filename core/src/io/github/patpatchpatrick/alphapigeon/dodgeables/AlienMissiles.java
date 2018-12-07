@@ -236,7 +236,7 @@ public class AlienMissiles {
         alienMissileBody.setUserData(missileData);
 
         //keep track of time the bird was spawned
-        lastAlienMissileSpawnTime = TimeUtils.nanoTime();
+        lastAlienMissileSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
 
     }
 
