@@ -1,23 +1,12 @@
 package io.github.patpatchpatrick.alphapigeon.dodgeables;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.Pigeon;
-import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
-import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
 public class Dodgeables {
@@ -37,6 +26,14 @@ public class Dodgeables {
     private Meteors meteors;
     private UFOs ufos;
 
+    //GAME TIMES
+    private float startTime = 0f;
+    //WAVE TIMES in milliseconds
+    private final float WAVE_0 = 0f;
+    private final float WAVE_1 = 60000;
+    private final float WAVE_2 = WAVE_1 * 2;
+    private final float BIRD_SPAWN_DURATION_WAVE_0 = 2000;
+
     public Dodgeables(Pigeon pigeon, World world, AlphaPigeon game, OrthographicCamera camera) {
 
         gameWorld = world;
@@ -51,34 +48,51 @@ public class Dodgeables {
         meteors = new Meteors(gameWorld, game, camera);
         ufos = new UFOs(gameWorld, game, camera);
 
+        startTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+
     }
 
 
     public void spawnDodgeables() {
 
+        //class to determine if we need to spawn new dodgeables depending on how much time has passed
         //Get current time in milliseconds
         long currentTimeInMillis = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
-        
-        //class to determine if we need to spawn new dodgeables depending on how much time has passed
-        if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() / GameVariables.MILLION_SCALE > 50000)
-            birds.spawnLevelOneBird();
-        if (currentTimeInMillis - meteors.getLastMeteorSpawnTime() / GameVariables.MILLION_SCALE > 10000)
-            meteors.spawnMeteor();
-        if (currentTimeInMillis - birds.getLastLevelTwoBirdSpawnTime() / GameVariables.MILLION_SCALE > 10000)
-            birds.spawnLevelTwoBird();
-        if (currentTimeInMillis - rockets.getLastRocketSpawnTime() / GameVariables.MILLION_SCALE > 10000)
-            rockets.spawnRocket();
-        if (currentTimeInMillis - alienMissiles.getLastAlienMissileSpawnTime() / GameVariables.MILLION_SCALE > 10000)
-            alienMissiles.spawnAlienMissile();
-        if (currentTimeInMillis - powerUps.getLastpowerUpShieldSpawnTime() / GameVariables.MILLION_SCALE > 50000)
-            powerUps.spawnPowerUpShield();
-        if (currentTimeInMillis - teleports.getLastTeleportSpawnTime() / GameVariables.MILLION_SCALE > 50000)
-            teleports.spawnTeleports();
-        if (currentTimeInMillis - ufos.getLastUfoSpawnTime() / GameVariables.MILLION_SCALE > 15000)
-            ufos.spawnUfo();
+        float totalGameTime = currentTimeInMillis - startTime;
+
+
+        if (totalGameTime > WAVE_0 && totalGameTime < WAVE_1) {
+
+            if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() / GameVariables.MILLION_SCALE > BIRD_SPAWN_DURATION_WAVE_0)
+                birds.spawnLevelOneBird();
+
+        } else if (totalGameTime > WAVE_1){
+
+        } else {
+
+            if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() / GameVariables.MILLION_SCALE > 2000)
+                birds.spawnLevelOneBird();
+            if (currentTimeInMillis - meteors.getLastMeteorSpawnTime() / GameVariables.MILLION_SCALE > 1000000)
+                meteors.spawnMeteor();
+            if (currentTimeInMillis - birds.getLastLevelTwoBirdSpawnTime() / GameVariables.MILLION_SCALE > 1000000)
+                birds.spawnLevelTwoBird();
+            if (currentTimeInMillis - rockets.getLastRocketSpawnTime() / GameVariables.MILLION_SCALE > 1000000)
+                rockets.spawnRocket();
+            if (currentTimeInMillis - alienMissiles.getLastAlienMissileSpawnTime() / GameVariables.MILLION_SCALE > 1000000)
+                alienMissiles.spawnAlienMissile();
+            if (currentTimeInMillis - powerUps.getLastpowerUpShieldSpawnTime() / GameVariables.MILLION_SCALE > 5000000)
+                powerUps.spawnPowerUpShield();
+            if (currentTimeInMillis - teleports.getLastTeleportSpawnTime() / GameVariables.MILLION_SCALE > 5000000)
+                teleports.spawnTeleports();
+            if (currentTimeInMillis - ufos.getLastUfoSpawnTime() / GameVariables.MILLION_SCALE > 1500000)
+                ufos.spawnUfo();
+
+        }
+
+
     }
 
-    public void spawnRocketExplosion(float explosionPositionX, float explosionPositionY){
+    public void spawnRocketExplosion(float explosionPositionX, float explosionPositionY) {
         rockets.spawnRocketExplosion(explosionPositionX, explosionPositionY);
     }
 

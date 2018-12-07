@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 
 public class Birds {
@@ -36,6 +37,8 @@ public class Birds {
     private Animation<TextureRegion> levelTwoBirdAnimation;
     private Texture levelTwoBirdFlySheet;
     private long lastLevelTwoBirdSpawnTime;
+    private final float LEVEL_TWO_BIRD_WIDTH = 12f;
+    private final float LEVEL_TWO_BIRD_HEIGHT = 12f;
 
     public Birds(World gameWorld, AlphaPigeon game, OrthographicCamera camera){
 
@@ -66,7 +69,7 @@ public class Birds {
         // draw all level one birds dodgeables using the current animation frame
         for (Body speedBird : levelTwoBirdsArray) {
             if (speedBird.isActive()) {
-                batch.draw(levelTwoCurrentFrame, speedBird.getPosition().x, speedBird.getPosition().y - 2f, 0, 2, 12, 12, 1, 1, MathUtils.radiansToDegrees * speedBird.getAngle());
+                batch.draw(levelTwoCurrentFrame, speedBird.getPosition().x, speedBird.getPosition().y - 2f, 0, 2, LEVEL_TWO_BIRD_WIDTH, LEVEL_TWO_BIRD_HEIGHT, 1, 1, MathUtils.radiansToDegrees * speedBird.getAngle());
             } else {
                 levelTwoBirdsArray.removeValue(speedBird, false);
             }
@@ -75,6 +78,21 @@ public class Birds {
     }
 
     public void update(){
+
+        // Destroy all bodies that are off the screen
+
+        for (Body levelOneBird : levelOneBirdsArray){
+            if (levelOneBird.getPosition().x < 0 - LEVEL_ONE_BIRD_WIDTH ){
+                levelOneBirdsArray.removeValue(levelOneBird, false);
+                gameWorld.destroyBody(levelOneBird);
+            }
+        }
+        for (Body levelTwoBird : levelTwoBirdsArray){
+            if (levelTwoBird.getPosition().x < 0 - LEVEL_TWO_BIRD_WIDTH){
+                levelTwoBirdsArray.removeValue(levelTwoBird, false);
+                gameWorld.destroyBody(levelTwoBird);
+            }
+        }
 
     }
 
@@ -122,7 +140,7 @@ public class Birds {
         // set the bird filter categories and masks for collisions
         levelTwoBirdFixtureDef.filter.categoryBits = game.CATEGORY_LEVEL_TWO_BIRD;
         levelTwoBirdFixtureDef.filter.maskBits = game.MASK_LEVEL_TWO_BIRD;
-        loader.attachFixture(levelTwoBirdBody, "LevelTwoBird", levelTwoBirdFixtureDef, 12);
+        loader.attachFixture(levelTwoBirdBody, "LevelTwoBird", levelTwoBirdFixtureDef, LEVEL_TWO_BIRD_WIDTH);
         levelTwoBirdBody.applyForceToCenter(-15.0f, 0, true);
 
         //add bird to level two birds array
