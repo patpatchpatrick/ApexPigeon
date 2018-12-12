@@ -116,6 +116,8 @@ public class Dodgeables {
 
         } else {
 
+            /**
+
             if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() > 2000)
                 birds.spawnLevelOneBird();
             if (currentTimeInMillis - meteors.getLastMeteorSpawnTime() > 1000000)
@@ -132,6 +134,8 @@ public class Dodgeables {
                 teleports.spawnTeleports();
             if (currentTimeInMillis - ufos.getLastUfoSpawnTime() > 1500000)
                 ufos.spawnUfo();
+
+             */
 
         }
 
@@ -167,6 +171,11 @@ public class Dodgeables {
         powerUps.update();
         meteors.update();
         ufos.update(stateTime);
+
+    }
+
+    public void sweepDeadBodies(){
+        this.birds.sweepDeadBodies();
 
     }
 

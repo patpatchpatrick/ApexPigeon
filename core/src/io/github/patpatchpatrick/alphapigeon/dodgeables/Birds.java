@@ -83,7 +83,7 @@ public class Birds {
 
         for (Bird backwardsPigeon : activeBirds) {
             if (backwardsPigeon.alive) {
-                batch.draw(backwardsCurrentFrame, backwardsPigeon.position.x, backwardsPigeon.position.y, 0, 0, LEVEL_ONE_BIRD_WIDTH, LEVEL_ONE_BIRD_HEIGHT, 1, 1, 0);
+                batch.draw(backwardsCurrentFrame, backwardsPigeon.getPosition().x, backwardsPigeon.getPosition().y, 0, 0, LEVEL_ONE_BIRD_WIDTH, LEVEL_ONE_BIRD_HEIGHT, 1, 1, backwardsPigeon.getAngle());
             } else {
                 activeBirds.removeValue(backwardsPigeon, false);
             }
@@ -113,8 +113,7 @@ public class Birds {
          */
 
         for (Bird levelOneBird : activeBirds){
-            levelOneBird.update();
-            if (levelOneBird.position.x < 0 - LEVEL_ONE_BIRD_WIDTH ){
+            if (levelOneBird.getPosition().x < 0 - LEVEL_ONE_BIRD_WIDTH ){
                 activeBirds.removeValue(levelOneBird, false);
                 birdPool.free(levelOneBird);
             }
@@ -251,6 +250,14 @@ public class Birds {
 
     public float getLastLevelTwoBirdSpawnTime(){
         return lastLevelTwoBirdSpawnTime;
+    }
+
+    public void sweepDeadBodies(){
+        for (Bird bird : activeBirds){
+            if (!bird.isActive()){
+                birdPool.free(bird);
+            }
+        }
     }
 
     public void dispose(){

@@ -104,7 +104,7 @@ public class GameScreen implements Screen {
         // tell the camera to update its matrices
         camera.update();
 
-        //debugRenderer.render(world, camera.combined);
+        debugRenderer.render(world, camera.combined);
         // tell the SpriteBatch to render in the
         // coordinate system specified by the camera
         game.batch.setProjectionMatrix(camera.combined);
@@ -365,8 +365,11 @@ public class GameScreen implements Screen {
 
     public void sweepDeadBodies() {
 
+        this.dodgeables.sweepDeadBodies();
+
         //Go through and remove all bodies flagged for deletion
 
+        /**
         Array bodies = new Array<Body>();
         world.getBodies(bodies);
         for (Iterator<Body> iter = bodies.iterator(); iter.hasNext(); ) {
@@ -382,6 +385,7 @@ public class GameScreen implements Screen {
                 }
             }
         }
+         */
     }
 
 }

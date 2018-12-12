@@ -12,31 +12,20 @@ import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
-public class Bird implements Pool.Poolable{
+public class Bird extends Dodgeable {
 
-    public Vector2 position;
-    public boolean alive;
-
-    private AlphaPigeon game;
-    private World gameWorld;
-    private OrthographicCamera camera;
-
-    private Body levelOneBirdBody;
+    //Class for the bird dodgeable
 
     private final float LEVEL_ONE_BIRD_WIDTH = 6f;
     private final float LEVEL_ONE_BIRD_HEIGHT = 6f;
     private final float LEVEL_ONE_FORCE_X = -9.0f;
 
-    public Bird(World gameWorld, AlphaPigeon game, OrthographicCamera camera){
-        this.position =  new Vector2();
-        this.alive = false;
-
-        this.gameWorld = gameWorld;
-        this.game = game;
-        this.camera = camera;
+    public Bird(World gameWorld, AlphaPigeon game, OrthographicCamera camera) {
+        super(gameWorld, game, camera);
 
         //spawn a new level one bird
         BodyDef levelOneBirdBodyDef = new BodyDef();
@@ -44,7 +33,7 @@ public class Bird implements Pool.Poolable{
 
         //spawn bird at random height
         levelOneBirdBodyDef.position.set(camera.viewportWidth, MathUtils.random(0, camera.viewportHeight - LEVEL_ONE_BIRD_HEIGHT));
-        levelOneBirdBody = gameWorld.createBody(levelOneBirdBodyDef);
+        dodgeableBody = gameWorld.createBody(levelOneBirdBodyDef);
         BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("json/LevelOnePigeon.json"));
         FixtureDef levelOneBirdFixtureDef = new FixtureDef();
         levelOneBirdFixtureDef.density = 0.001f;
@@ -53,38 +42,18 @@ public class Bird implements Pool.Poolable{
         // set the bird filter categories and masks for collisions
         levelOneBirdFixtureDef.filter.categoryBits = game.CATEGORY_LEVEL_ONE_BIRD;
         levelOneBirdFixtureDef.filter.maskBits = game.MASK_LEVEL_ONE_BIRD;
-        loader.attachFixture(levelOneBirdBody, "BackwardsPigeon", levelOneBirdFixtureDef, LEVEL_ONE_BIRD_HEIGHT);
+        loader.attachFixture(dodgeableBody, "BackwardsPigeon", levelOneBirdFixtureDef, LEVEL_ONE_BIRD_HEIGHT);
 
 
     }
 
-    public void update(){
-        this.position = levelOneBirdBody.getPosition();
-    }
+    public void init() {
 
-    public void init(){
-
-        levelOneBirdBody.setActive(true);
-        this.position.set(camera.viewportWidth, MathUtils.random(0, camera.viewportHeight - LEVEL_ONE_BIRD_HEIGHT));
-        levelOneBirdBody.setTransform(this.position, levelOneBirdBody.getAngle());
-        levelOneBirdBody.applyForceToCenter(LEVEL_ONE_FORCE_X, 0, true);
+        dodgeableBody.setActive(true);
+        dodgeableBody.setTransform(camera.viewportWidth, MathUtils.random(0, camera.viewportHeight - LEVEL_ONE_BIRD_HEIGHT), dodgeableBody.getAngle());
+        dodgeableBody.applyForceToCenter(LEVEL_ONE_FORCE_X, 0, true);
         this.alive = true;
 
     }
-
-    @Override
-    public void reset() {
-
-        levelOneBirdBody.setActive(false);
-        this.position.set(-90,  -90);
-        levelOneBirdBody.setTransform(this.position, levelOneBirdBody.getAngle());
-        Vector2 vel = levelOneBirdBody.getLinearVelocity();
-        vel.x = 0f;
-        vel.y = 0f;
-        levelOneBirdBody.setLinearVelocity(vel);
-        this.alive = false;
-
-    }
-
 
 }
