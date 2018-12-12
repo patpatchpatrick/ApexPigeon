@@ -13,9 +13,11 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Bird;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
@@ -26,7 +28,9 @@ public class Birds {
     private OrthographicCamera camera;
 
     //Level One Bird variables
-    private Array<Body> levelOneBirdsArray = new Array<Body>();
+    private final Array<Bird> activeBirds = new Array<Bird>();
+    private final Pool<Bird> birdPool;
+    //private Array<Body> levelOneBirdsArray = new Array<Body>();
     private Animation<TextureRegion> levelOneBirdAnimation;
     private Texture levelOneBirdFlySheet;
     private long lastLevelOneBirdSpawnTime;
@@ -43,7 +47,7 @@ public class Birds {
     private final float LEVEL_TWO_BIRD_HEIGHT = 12f;
     private final float LEVEL_TWO_FORCE_X = -25.0f;
 
-    public Birds(World gameWorld, AlphaPigeon game, OrthographicCamera camera){
+    public Birds(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera){
 
         this.gameWorld = gameWorld;
         this.game = game;
@@ -52,6 +56,12 @@ public class Birds {
         initializeLevelOneBirdAnimation();
         initializeLevelTwoBirdAnimation();
 
+        birdPool = new Pool<Bird>() {
+            @Override
+            protected Bird newObject() {
+                return new Bird(gameWorld, game, camera);
+            }
+        };
 
     }
 
@@ -61,11 +71,21 @@ public class Birds {
         TextureRegion levelTwoCurrentFrame = levelTwoBirdAnimation.getKeyFrame(stateTime, true);
 
         // draw all level one birds dodgeables using the current animation frame
+        /**
         for (Body backwardsPigeon : levelOneBirdsArray) {
             if (backwardsPigeon.isActive()) {
                 batch.draw(backwardsCurrentFrame, backwardsPigeon.getPosition().x, backwardsPigeon.getPosition().y, 0, 0, LEVEL_ONE_BIRD_WIDTH, LEVEL_ONE_BIRD_HEIGHT, 1, 1, MathUtils.radiansToDegrees * backwardsPigeon.getAngle());
             } else {
                 levelOneBirdsArray.removeValue(backwardsPigeon, false);
+            }
+        }
+         */
+
+        for (Bird backwardsPigeon : activeBirds) {
+            if (backwardsPigeon.alive) {
+                batch.draw(backwardsCurrentFrame, backwardsPigeon.position.x, backwardsPigeon.position.y, 0, 0, LEVEL_ONE_BIRD_WIDTH, LEVEL_ONE_BIRD_HEIGHT, 1, 1, 0);
+            } else {
+                activeBirds.removeValue(backwardsPigeon, false);
             }
         }
 
@@ -83,13 +103,23 @@ public class Birds {
     public void update(){
 
         // Destroy all bodies that are off the screen
-
+        /**
         for (Body levelOneBird : levelOneBirdsArray){
             if (levelOneBird.getPosition().x < 0 - LEVEL_ONE_BIRD_WIDTH ){
                 levelOneBirdsArray.removeValue(levelOneBird, false);
                 gameWorld.destroyBody(levelOneBird);
             }
         }
+         */
+
+        for (Bird levelOneBird : activeBirds){
+            levelOneBird.update();
+            if (levelOneBird.position.x < 0 - LEVEL_ONE_BIRD_WIDTH ){
+                activeBirds.removeValue(levelOneBird, false);
+                birdPool.free(levelOneBird);
+            }
+        }
+
         for (Body levelTwoBird : levelTwoBirdsArray){
             if (levelTwoBird.getPosition().x < 0 - LEVEL_TWO_BIRD_WIDTH){
                 levelTwoBirdsArray.removeValue(levelTwoBird, false);
@@ -100,6 +130,8 @@ public class Birds {
     }
 
     public void spawnLevelOneBird(){
+
+        /**
 
         //spawn a new level one bird
         BodyDef levelOneBirdBodyDef = new BodyDef();
@@ -119,8 +151,13 @@ public class Birds {
         loader.attachFixture(levelOneBirdBody, "BackwardsPigeon", levelOneBirdFixtureDef, LEVEL_ONE_BIRD_HEIGHT);
         levelOneBirdBody.applyForceToCenter(LEVEL_ONE_FORCE_X, 0, true);
 
+         */
+
+        Bird bird = birdPool.obtain();
+        bird.init();
+        activeBirds.add(bird);
         //add bird to level one birds array
-        levelOneBirdsArray.add(levelOneBirdBody);
+        //levelOneBirdsArray.add(levelOneBirdBody);
 
         //keep track of time the bird was spawned
         lastLevelOneBirdSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;

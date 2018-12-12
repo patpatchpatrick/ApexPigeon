@@ -20,7 +20,7 @@ public class HighScore {
         score = 0;
         scoreString = "Distance: 0";
         scoreBitmapFont = new BitmapFont();
-        generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/ARCADECLASSIC.ttf"));
+        generator = new FreeTypeFontGenerator(Gdx.files.internal("arcadeclassic.TTF"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 12;
         font12 = generator.generateFont(parameter);
