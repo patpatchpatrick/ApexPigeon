@@ -31,8 +31,8 @@ public class Dodgeables {
     private float startTime = 0f;
     //WAVE TIMES in milliseconds
     private final float WAVE_0 = 0f;
-    private final float WAVE_1 = 100000;
-    private final float WAVE_2 = 200000;
+    private final float WAVE_1 = 1000;
+    private final float WAVE_2 = 2000;
     private final float WAVE_3 = 800000;
     //Time durations in between spawns for dodgeables (milliseconds)
     private final float L1BIRD_SPAWN_DURATION_WAVE_0 = 2000;
@@ -176,6 +176,7 @@ public class Dodgeables {
 
     public void sweepDeadBodies(){
         this.birds.sweepDeadBodies();
+        this.rockets.sweepDeadBodies();
 
     }
 

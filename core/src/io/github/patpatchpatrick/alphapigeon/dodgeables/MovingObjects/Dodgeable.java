@@ -17,7 +17,7 @@ public abstract class Dodgeable implements Pool.Poolable {
     //This class implements poolable because objects used in this class can and should be pooled when not in use
 
     public boolean alive;
-    protected Body dodgeableBody;
+    public Body dodgeableBody;
 
     protected AlphaPigeon game;
     protected World gameWorld;
@@ -61,7 +61,7 @@ public abstract class Dodgeable implements Pool.Poolable {
         //Set all velocities to 0 and set the body off the screen
         //Set the body to inactive so there are no off-screen collisions
         //Set flagged for delete to false because the body has already been removed form screen
-        
+
         dodgeableBody.setActive(false);
         dodgeableBody.setTransform(300, 300, 0);
         Vector2 vel = new Vector2(0f, 0f);
