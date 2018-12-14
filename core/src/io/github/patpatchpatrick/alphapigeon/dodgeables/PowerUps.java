@@ -12,9 +12,13 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBird;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelTwoBird;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.PowerUp;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
@@ -25,25 +29,31 @@ public class PowerUps {
     private OrthographicCamera camera;
 
     //PowerUp Shield variables
-    private Array<Body> powerUpShieldsArray = new Array<Body>();
+    private final Array<PowerUp> activePowerUps = new Array<PowerUp>();
+    private final Pool<PowerUp> powerUpsPool;
     private Animation<TextureRegion> powerUpShieldAnimation;
     private Texture powerUpShieldSheet;
     private long lastpowerUpShieldSpawnTime;
-    private final float POWER_UP_SHIELD_WIDTH = 8f;
-    private final float POWER_UP_SHIELD_HEIGHT = 4.8f;
 
     //Shield intervals between spawns
     private final float SHIELD_INITIAL_SPAWN_INTERVAL_START_RANGE = 20000;
     private final float SHIELD_INITIAL_SPAWN_INTERVAL_END_RANGE = 60000;
     private float shieldRandomSpawnInterval;
 
-    public PowerUps(World gameWorld, AlphaPigeon game, OrthographicCamera camera){
+    public PowerUps(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera){
         this.gameWorld = gameWorld;
         this.game = game;
         this.camera = camera;
 
         // initialize powerup animations
         initializePowerUpShieldAnimation();
+
+        powerUpsPool = new Pool<PowerUp>() {
+            @Override
+            protected PowerUp newObject() {
+                return new PowerUp(gameWorld, game, camera);
+            }
+        };
 
         // set the initial shield spawn interval to a random number between 20 seconds and 60 seconds
         shieldRandomSpawnInterval = MathUtils.random(SHIELD_INITIAL_SPAWN_INTERVAL_START_RANGE, SHIELD_INITIAL_SPAWN_INTERVAL_END_RANGE);
@@ -55,26 +65,27 @@ public class PowerUps {
 
         TextureRegion powerUpShieldCurrentFrame = powerUpShieldAnimation.getKeyFrame(stateTime, true);
 
-        // draw all PowerUp shield dodgeables using the current animation frame
-        for (Body powerUpShield : powerUpShieldsArray) {
-
-            // draw the PowerUp shield if it is active (hasn't been grabbed by the pigeon), otherwise remove it from the array
-            if (powerUpShield.isActive()) {
-                batch.draw(powerUpShieldCurrentFrame, powerUpShield.getPosition().x, powerUpShield.getPosition().y,
-                        0, 0, POWER_UP_SHIELD_WIDTH, POWER_UP_SHIELD_HEIGHT, 1, 1, MathUtils.radiansToDegrees * powerUpShield.getAngle());
+        // Render all active powerups
+        for (PowerUp powerUp : activePowerUps) {
+            if (powerUp.alive) {
+                batch.draw(powerUpShieldCurrentFrame, powerUp.getPosition().x, powerUp.getPosition().y,
+                        0, 0, powerUp.WIDTH, powerUp.HEIGHT, 1, 1, powerUp.getAngle());
             } else {
-                powerUpShieldsArray.removeValue(powerUpShield, false);
+                activePowerUps.removeValue(powerUp, false);
             }
         }
+
 
     }
 
     public void update(){
 
-        for (Body powerUpShield : powerUpShieldsArray){
-            if (powerUpShield.getPosition().x < 0 - POWER_UP_SHIELD_WIDTH ){
-                powerUpShieldsArray.removeValue(powerUpShield, false);
-                gameWorld.destroyBody(powerUpShield);
+        //Remove all powerups that are off the screen
+
+        for (PowerUp powerUp : activePowerUps){
+            if (powerUp.getPosition().x < 0 - powerUp.WIDTH){
+                activePowerUps.removeValue(powerUp, false);
+                powerUpsPool.free(powerUp);
             }
         }
 
@@ -82,27 +93,11 @@ public class PowerUps {
 
     public void spawnPowerUpShield() {
 
-        //spawn a new PowerUp Shield
-        BodyDef powerUpShieldBodyDef = new BodyDef();
-        powerUpShieldBodyDef.type = BodyDef.BodyType.DynamicBody;
+        // Spawn(obtain) a new powerup from the powerups pool and add to list of active powerups
 
-        //spawn PowerUp shield at random height
-        powerUpShieldBodyDef.position.set(camera.viewportWidth, MathUtils.random(0, camera.viewportHeight - POWER_UP_SHIELD_HEIGHT));
-        Body powerUpShieldBody = gameWorld.createBody(powerUpShieldBodyDef);
-        BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("json/PowerUpShield.json"));
-        FixtureDef powerUpShieldFixtureDef = new FixtureDef();
-        powerUpShieldFixtureDef.density = 0.001f;
-        powerUpShieldFixtureDef.friction = 0.5f;
-        powerUpShieldFixtureDef.restitution = 0.3f;
-        // set the powerup shield filter categories and masks for collisions
-        powerUpShieldFixtureDef.filter.categoryBits = game.CATEGORY_POWERUP_SHIELD;
-        powerUpShieldFixtureDef.filter.maskBits = game.MASK_POWERUP;
-        //The JSON loader loaders a fixture 1 pixel by 1 pixel... the animation is 80 px x 48 px, so need to scale by a factor of 8 since the width is the limiting factor
-        loader.attachFixture(powerUpShieldBody, "PowerUpShield", powerUpShieldFixtureDef, POWER_UP_SHIELD_WIDTH);
-        powerUpShieldBody.applyForceToCenter(-9.0f, 0, true);
-
-        //add PowerUp shield to shields array
-        powerUpShieldsArray.add(powerUpShieldBody);
+        PowerUp powerUp = powerUpsPool.obtain();
+        powerUp.init();
+        activePowerUps.add(powerUp);
 
         //keep track of time the PowerUp shield was spawned
         lastpowerUpShieldSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
@@ -143,6 +138,20 @@ public class PowerUps {
 
     public long getLastpowerUpShieldSpawnTime(){
         return lastpowerUpShieldSpawnTime;
+    }
+
+    public void sweepDeadBodies(){
+
+        // If the powerup is flagged for deletion due to a collision, free the powerup from the pool
+        // so that it moves off the screen and can be reused
+
+        for (PowerUp powerUp : activePowerUps){
+            if (!powerUp.isActive()){
+                activePowerUps.removeValue(powerUp, false);
+                powerUpsPool.free(powerUp);
+            }
+        }
+
     }
 
     public void dispose(){

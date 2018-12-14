@@ -177,6 +177,7 @@ public class Dodgeables {
     public void sweepDeadBodies(){
         this.birds.sweepDeadBodies();
         this.rockets.sweepDeadBodies();
+        this.powerUps.sweepDeadBodies();
 
     }
 

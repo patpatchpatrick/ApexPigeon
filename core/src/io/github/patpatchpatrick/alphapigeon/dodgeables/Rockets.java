@@ -32,7 +32,6 @@ public class Rockets {
     //Rocket variables
     private final Array<Rocket> activeRockets = new Array<Rocket>();
     private final Pool<Rocket> rocketPool;
-    private Array<Body> rocketArray = new Array<Body>();
     private Animation<TextureRegion> rocketAnimation;
     private Texture rocketSheet;
     private long lastRocketSpawnTime;
