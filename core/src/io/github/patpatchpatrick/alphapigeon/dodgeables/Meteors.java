@@ -12,9 +12,13 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBird;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelTwoBird;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Meteor;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
@@ -25,14 +29,15 @@ public class Meteors {
     private OrthographicCamera camera;
 
     //Meteor global variables
-    private Array<Body> meteorArray = new Array<Body>();
+    private final Array<Meteor> activeMeteors = new Array<Meteor>();
+    private final Pool<Meteor> meteorsPool;
     private Texture meteorTextureSpriteSheet;
     private Animation<TextureRegion> meteorAnimation;
     private long lastMeteorSpawnTime;
     private final float METEOR_WIDTH = 80f;
     private final float METEOR_HEIGHT = METEOR_WIDTH / 2;
 
-    public Meteors(World gameWorld, AlphaPigeon game, OrthographicCamera camera){
+    public Meteors(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera){
 
         this.gameWorld = gameWorld;
         this.game = game;
@@ -41,18 +46,25 @@ public class Meteors {
         // initialize meteor animations
         initializeMeteorAnimation();
 
+        meteorsPool = new Pool<Meteor>() {
+            @Override
+            protected Meteor newObject() {
+                return new Meteor(gameWorld, game, camera);
+            }
+        };
+
     }
 
     public void render(float stateTime, SpriteBatch batch){
 
         TextureRegion meteorCurrentFrame = meteorAnimation.getKeyFrame(stateTime, true);
 
-        // draw all meteors using the current animation frame
-        for (Body meteor : meteorArray) {
-            if (meteor.isActive()) {
-                batch.draw(meteorCurrentFrame, meteor.getPosition().x, meteor.getPosition().y, 0, 0, METEOR_WIDTH, METEOR_HEIGHT, 1, 1, MathUtils.radiansToDegrees * meteor.getAngle());
+        // Render all active meteors
+        for (Meteor meteor : activeMeteors) {
+            if (meteor.alive) {
+                batch.draw(meteorCurrentFrame, meteor.getPosition().x, meteor.getPosition().y, 0, 0, meteor.WIDTH, meteor.HEIGHT, 1, 1, meteor.getAngle());
             } else {
-                meteorArray.removeValue(meteor, false);
+                activeMeteors.removeValue(meteor, false);
             }
         }
 
@@ -60,31 +72,22 @@ public class Meteors {
 
     public void update(){
 
+        for (Meteor meteor : activeMeteors){
+            if (meteor.getPosition().x < 0 - meteor.WIDTH){
+                activeMeteors.removeValue(meteor, false);
+                meteorsPool.free(meteor);
+            }
+        }
+
     }
 
     public void spawnMeteor() {
 
-        //spawn a new meteor bird
-        BodyDef meteorBodyDef = new BodyDef();
-        meteorBodyDef.type = BodyDef.BodyType.DynamicBody;
+        // Spawn(obtain) a new meteor from the meteors pool and add to list of active meteors
 
-        //spawn meteor at random width
-        meteorBodyDef.position.set(MathUtils.random(0 - METEOR_WIDTH/2, camera.viewportWidth), camera.viewportHeight + METEOR_HEIGHT/2);
-        Body meteorBody = gameWorld.createBody(meteorBodyDef);
-        meteorBody.setTransform(meteorBody.getPosition().x, meteorBody.getPosition().y, MathUtils.degreesToRadians*-15);
-        BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("json/Meteor.json"));
-        FixtureDef meteorFixtureDef = new FixtureDef();
-        meteorFixtureDef.density = 0.05f;
-        meteorFixtureDef.friction = 0.5f;
-        meteorFixtureDef.restitution = 0.3f;
-        // set the meteor filter categories and masks for collisions
-        meteorFixtureDef.filter.categoryBits = game.CATEGORY_METEOR;
-        meteorFixtureDef.filter.maskBits = game.MASK_METEOR;
-        loader.attachFixture(meteorBody, "Meteor", meteorFixtureDef, METEOR_WIDTH);
-        meteorBody.applyForceToCenter(-3000.0f, -3000.0f, true);
-
-        //add meteor to meteors array
-        meteorArray.add(meteorBody);
+        Meteor meteor = meteorsPool.obtain();
+        meteor.init();
+        activeMeteors.add(meteor);
 
         //keep track of time the meteor was spawned
         lastMeteorSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
@@ -126,6 +129,21 @@ public class Meteors {
 
     public long getLastMeteorSpawnTime(){
         return lastMeteorSpawnTime;
+    }
+
+    public void sweepDeadBodies(){
+
+        // If the meteor is flagged for deletion due to a collision, free the meteor from the pool
+        // so that it moves off the screen and can be reused
+
+        for (Meteor meteor : activeMeteors){
+            if (!meteor.isActive()){
+                activeMeteors.removeValue(meteor, false);
+                meteorsPool.free(meteor);
+            }
+        }
+
+
     }
 
     public void dispose(){

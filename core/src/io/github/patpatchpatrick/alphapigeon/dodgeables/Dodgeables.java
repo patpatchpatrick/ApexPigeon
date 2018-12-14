@@ -76,9 +76,6 @@ public class Dodgeables {
                 birds.spawnLevelOneBird();
             }
             if (currentTimeInMillis - powerUps.getLastpowerUpShieldSpawnTime() > powerUpShieldInterval) {
-                Gdx.app.log("MyTag", "" + currentTimeInMillis);
-                Gdx.app.log("MyTag", "" + powerUps.getLastpowerUpShieldSpawnTime());
-                Gdx.app.log("MyTag", "" + powerUpShieldInterval);
                 powerUps.spawnPowerUpShield();
             }
 
@@ -109,6 +106,9 @@ public class Dodgeables {
             }
             if (currentTimeInMillis - rockets.getLastRocketSpawnTime() > ROCKET_SPAWN_DURATION_WAVE_2){
                 rockets.spawnRocket();
+            }
+            if (currentTimeInMillis - meteors.getLastMeteorSpawnTime() > 5000){
+                meteors.spawnMeteor();
             }
 
 
@@ -178,6 +178,7 @@ public class Dodgeables {
         this.birds.sweepDeadBodies();
         this.rockets.sweepDeadBodies();
         this.powerUps.sweepDeadBodies();
+        this.meteors.sweepDeadBodies();
 
     }
 
