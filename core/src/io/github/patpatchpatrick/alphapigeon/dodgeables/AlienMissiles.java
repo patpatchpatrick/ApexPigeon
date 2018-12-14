@@ -12,9 +12,13 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.AlienMissile;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBird;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelTwoBird;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
@@ -26,6 +30,8 @@ public class AlienMissiles {
     private OrthographicCamera camera;
 
     //Alien Missile variables
+    private final Array<AlienMissile> activeAlienMissiles = new Array<AlienMissile>();
+    private final Pool<AlienMissile> alienMissilePool;
     private Array<Body> alienMissileArray = new Array<Body>();
     private Animation<TextureRegion> alienMissileAnimation;
     private Texture alienMissileSheet;
@@ -59,7 +65,7 @@ public class AlienMissiles {
     private final float ALIEN_MISSILE_CORNER_EXPLOSION_WIDTH = 10f;
     private final float ALIEN_MISSILE_CORNER_EXPLOSION_HEIGHT = 10f;
 
-    public AlienMissiles(World gameWorld, AlphaPigeon game, OrthographicCamera camera){
+    public AlienMissiles(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera){
         this.gameWorld = gameWorld;
         this.game = game;
         this.camera = camera;
@@ -67,6 +73,13 @@ public class AlienMissiles {
         initializeAlienMissileAnimation();
         initializeAlienMissileExplosionAnimation();
         initializeAlienMissileCornerAnimation();
+
+        alienMissilePool = new Pool<AlienMissile>() {
+            @Override
+            protected AlienMissile newObject() {
+                return new AlienMissile(gameWorld, game, camera);
+            }
+        };
 
     }
 
@@ -77,12 +90,12 @@ public class AlienMissiles {
         TextureRegion alienMissileExplosionCurrentFrame = alienMissileExplosionAnimation.getKeyFrame(stateTime, true);
         TextureRegion alienCornerCurrentFrame = alienMissileCornerAnimation.getKeyFrame(stateTime, true);
 
-        // draw all alien missile dodgeables using the current animation frame
-        for (Body alienMissile : alienMissileArray) {
-            if (alienMissile.isActive()) {
-                batch.draw(alienMissileCurrentFrame, alienMissile.getPosition().x, alienMissile.getPosition().y, ALIEN_MISSILE_WIDTH / 2, ALIEN_MISSILE_HEIGHT / 2, ALIEN_MISSILE_WIDTH, ALIEN_MISSILE_HEIGHT, 1, 1, MathUtils.radiansToDegrees * alienMissile.getAngle());
+        // Render all active alien missiles
+        for (AlienMissile alienMissile : activeAlienMissiles) {
+            if (alienMissile.alive) {
+                batch.draw(alienMissileCurrentFrame, alienMissile.getPosition().x, alienMissile.getPosition().y, alienMissile.WIDTH / 2, alienMissile.HEIGHT / 2, alienMissile.WIDTH, alienMissile.HEIGHT, 1, 1, alienMissile.getAngle());
             } else {
-                alienMissileArray.removeValue(alienMissile, false);
+                activeAlienMissiles.removeValue(alienMissile, false);
             }
         }
 
@@ -117,27 +130,24 @@ public class AlienMissiles {
 
     public void update(){
 
+        long currentTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+
         // Alien Missile
         // If missiles are spawned , explode them after a set amount of time.
         // Exploding the missiles shoots the 4 missile corners in opposing directions away from the center of missile
-        for (Body alienMissile : alienMissileArray) {
-            if (alienMissile.isActive()) {
-                BodyData missileData = (BodyData) alienMissile.getUserData();
-                if (missileData != null) {
-                    long missileSpawnTime = missileData.getSpawnTime();
-                    if (TimeUtils.nanoTime() / GameVariables.MILLION_SCALE - missileSpawnTime / GameVariables.MILLION_SCALE > 2000) {
-                        missileData.setFlaggedForDelete(true);
-                        spawnAlienMissileExplosion(alienMissile.getPosition().x, alienMissile.getPosition().y);
-                        spawnAlienMissileCorners(alienMissile.getPosition().x, alienMissile.getPosition().y);
-                    }
-                } else {
-                    if (missileData != null) {
-                        missileData.setFlaggedForDelete(true);
-                    }
-                }
 
+        for (AlienMissile alienMissile : activeAlienMissiles){
+            BodyData missileData = (BodyData) alienMissile.dodgeableBody.getUserData();
+            if (missileData != null) {
+                long missileSpawnTime = missileData.getSpawnTime();
+                if (currentTime - missileSpawnTime > 2000) {
+                    missileData.setFlaggedForDelete(true);
+                    spawnAlienMissileExplosion(alienMissile.getPosition().x, alienMissile.getPosition().y);
+                    spawnAlienMissileCorners(alienMissile.getPosition().x, alienMissile.getPosition().y);
+                }
             } else {
-                alienMissileArray.removeValue(alienMissile, false);
+                BodyData setFlagForDelete = new BodyData(true);
+                alienMissile.dodgeableBody.setUserData(setFlagForDelete);
             }
         }
 
@@ -210,30 +220,11 @@ public class AlienMissiles {
 
     public void spawnAlienMissile() {
 
-        //spawn a new alien missile
-        BodyDef alienMissileBodyDef = new BodyDef();
-        alienMissileBodyDef.type = BodyDef.BodyType.DynamicBody;
+        // Spawn(obtain) a new alien missile from the alien missile pool and add to list of active alien missiles
 
-        //spawn alien missile at random height
-        alienMissileBodyDef.position.set(camera.viewportWidth, MathUtils.random(0, camera.viewportHeight - ALIEN_MISSILE_HEIGHT / 2));
-        Body alienMissileBody = gameWorld.createBody(alienMissileBodyDef);
-        BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("json/AlienMissile.json"));
-        FixtureDef alienMissileFixtureDef = new FixtureDef();
-        alienMissileFixtureDef.density = 0.001f;
-        alienMissileFixtureDef.friction = 0.5f;
-        alienMissileFixtureDef.restitution = 0.3f;
-        // set the alien missile filter categories and masks for collisions
-        alienMissileFixtureDef.filter.categoryBits = game.CATEGORY_ALIEN_MISSILE;
-        alienMissileFixtureDef.filter.maskBits = game.MASK_ALIEN_MISSILE;
-        loader.attachFixture(alienMissileBody, "Alien Missile", alienMissileFixtureDef, ALIEN_MISSILE_HEIGHT);
-        alienMissileBody.applyForceToCenter(-40.0f, 0, true);
-
-        //add alien missile to alien missiles array
-        alienMissileArray.add(alienMissileBody);
-
-        BodyData missileData = new BodyData(false);
-        missileData.setSpawnTime(TimeUtils.nanoTime());
-        alienMissileBody.setUserData(missileData);
+        AlienMissile alienMissile = alienMissilePool.obtain();
+        alienMissile.init();
+        activeAlienMissiles.add(alienMissile);
 
         //keep track of time the bird was spawned
         lastAlienMissileSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
@@ -459,6 +450,20 @@ public class AlienMissiles {
 
     public float getLastAlienMissileSpawnTime(){
         return lastAlienMissileSpawnTime;
+    }
+
+    public void sweepDeadBodies(){
+
+        // If the alien missile is flagged for deletion due to a collision, free the alien missile from the pool
+        // so that it moves off the screen and can be reused
+
+        for (AlienMissile alienMissile : activeAlienMissiles){
+            if (!alienMissile.isActive()){
+                activeAlienMissiles.removeValue(alienMissile, false);
+                alienMissilePool.free(alienMissile);
+            }
+        }
+
     }
 
     public void dispose(){

@@ -110,6 +110,9 @@ public class Dodgeables {
             if (currentTimeInMillis - meteors.getLastMeteorSpawnTime() > 5000){
                 meteors.spawnMeteor();
             }
+            if (currentTimeInMillis - alienMissiles.getLastAlienMissileSpawnTime() > 5000) {
+                alienMissiles.spawnAlienMissile();
+            }
 
 
 
@@ -179,6 +182,7 @@ public class Dodgeables {
         this.rockets.sweepDeadBodies();
         this.powerUps.sweepDeadBodies();
         this.meteors.sweepDeadBodies();
+        this.alienMissiles.sweepDeadBodies();
 
     }
 
