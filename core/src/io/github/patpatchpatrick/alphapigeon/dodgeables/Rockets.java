@@ -18,6 +18,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBird;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Rocket;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.RocketExplosion;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
@@ -35,16 +36,13 @@ public class Rockets {
     private Animation<TextureRegion> rocketAnimation;
     private Texture rocketSheet;
     private long lastRocketSpawnTime;
-    private final float ROCKET_WIDTH = 10f;
-    private final float ROCKET_HEIGHT = 20f;
 
     //Rocket explosion variables
-    private Array<Body> rocketExplosionArray = new Array<Body>();
+    private final Array<RocketExplosion> activeRocketExplosions = new Array<RocketExplosion>();
+    private final Pool<RocketExplosion> rocketExplosionPool;
     private Animation<TextureRegion> rocketExplosionAnimation;
     private Texture rocketExplosionSheet;
     private long lastRocketExplosionSpawnTime;
-    private final float ROCKET_EXPLOSION_WIDTH = 30f;
-    private final float ROCKET_EXPLOSION_HEIGHT = 30f;
 
     public Rockets(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera) {
         this.gameWorld = gameWorld;
@@ -58,6 +56,13 @@ public class Rockets {
             @Override
             protected Rocket newObject() {
                 return new Rocket(gameWorld, game, camera);
+            }
+        };
+
+        rocketExplosionPool = new Pool<RocketExplosion>() {
+            @Override
+            protected RocketExplosion newObject() {
+                return new RocketExplosion(gameWorld, game, camera);
             }
         };
 
@@ -76,14 +81,15 @@ public class Rockets {
             }
         }
 
-        // draw all rocket explosion dodgeables using the current animation frame
-        for (Body rocketExplosion : rocketExplosionArray) {
-            if (rocketExplosion.isActive()) {
-                batch.draw(rocketExplosionCurrentFrame, rocketExplosion.getPosition().x, rocketExplosion.getPosition().y, 0, 0, ROCKET_EXPLOSION_WIDTH, ROCKET_EXPLOSION_HEIGHT, 1, 1, MathUtils.radiansToDegrees * rocketExplosion.getAngle());
+        // Render all active rocket explosions
+        for (RocketExplosion rocketExplosion : activeRocketExplosions) {
+            if (rocketExplosion.alive) {
+                batch.draw(rocketExplosionCurrentFrame, rocketExplosion.getPosition().x, rocketExplosion.getPosition().y, 0, 0, rocketExplosion.WIDTH, rocketExplosion.HEIGHT, 1, 1, rocketExplosion.getAngle());
             } else {
-                rocketExplosionArray.removeValue(rocketExplosion, false);
+                activeRocketExplosions.removeValue(rocketExplosion, false);
             }
         }
+
 
     }
 
@@ -94,6 +100,7 @@ public class Rockets {
         // ROCKETS
         // If rockets are spawned , accelerate them.  The X force is constant and the Y force
         // is stored on the rocket body data.  Y force depends on where the rocket was spawned (see spawnRockets method)
+        // If data is null on the rocket, delete the rocket
         if (currentTimeInMillis - lastRocketSpawnTime > 500) {
             for (Rocket rocket : activeRockets) {
                 float forceX = -1f;
@@ -101,6 +108,9 @@ public class Rockets {
                 if (rocketData != null) {
                     float forceY = rocketData.getRocketYForce();
                     rocket.dodgeableBody.applyForceToCenter(forceX, forceY, true);
+                } else {
+                    BodyData setRocketForDeletion = new BodyData(true);
+                    rocket.dodgeableBody.setUserData(setRocketForDeletion);
                 }
             }
         }
@@ -108,34 +118,36 @@ public class Rockets {
         // ROCKET EXPLOSIONS
         // If rocket explosions are active, check how long they've been active.
         // If they have been active longer than set time,  destroy them.
-        for (Body rocketExplosion : rocketExplosionArray) {
-            if (rocketExplosion.isActive()) {
-                BodyData rocketExplosionData = (BodyData) rocketExplosion.getUserData();
-                if (rocketExplosionData != null) {
-                    long rocketExplosionTime = rocketExplosionData.getExplosionTime();
-                    if (TimeUtils.nanoTime() / GameVariables.MILLION_SCALE - rocketExplosionTime / GameVariables.MILLION_SCALE > 500) {
-                        rocketExplosionData.setFlaggedForDelete(true);
-                    }
-                } else {
-                    if (rocketExplosionData != null) {
-                        rocketExplosionData.setFlaggedForDelete(true);
-                    }
+        for (RocketExplosion rocketExplosion : activeRocketExplosions) {
+            BodyData rocketExplosionData = (BodyData) rocketExplosion.dodgeableBody.getUserData();
+            if (rocketExplosionData != null) {
+                long rocketExplosionTime = rocketExplosionData.getExplosionTime();
+                if (currentTimeInMillis - rocketExplosionTime> 500) {
+                    rocketExplosionData.setFlaggedForDelete(true);
                 }
-
             } else {
-                rocketExplosionArray.removeValue(rocketExplosion, false);
+                // If data on the rocket explosion is null, set new data on the explosion to mark it for deletion
+                BodyData flagRocketForDelete = new BodyData(true);
+                rocketExplosion.dodgeableBody.setUserData(flagRocketForDelete);
             }
         }
 
 
-        //RECYCLE ROCKETS OUT OF PLAY
-        // If rockets are off the screen, free them from the pool and recycle them so they are ready
+        //RECYCLE ROCKETS AND EXPLOSIONS OUT OF PLAY
+        // If rockets or explosions are off the screen, free them from the pool and recycle them so they are ready
         // for reuse
 
         for (Rocket rocket : activeRockets) {
             if (rocket.getPosition().x < 0 - rocket.WIDTH) {
                 activeRockets.removeValue(rocket, false);
                 rocketPool.free(rocket);
+            }
+        }
+
+        for (RocketExplosion rocketExplosion : activeRocketExplosions) {
+            if (rocketExplosion.getPosition().x < 0 - rocketExplosion.WIDTH) {
+                activeRocketExplosions.removeValue(rocketExplosion, false);
+                rocketExplosionPool.free(rocketExplosion);
             }
         }
 
@@ -156,36 +168,14 @@ public class Rockets {
 
     public void spawnRocketExplosion(float explosionPositionX, float explosionPositionY) {
 
-        //spawn a new rocket explosion
-        BodyDef rocketExplosionBodyDef = new BodyDef();
-        rocketExplosionBodyDef.type = BodyDef.BodyType.DynamicBody;
+        // Spawn(obtain) a new rocket explosion from the rocket explosion pool and add to list of active rocket explosions
 
-        //spawn rocket explosion at the input position (this will be the position of the enemy that was hit
-        // with the rocket.   Move the rocket to the left and downwards so it is centered on the enemy's body
-        rocketExplosionBodyDef.position.set(explosionPositionX - ROCKET_WIDTH * 1.5f, explosionPositionY - ROCKET_HEIGHT / 1.5f);
-        Body rocketExplosionBody = gameWorld.createBody(rocketExplosionBodyDef);
-        BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("json/RocketExplosion.json"));
-        FixtureDef rocketExplosionFixtureDef = new FixtureDef();
-        rocketExplosionFixtureDef.density = 0.001f;
-        rocketExplosionFixtureDef.friction = 0.5f;
-        rocketExplosionFixtureDef.restitution = 0.3f;
-        // set the rocket explosion filter categories and masks for collisions
-        rocketExplosionFixtureDef.filter.categoryBits = game.CATEGORY_ROCKET_EXPLOSION;
-        rocketExplosionFixtureDef.filter.maskBits = game.MASK_ROCKET_EXPLOSION;
-        loader.attachFixture(rocketExplosionBody, "RocketExplosion", rocketExplosionFixtureDef, 30);
-        rocketExplosionBody.applyForceToCenter(0, 0, true);
+        RocketExplosion rocketExplosion = rocketExplosionPool.obtain();
+        rocketExplosion.init(explosionPositionX, explosionPositionY);
+        activeRocketExplosions.add(rocketExplosion);
 
-        //Set the time the rocket was exploded on the rocket.  This is used in the update method
-        //to destroy the rocket explosion after a set amount of time
-        BodyData rocketExplosionData = new BodyData(false);
-        rocketExplosionData.setExplosionData(TimeUtils.nanoTime());
-        rocketExplosionBody.setUserData(rocketExplosionData);
-
-        //add rocket explosion to rocket explosions array
-        rocketExplosionArray.add(rocketExplosionBody);
-
-        //keep track of time the bird was spawned
-        lastRocketExplosionSpawnTime = TimeUtils.nanoTime();
+        //keep track of time the rocket explosion was spawned
+        lastRocketExplosionSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
 
 
     }
@@ -255,15 +245,22 @@ public class Rockets {
         return lastRocketSpawnTime;
     }
 
-    public void sweepDeadBodies(){
+    public void sweepDeadBodies() {
 
-        // If the rocket is flagged for deletion due to a collision, free the rocket from the pool
+        // If the rocket or rocket explosion is flagged for deletion due to a collision, free the object from the pool
         // so that it moves off the screen and can be reused
 
-        for (Rocket rocket : activeRockets){
-            if (!rocket.isActive()){
+        for (Rocket rocket : activeRockets) {
+            if (!rocket.isActive()) {
                 activeRockets.removeValue(rocket, false);
                 rocketPool.free(rocket);
+            }
+        }
+
+        for (RocketExplosion rocketExplosion : activeRocketExplosions) {
+            if (!rocketExplosion.isActive()) {
+                activeRocketExplosions.removeValue(rocketExplosion, false);
+                rocketExplosionPool.free(rocketExplosion);
             }
         }
     }
