@@ -12,10 +12,14 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.EnergyBall;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBird;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelTwoBird;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.UFO;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
@@ -27,6 +31,8 @@ public class UFOs {
     private OrthographicCamera camera;
 
     //UFO vehicle variables
+    private final Array<UFO> activeUFOs = new Array<UFO>();
+    private final Pool<UFO> ufoPool;
     private Array<Body> ufoArray = new Array<Body>();
     private Animation<TextureRegion> ufoAnimation;
     private Texture ufoSheet;
@@ -60,7 +66,7 @@ public class UFOs {
     private Animation<TextureRegion> energyBeamStaticAnimation;
     private Texture energyBeamStaticSheet;
 
-    public UFOs(World gameWorld, AlphaPigeon game, OrthographicCamera camera) {
+    public UFOs(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera) {
 
         this.gameWorld = gameWorld;
         this.game = game;
@@ -74,6 +80,13 @@ public class UFOs {
         initializeEnergyBeamAnimation();
         initializeEnergyBeamStaticAnimation();
 
+        ufoPool = new Pool<UFO>() {
+            @Override
+            protected UFO newObject() {
+                return new UFO(gameWorld, game, camera);
+            }
+        };
+
     }
 
     public void render(float stateTime, SpriteBatch batch) {
@@ -83,16 +96,16 @@ public class UFOs {
         TextureRegion energyBeamStaticCurrentFrame = energyBeamStaticAnimation.getKeyFrame(stateTime, true);
         TextureRegion energyBeamCurrentFrame = energyBeamAnimation.getKeyFrame(stateTime, true);
 
-        // draw all ufos using the current animation frame
-        for (Body ufo : ufoArray) {
-            if (ufo.isActive()) {
-                BodyData ufoData = (BodyData) ufo.getUserData();
+        // Render all active ufos
+        for (UFO ufo : activeUFOs) {
+            if (ufo.alive) {
+                BodyData ufoData = (BodyData) ufo.dodgeableBody.getUserData();
                 Boolean energyBallIsSpawned = false;
                 if (ufoData != null) {
                     energyBallIsSpawned = ufoData.ufoEnergyBallIsSpawned();
                 }
                 // draw the UFO vehicle at the UFO body position
-                batch.draw(ufoCurrentFrame, ufo.getPosition().x, ufo.getPosition().y, 0, 0, UFO_WIDTH, UFO_HEIGHT, 1, 1, MathUtils.radiansToDegrees * ufo.getAngle());
+                batch.draw(ufoCurrentFrame, ufo.getPosition().x, ufo.getPosition().y, 0, 0, ufo.WIDTH, ufo.HEIGHT, 1, 1, ufo.getAngle());
 
                 // Energy ball/beam render methods
                 if (energyBallIsSpawned) {
@@ -146,7 +159,7 @@ public class UFOs {
                     }
                 }
             } else {
-                ufoArray.removeValue(ufo, false);
+                activeUFOs.removeValue(ufo, false);
             }
         }
 
@@ -207,36 +220,32 @@ public class UFOs {
         //into an energy beam when it is fully charged
         //Slowly increment the energy ball size until it is fully charged
         //After the energy ball width matches the beam width, it is fully charged and ready to be a beam
-        for (Body ufo : ufoArray) {
-            if (ufo.isActive()) {
-                BodyData ufoData = (BodyData) ufo.getUserData();
-                if (ufoData != null) {
-                    if (!ufoData.ufoEnergyBallIsSpawned()) {
-                        long ufoSpawnTime = ufoData.getSpawnTime();
-                        if (currentTimeInMillis - ufoSpawnTime > 5000) {
-                            spawnEnergyBall(ufoData, ENERGY_BEAM_UP);
-                        }
-                    } else {
-                        EnergyBall energyBall = ufoData.getEnergyBall();
-                        Boolean energyBeamIsSpawned = ufoData.getEnergyBeamIsSpawned();
-                        if (energyBall != null) {
-                            if (energyBall.getWidth() >= ENERGY_BEAM_WIDTH) {
-                                energyBall.setCharged(true);
-                                energyBall.incrementFrameNumber();
-                                if (energyBall.getFrameNumber() > 12f && !energyBeamIsSpawned) {
-                                    energyBall.setAnimationIsComplete(true);
-                                    ufoData.setEnergyBeamSpawned(true);
-                                    spawnEnergyBeam(ufo, ufoData);
-                                }
-                            } else {
-                                energyBall.increaseWidth(0.2f);
-                                energyBall.increaseHeight(0.1f);
+        for (UFO ufo : activeUFOs){
+            BodyData ufoData = (BodyData) ufo.dodgeableBody.getUserData();
+            if (ufoData != null) {
+                if (!ufoData.ufoEnergyBallIsSpawned()) {
+                    long ufoSpawnTime = ufoData.getSpawnTime();
+                    if (currentTimeInMillis - ufoSpawnTime > 5000) {
+                        spawnEnergyBall(ufoData, ENERGY_BEAM_UP);
+                    }
+                } else {
+                    EnergyBall energyBall = ufoData.getEnergyBall();
+                    Boolean energyBeamIsSpawned = ufoData.getEnergyBeamIsSpawned();
+                    if (energyBall != null) {
+                        if (energyBall.getWidth() >= ENERGY_BEAM_WIDTH) {
+                            energyBall.setCharged(true);
+                            energyBall.incrementFrameNumber();
+                            if (energyBall.getFrameNumber() > 12f && !energyBeamIsSpawned) {
+                                energyBall.setAnimationIsComplete(true);
+                                ufoData.setEnergyBeamSpawned(true);
+                                spawnEnergyBeam(ufo.dodgeableBody, ufoData);
                             }
+                        } else {
+                            energyBall.increaseWidth(0.2f);
+                            energyBall.increaseHeight(0.1f);
                         }
                     }
                 }
-            } else {
-                ufoArray.removeValue(ufo, false);
             }
         }
 
@@ -249,38 +258,28 @@ public class UFOs {
             }
         }
 
+        //REMOVE OFF SCREEN UFOs
+        for (UFO ufo : activeUFOs){
+            if (ufo.getPosition().x < 0 - ufo.WIDTH){
+                activeUFOs.removeValue(ufo, false);
+                ufoPool.free(ufo);
+            }
+        }
+
     }
 
     public void spawnUfo() {
 
-        //spawn a new ufo
-        BodyDef ufoBodyDef = new BodyDef();
-        ufoBodyDef.type = BodyDef.BodyType.DynamicBody;
+        // Spawn(obtain) a new UFO from the UFO pool and add to list of active UFOs
 
-        //spawn ufo at random height
-        ufoBodyDef.position.set(camera.viewportWidth, MathUtils.random(0, camera.viewportHeight - UFO_HEIGHT));
-        Body ufoBody = gameWorld.createBody(ufoBodyDef);
-        BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("json/Ufo.json"));
-        FixtureDef ufoFixtureDef = new FixtureDef();
-        ufoFixtureDef.density = 0.001f;
-        ufoFixtureDef.friction = 0.5f;
-        ufoFixtureDef.restitution = 0.3f;
-        // set the ufo filter categories and masks for collisions
-        ufoFixtureDef.filter.categoryBits = game.CATEGORY_UFO;
-        ufoFixtureDef.filter.maskBits = game.MASK_UFO;
-        loader.attachFixture(ufoBody, "Ufo", ufoFixtureDef, UFO_HEIGHT);
-        ufoBody.applyForceToCenter(-9.0f, 0, true);
+        UFO ufo = ufoPool.obtain();
+        ufo.init();
+        activeUFOs.add(ufo);
+
 
         //keep track of time the ufo was spawned
         lastUfoSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
-        long ufoSpawnTimeMillis = lastUfoSpawnTime / GameVariables.MILLION_SCALE;
 
-        BodyData ufoBodyData = new BodyData(false);
-        ufoBodyData.setSpawnTime(ufoSpawnTimeMillis);
-        ufoBody.setUserData(ufoBodyData);
-
-        //add ufo to ufos array
-        ufoArray.add(ufoBody);
     }
 
     public void spawnEnergyBall(BodyData ufoData, float direction) {
@@ -520,6 +519,20 @@ public class UFOs {
 
     public float getLastUfoSpawnTime() {
         return lastUfoSpawnTime;
+    }
+
+    public void sweepDeadBodies(){
+
+        // If any UFO objects are flagged for deletion, free them from the pool
+        // so that they move off the screen and can be reused
+
+        for (UFO ufo : activeUFOs){
+            if (!ufo.isActive()){
+                activeUFOs.removeValue(ufo, false);
+                ufoPool.free(ufo);
+            }
+        }
+
     }
 
     public void dispose() {

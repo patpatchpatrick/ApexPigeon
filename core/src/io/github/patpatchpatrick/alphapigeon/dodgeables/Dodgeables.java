@@ -113,6 +113,9 @@ public class Dodgeables {
             if (currentTimeInMillis - alienMissiles.getLastAlienMissileSpawnTime() > 5000) {
                 alienMissiles.spawnAlienMissile();
             }
+            if (currentTimeInMillis - ufos.getLastUfoSpawnTime() > 5000) {
+                ufos.spawnUfo();
+            }
 
 
 
@@ -183,6 +186,7 @@ public class Dodgeables {
         this.powerUps.sweepDeadBodies();
         this.meteors.sweepDeadBodies();
         this.alienMissiles.sweepDeadBodies();
+        this.ufos.sweepDeadBodies();
 
     }
 

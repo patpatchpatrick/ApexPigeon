@@ -1,0 +1,63 @@
+package io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.TimeUtils;
+
+import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
+import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
+import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
+
+public class UFO extends Dodgeable {
+
+    public final float WIDTH = 15f;
+    public final float HEIGHT = WIDTH;
+    private final float FORCE_X = -9.0f;
+
+    public UFO(World gameWorld, AlphaPigeon game, OrthographicCamera camera) {
+        super(gameWorld, game, camera);
+
+        //spawn a new ufo
+        BodyDef ufoBodyDef = new BodyDef();
+        ufoBodyDef.type = BodyDef.BodyType.DynamicBody;
+
+        //spawn ufo at random height
+        ufoBodyDef.position.set(-100,-100);
+        dodgeableBody = gameWorld.createBody(ufoBodyDef);
+        BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("json/Ufo.json"));
+        FixtureDef ufoFixtureDef = new FixtureDef();
+        ufoFixtureDef.density = 0.001f;
+        ufoFixtureDef.friction = 0.5f;
+        ufoFixtureDef.restitution = 0.3f;
+        // set the ufo filter categories and masks for collisions
+        ufoFixtureDef.filter.categoryBits = game.CATEGORY_UFO;
+        ufoFixtureDef.filter.maskBits = game.MASK_UFO;
+        loader.attachFixture(dodgeableBody, "Ufo", ufoFixtureDef, HEIGHT);
+        dodgeableBody.applyForceToCenter(FORCE_X, 0, true);
+
+
+    }
+
+    public void init() {
+
+        dodgeableBody.setActive(true);
+        dodgeableBody.setTransform(camera.viewportWidth, MathUtils.random(0, camera.viewportHeight - HEIGHT), dodgeableBody.getAngle());
+        dodgeableBody.applyForceToCenter(FORCE_X, 0, true);
+        this.alive = true;
+
+        //keep track of time the ufo was spawned
+        long lastUfoSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+
+        BodyData ufoBodyData = new BodyData(false);
+        ufoBodyData.setSpawnTime(lastUfoSpawnTime);
+        dodgeableBody.setUserData(ufoBodyData);
+
+    }
+
+}
