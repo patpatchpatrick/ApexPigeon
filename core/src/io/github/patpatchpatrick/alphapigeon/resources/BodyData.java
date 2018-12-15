@@ -2,6 +2,7 @@ package io.github.patpatchpatrick.alphapigeon.resources;
 import com.badlogic.gdx.physics.box2d.Body;
 
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.EnergyBall;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.UFO;
 
 public class BodyData {
 
@@ -23,7 +24,7 @@ public class BodyData {
     private boolean ufoEnergyBeamIsSpawned = false;
     private EnergyBall energyBall;
     private float energyBeamDirection;
-    private Body ufo;
+    private UFO ufo;
 
 
     public BodyData(boolean flagForDelete) {
@@ -104,11 +105,11 @@ public class BodyData {
         return this.energyBall;
     }
 
-    public void setUfo(Body ufo){
+    public void setUfo(UFO ufo){
         this.ufo = ufo;
     }
 
-    public Body getUfo(Body ufo){
+    public UFO getUfo(){
         return this.ufo;
     }
 

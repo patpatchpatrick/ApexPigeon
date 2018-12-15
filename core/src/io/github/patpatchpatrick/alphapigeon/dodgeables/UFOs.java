@@ -6,9 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
@@ -16,10 +14,14 @@ import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Dodgeable;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.EnergyBall;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBird;
-import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelTwoBird;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.UFO;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.ufoEnergyBeam.UfoEnergyBeamDown;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.ufoEnergyBeam.UfoEnergyBeamLeft;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.ufoEnergyBeam.UfoEnergyBeamRight;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.ufoEnergyBeam.UfoEnergyBeamUp;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
@@ -33,7 +35,6 @@ public class UFOs {
     //UFO vehicle variables
     private final Array<UFO> activeUFOs = new Array<UFO>();
     private final Pool<UFO> ufoPool;
-    private Array<Body> ufoArray = new Array<Body>();
     private Animation<TextureRegion> ufoAnimation;
     private Texture ufoSheet;
     private final float UFO_WIDTH = 15f;
@@ -50,6 +51,14 @@ public class UFOs {
     private final float ENERGY_BALL_INITIAL_HEIGHT = ENERGY_BALL_INITIAL_WIDTH / 2;
 
     //UFO Energy Beam variables
+    private final Array<UfoEnergyBeamLeft> activeEnergyBeamLefts = new Array<UfoEnergyBeamLeft>();
+    private final Pool<UfoEnergyBeamLeft> ufoEnergyBeamLeftPool;
+    private final Array<UfoEnergyBeamRight> activeEnergyBeamRights = new Array<UfoEnergyBeamRight>();
+    private final Pool<UfoEnergyBeamRight> ufoEnergyBeamRightPool;
+    private final Array<UfoEnergyBeamDown> activeEnergyBeamDowns = new Array<UfoEnergyBeamDown>();
+    private final Pool<UfoEnergyBeamDown> ufoEnergyBeamDownPool;
+    private final Array<UfoEnergyBeamUp> activeEnergyBeamUps = new Array<UfoEnergyBeamUp>();
+    private final Pool<UfoEnergyBeamUp> ufoEnergyBeamUpPool;
     private Array<Body> energyBeamArray = new Array<Body>();
     private Animation<TextureRegion> energyBeamAnimation;
     private Texture energyBeamSheet;
@@ -84,6 +93,34 @@ public class UFOs {
             @Override
             protected UFO newObject() {
                 return new UFO(gameWorld, game, camera);
+            }
+        };
+
+        ufoEnergyBeamLeftPool = new Pool<UfoEnergyBeamLeft>() {
+            @Override
+            protected UfoEnergyBeamLeft newObject() {
+                return new UfoEnergyBeamLeft(gameWorld, game, camera);
+            }
+        };
+
+        ufoEnergyBeamRightPool = new Pool<UfoEnergyBeamRight>() {
+            @Override
+            protected UfoEnergyBeamRight newObject() {
+                return new UfoEnergyBeamRight(gameWorld, game, camera);
+            }
+        };
+
+        ufoEnergyBeamDownPool = new Pool<UfoEnergyBeamDown>() {
+            @Override
+            protected UfoEnergyBeamDown newObject() {
+                return new UfoEnergyBeamDown(gameWorld, game, camera);
+            }
+        };
+
+        ufoEnergyBeamUpPool = new Pool<UfoEnergyBeamUp>() {
+            @Override
+            protected UfoEnergyBeamUp newObject() {
+                return new UfoEnergyBeamUp(gameWorld, game, camera);
             }
         };
 
@@ -163,52 +200,87 @@ public class UFOs {
             }
         }
 
-        // draw all energy beams  using the current animation frame
-        for (Body energyBeam : energyBeamArray) {
-            if (energyBeam.isActive()) {
-                BodyData energyBeamData = (BodyData) energyBeam.getUserData();
-                float energyBeamDirection = 0;
-                float energyBeamXScale;
-                float energyBeamRotation = 0;
-
-                float energyBeamXPosition = energyBeam.getPosition().x;
-                float energyBeamYPosition = energyBeam.getPosition().y;
-
-                // Based on the energy beams direction, determine what the image scale should be
-                // determine if the image should be flipped or not depending on the direction of the beam
-                if (energyBeamData != null) {
-                    energyBeamDirection = energyBeamData.getEnergyBeamDirection();
-                }
-                if (energyBeamDirection == ENERGY_BEAM_RIGHT) {
-                    energyBeamXScale = -1;
-                } else if (energyBeamDirection == ENERGY_BEAM_DOWN) {
-                    energyBeamXScale = 1;
-                    energyBeamRotation = 90;
-                    energyBeamXPosition = energyBeamXPosition - ENERGY_BEAM_VERTICAL_WIDTH / 2 + 0.5f;
-                    energyBeamYPosition = energyBeamYPosition + ENERGY_BEAM_VERTICAL_WIDTH / 2 - 2f;
-
-                } else if (energyBeamDirection == ENERGY_BEAM_UP) {
-                    energyBeamXScale = 1;
-                    energyBeamRotation = -90;
-                    energyBeamXPosition = energyBeamXPosition - ENERGY_BEAM_VERTICAL_WIDTH / 2 + -0.5f;
-                    energyBeamYPosition = energyBeamYPosition + ENERGY_BEAM_VERTICAL_WIDTH / 2 + 4f;
-
-                } else {
-                    energyBeamXScale = 1;
-                }
-
-
-                // overlay the energy ball, the energy beam animation and the static energy beam to
-                // complete the energy beam animation
-                batch.draw(energyBallCurrentFrame, energyBeamXPosition, energyBeamYPosition, ENERGY_BEAM_WIDTH / 2, ENERGY_BEAM_HEIGHT / 2, ENERGY_BEAM_WIDTH, ENERGY_BEAM_HEIGHT, energyBeamXScale, 1, energyBeamRotation);
-                batch.draw(energyBeamStaticCurrentFrame, energyBeamXPosition, energyBeamYPosition, ENERGY_BEAM_WIDTH / 2, ENERGY_BEAM_HEIGHT / 2, ENERGY_BEAM_WIDTH, ENERGY_BEAM_HEIGHT, energyBeamXScale, 1, energyBeamRotation);
-                batch.draw(energyBeamCurrentFrame, energyBeamXPosition, energyBeamYPosition, ENERGY_BEAM_WIDTH / 2, ENERGY_BEAM_HEIGHT / 2, ENERGY_BEAM_WIDTH, ENERGY_BEAM_HEIGHT, energyBeamXScale, 1, energyBeamRotation);
+        // Render all active energy beams
+        for (UfoEnergyBeamLeft ufoEnergyBeamLeft : activeEnergyBeamLefts) {
+            if (ufoEnergyBeamLeft.alive) {
+               renderEnergyBeam(ufoEnergyBeamLeft, batch, energyBallCurrentFrame, energyBeamStaticCurrentFrame, energyBeamCurrentFrame);
             } else {
-                energyBeamArray.removeValue(energyBeam, false);
+                activeEnergyBeamLefts.removeValue(ufoEnergyBeamLeft, false);
             }
         }
 
+        // Render all active energy beams
+        for (UfoEnergyBeamRight ufoEnergyBeamRight : activeEnergyBeamRights) {
+            if (ufoEnergyBeamRight.alive) {
+                renderEnergyBeam(ufoEnergyBeamRight, batch, energyBallCurrentFrame, energyBeamStaticCurrentFrame, energyBeamCurrentFrame);
+            } else {
+                activeEnergyBeamRights.removeValue(ufoEnergyBeamRight, false);
+            }
+        }
 
+        // Render all active energy beams
+        for (UfoEnergyBeamDown ufoEnergyBeamDown : activeEnergyBeamDowns) {
+            if (ufoEnergyBeamDown.alive) {
+                renderEnergyBeam(ufoEnergyBeamDown, batch, energyBallCurrentFrame, energyBeamStaticCurrentFrame, energyBeamCurrentFrame);
+            } else {
+                activeEnergyBeamDowns.removeValue(ufoEnergyBeamDown, false);
+            }
+        }
+
+        // Render all active energy beams
+        for (UfoEnergyBeamUp ufoEnergyBeamUp : activeEnergyBeamUps) {
+            if (ufoEnergyBeamUp.alive) {
+                renderEnergyBeam(ufoEnergyBeamUp, batch, energyBallCurrentFrame, energyBeamStaticCurrentFrame, energyBeamCurrentFrame);
+            } else {
+                activeEnergyBeamUps.removeValue(ufoEnergyBeamUp, false);
+            }
+        }
+
+        
+    }
+    
+    private void renderEnergyBeam(Dodgeable energyBeam, SpriteBatch batch, TextureRegion energyBallCurrentFrame, TextureRegion energyBeamStaticCurrentFrame, TextureRegion energyBeamCurrentFrame){
+
+        BodyData energyBeamData = (BodyData) energyBeam.dodgeableBody.getUserData();
+        float energyBeamDirection = 0;
+        float energyBeamXScale;
+        float energyBeamRotation = 0;
+
+        float energyBeamXPosition = energyBeam.getPosition().x;
+        float energyBeamYPosition = energyBeam.getPosition().y;
+
+        // Based on the energy beams direction, determine what the image scale should be
+        // determine if the image should be flipped or not depending on the direction of the beam
+        if (energyBeamData != null) {
+            energyBeamDirection = energyBeamData.getEnergyBeamDirection();
+        }
+        if (energyBeamDirection == ENERGY_BEAM_RIGHT) {
+            energyBeamXScale = -1;
+        } else if (energyBeamDirection == ENERGY_BEAM_DOWN) {
+            energyBeamXScale = 1;
+            energyBeamRotation = 90;
+            energyBeamXPosition = energyBeamXPosition - ENERGY_BEAM_VERTICAL_WIDTH / 2 + 0.5f;
+            energyBeamYPosition = energyBeamYPosition + ENERGY_BEAM_VERTICAL_WIDTH / 2 - 2f;
+
+        } else if (energyBeamDirection == ENERGY_BEAM_UP) {
+            energyBeamXScale = 1;
+            energyBeamRotation = -90;
+            energyBeamXPosition = energyBeamXPosition - ENERGY_BEAM_VERTICAL_WIDTH / 2 + -0.5f;
+            energyBeamYPosition = energyBeamYPosition + ENERGY_BEAM_VERTICAL_WIDTH / 2 + 4f;
+
+        } else {
+            energyBeamXScale = 1;
+        }
+
+
+        // overlay the energy ball, the energy beam animation and the static energy beam to
+        // complete the energy beam animation
+        batch.draw(energyBallCurrentFrame, energyBeamXPosition, energyBeamYPosition, ENERGY_BEAM_WIDTH / 2, ENERGY_BEAM_HEIGHT / 2, ENERGY_BEAM_WIDTH, ENERGY_BEAM_HEIGHT, energyBeamXScale, 1, energyBeamRotation);
+        batch.draw(energyBeamStaticCurrentFrame, energyBeamXPosition, energyBeamYPosition, ENERGY_BEAM_WIDTH / 2, ENERGY_BEAM_HEIGHT / 2, ENERGY_BEAM_WIDTH, ENERGY_BEAM_HEIGHT, energyBeamXScale, 1, energyBeamRotation);
+        batch.draw(energyBeamCurrentFrame, energyBeamXPosition, energyBeamYPosition, ENERGY_BEAM_WIDTH / 2, ENERGY_BEAM_HEIGHT / 2, ENERGY_BEAM_WIDTH, ENERGY_BEAM_HEIGHT, energyBeamXScale, 1, energyBeamRotation);
+        
+        
+        
     }
 
     public void update(float stateTime) {
@@ -238,7 +310,7 @@ public class UFOs {
                             if (energyBall.getFrameNumber() > 12f && !energyBeamIsSpawned) {
                                 energyBall.setAnimationIsComplete(true);
                                 ufoData.setEnergyBeamSpawned(true);
-                                spawnEnergyBeam(ufo.dodgeableBody, ufoData);
+                                spawnEnergyBeam(ufo, ufoData);
                             }
                         } else {
                             energyBall.increaseWidth(0.2f);
@@ -249,20 +321,87 @@ public class UFOs {
             }
         }
 
-        for (Body energyBeam : energyBeamArray) {
-            if (energyBeam.isActive()) {
-                BodyData energyBeamData = (BodyData) energyBeam.getUserData();
-                if (energyBeamData != null) {
-
-                }
-            }
-        }
-
         //REMOVE OFF SCREEN UFOs
         for (UFO ufo : activeUFOs){
             if (ufo.getPosition().x < 0 - ufo.WIDTH){
                 activeUFOs.removeValue(ufo, false);
                 ufoPool.free(ufo);
+            }
+        }
+
+        //REMOVE ENERGY BEAMS ATTACHED TO UFOs that aren't alive
+        for (UfoEnergyBeamLeft ufoEnergyBeamLeft : activeEnergyBeamLefts){
+            Boolean removeBeamFromPool = false;
+            BodyData ufoData = (BodyData) ufoEnergyBeamLeft.dodgeableBody.getUserData();
+            if (ufoData != null){
+                UFO ufo = ufoData.getUfo();
+                if (ufo == null || !ufo.alive){
+                    removeBeamFromPool = true;
+                }
+            } else {
+                removeBeamFromPool = true;
+            }
+           
+            if (removeBeamFromPool){
+                activeEnergyBeamLefts.removeValue(ufoEnergyBeamLeft, false);
+                ufoEnergyBeamLeftPool.free(ufoEnergyBeamLeft);
+            }
+        }
+
+        //REMOVE ENERGY BEAMS ATTACHED TO UFOs that aren't alive
+        for (UfoEnergyBeamRight ufoEnergyBeamRight : activeEnergyBeamRights){
+            Boolean removeBeamFromPool = false;
+            BodyData ufoData = (BodyData) ufoEnergyBeamRight.dodgeableBody.getUserData();
+            if (ufoData != null){
+                UFO ufo = ufoData.getUfo();
+                if (ufo == null || !ufo.alive){
+                    removeBeamFromPool = true;
+                }
+            } else {
+                removeBeamFromPool = true;
+            }
+
+            if (removeBeamFromPool){
+                activeEnergyBeamRights.removeValue(ufoEnergyBeamRight, false);
+                ufoEnergyBeamRightPool.free(ufoEnergyBeamRight);
+            }
+        }
+
+        //REMOVE ENERGY BEAMS ATTACHED TO UFOs that aren't alive
+        for (UfoEnergyBeamDown ufoEnergyBeamDown : activeEnergyBeamDowns){
+            Boolean removeBeamFromPool = false;
+            BodyData ufoData = (BodyData) ufoEnergyBeamDown.dodgeableBody.getUserData();
+            if (ufoData != null){
+                UFO ufo = ufoData.getUfo();
+                if (ufo == null || !ufo.alive){
+                    removeBeamFromPool = true;
+                }
+            } else {
+                removeBeamFromPool = true;
+            }
+
+            if (removeBeamFromPool){
+                activeEnergyBeamDowns.removeValue(ufoEnergyBeamDown, false);
+                ufoEnergyBeamDownPool.free(ufoEnergyBeamDown);
+            }
+        }
+
+        //REMOVE ENERGY BEAMS ATTACHED TO UFOs that aren't alive
+        for (UfoEnergyBeamUp ufoEnergyBeamUp : activeEnergyBeamUps){
+            Boolean removeBeamFromPool = false;
+            BodyData ufoData = (BodyData) ufoEnergyBeamUp.dodgeableBody.getUserData();
+            if (ufoData != null){
+                UFO ufo = ufoData.getUfo();
+                if (ufo == null || !ufo.alive){
+                    removeBeamFromPool = true;
+                }
+            } else {
+                removeBeamFromPool = true;
+            }
+
+            if (removeBeamFromPool){
+                activeEnergyBeamUps.removeValue(ufoEnergyBeamUp, false);
+                ufoEnergyBeamUpPool.free(ufoEnergyBeamUp);
             }
         }
 
@@ -291,116 +430,45 @@ public class UFOs {
         ufoData.setUfoEnergyBallIsSpawned(true);
     }
 
-    private void spawnEnergyBeam(Body ufo, BodyData ufoData) {
-
-        //spawn a new energybeam
-        BodyDef energyBeamBodyDef = new BodyDef();
-        energyBeamBodyDef.type = BodyDef.BodyType.DynamicBody;
-        Body energyBeamBody = null;
+    private void spawnEnergyBeam(UFO ufo, BodyData ufoData) {
+        
         //get the direction of the beam from the direction of the energy ball attached to the UFO
         float energyBeamDirection = ufoData.getEnergyBall().getDirection();
 
         if (energyBeamDirection == ENERGY_BEAM_LEFT) {
 
-            // Get ufo positions to determine where to spawn the energy beam
-            float ufoXPosition = ufo.getPosition().x;
-            float ufoYPosition = ufo.getPosition().y + UFO_HEIGHT / 2;
-            float energyBeamXPosition = ufoXPosition - ENERGY_BEAM_WIDTH;
-            float energyBeamYPosition = ufoYPosition - ENERGY_BEAM_HEIGHT / 2;
+            // Spawn(obtain) a new energy beam left from the energy beam left pool and add to list of active energy beam lefts
 
-            //spawn energybeam
-            energyBeamBodyDef.position.set(energyBeamXPosition, energyBeamYPosition);
-            energyBeamBody = gameWorld.createBody(energyBeamBodyDef);
-            BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("json/EnergyBeam.json"));
-            FixtureDef energyBeamFixtureDef = new FixtureDef();
-            energyBeamFixtureDef.density = 0.001f;
-            energyBeamFixtureDef.friction = 0.5f;
-            energyBeamFixtureDef.restitution = 0.3f;
-            // set the energybeam filter categories and masks for collisions
-            energyBeamFixtureDef.filter.categoryBits = game.CATEGORY_UFO;
-            energyBeamFixtureDef.filter.maskBits = game.MASK_UFO;
-            loader.attachFixture(energyBeamBody, "EnergyBeam", energyBeamFixtureDef, ENERGY_BEAM_WIDTH);
+            UfoEnergyBeamLeft ufoEnergyBeamLeft = ufoEnergyBeamLeftPool.obtain();
+            ufoEnergyBeamLeft.init(ufo, energyBeamDirection);
+            activeEnergyBeamLefts.add(ufoEnergyBeamLeft);
+            
 
         } else if (energyBeamDirection == ENERGY_BEAM_RIGHT) {
 
-            // Get ufo positions to determine where to spawn the energy beam
-            float ufoXPosition = ufo.getPosition().x;
-            float ufoYPosition = ufo.getPosition().y + UFO_HEIGHT / 2;
-            float energyBeamXPosition = ufoXPosition + UFO_WIDTH;
-            float energyBeamYPosition = ufoYPosition - ENERGY_BEAM_HEIGHT / 2;
+            // Spawn(obtain) a new energy beam Right from the energy beam Right pool and add to list of active energy beam Rights
 
-            //spawn energybeam
-            energyBeamBodyDef.position.set(energyBeamXPosition, energyBeamYPosition);
-            energyBeamBody = gameWorld.createBody(energyBeamBodyDef);
-            BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("json/EnergyBeamRight.json"));
-            FixtureDef energyBeamFixtureDef = new FixtureDef();
-            energyBeamFixtureDef.density = 0.001f;
-            energyBeamFixtureDef.friction = 0.5f;
-            energyBeamFixtureDef.restitution = 0.3f;
-            // set the energybeam filter categories and masks for collisions
-            energyBeamFixtureDef.filter.categoryBits = game.CATEGORY_UFO;
-            energyBeamFixtureDef.filter.maskBits = game.MASK_UFO;
-            loader.attachFixture(energyBeamBody, "EnergyBeamRight", energyBeamFixtureDef, ENERGY_BEAM_WIDTH);
+            UfoEnergyBeamRight ufoEnergyBeamRight = ufoEnergyBeamRightPool.obtain();
+            ufoEnergyBeamRight.init(ufo, energyBeamDirection);
+            activeEnergyBeamRights.add(ufoEnergyBeamRight);
 
         } else if (energyBeamDirection == ENERGY_BEAM_DOWN) {
 
-            // Get ufo positions to determine where to spawn the energy beam
-            float ufoXPosition = ufo.getPosition().x;
-            float ufoYPosition = ufo.getPosition().y + UFO_HEIGHT / 2;
-            float energyBeamXPosition = ufoXPosition + UFO_WIDTH / 2 - ENERGY_BEAM_VERTICAL_WIDTH / 2;
-            float energyBeamYPosition = ufoYPosition - ENERGY_BEAM_VERTICAL_HEIGHT;
+            // Spawn(obtain) a new energy beam Down from the energy beam Down pool and add to list of active energy beam Downs
 
-            //spawn energybeam
-            energyBeamBodyDef.position.set(energyBeamXPosition, energyBeamYPosition);
-            energyBeamBody = gameWorld.createBody(energyBeamBodyDef);
-            BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("json/EnergyBeamDown.json"));
-            FixtureDef energyBeamFixtureDef = new FixtureDef();
-            energyBeamFixtureDef.density = 0.001f;
-            energyBeamFixtureDef.friction = 0.5f;
-            energyBeamFixtureDef.restitution = 0.3f;
-            // set the energybeam filter categories and masks for collisions
-            energyBeamFixtureDef.filter.categoryBits = game.CATEGORY_UFO;
-            energyBeamFixtureDef.filter.maskBits = game.MASK_UFO;
-            loader.attachFixture(energyBeamBody, "EnergyBeamDown", energyBeamFixtureDef, ENERGY_BEAM_VERTICAL_WIDTH);
+            UfoEnergyBeamDown ufoEnergyBeamDown = ufoEnergyBeamDownPool.obtain();
+            ufoEnergyBeamDown.init(ufo, energyBeamDirection);
+            activeEnergyBeamDowns.add(ufoEnergyBeamDown);
 
         } else if (energyBeamDirection == ENERGY_BEAM_UP) {
 
-            // Get ufo positions to determine where to spawn the energy beam
-            float ufoXPosition = ufo.getPosition().x;
-            float ufoYPosition = ufo.getPosition().y + UFO_HEIGHT / 2;
-            float energyBeamXPosition = ufoXPosition + UFO_WIDTH / 2 - ENERGY_BEAM_VERTICAL_WIDTH / 2;
-            float energyBeamYPosition = ufoYPosition;
+            // Spawn(obtain) a new energy beam Up from the energy beam Up pool and add to list of active energy beam Ups
 
-            //spawn energybeam
-            energyBeamBodyDef.position.set(energyBeamXPosition, energyBeamYPosition);
-            energyBeamBody = gameWorld.createBody(energyBeamBodyDef);
-            BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("json/EnergyBeamUp.json"));
-            FixtureDef energyBeamFixtureDef = new FixtureDef();
-            energyBeamFixtureDef.density = 0.001f;
-            energyBeamFixtureDef.friction = 0.5f;
-            energyBeamFixtureDef.restitution = 0.3f;
-            // set the energybeam filter categories and masks for collisions
-            energyBeamFixtureDef.filter.categoryBits = game.CATEGORY_UFO;
-            energyBeamFixtureDef.filter.maskBits = game.MASK_UFO;
-            loader.attachFixture(energyBeamBody, "EnergyBeamUp", energyBeamFixtureDef, ENERGY_BEAM_VERTICAL_WIDTH);
-
+            UfoEnergyBeamUp ufoEnergyBeamUp = ufoEnergyBeamUpPool.obtain();
+            ufoEnergyBeamUp.init(ufo, energyBeamDirection);
+            activeEnergyBeamUps.add(ufoEnergyBeamUp);
 
         }
-
-
-        //Make the energy beam velocity match the UFO velocity
-        energyBeamBody.setLinearVelocity(ufo.getLinearVelocity());
-
-        // set the ufo linked to the energy beam on the beam so the objects positions can stay in sync
-        // via the update method
-        // set the energy beam direction so the render method knows how to render the sprite image
-        BodyData energyBeamData = new BodyData(false);
-        energyBeamData.setUfo(ufo);
-        energyBeamData.setEnergyBeamDirection(energyBeamDirection);
-        energyBeamBody.setUserData(energyBeamData);
-
-        //add energy beam to energybeams array
-        energyBeamArray.add(energyBeamBody);
 
     }
 
@@ -530,6 +598,34 @@ public class UFOs {
             if (!ufo.isActive()){
                 activeUFOs.removeValue(ufo, false);
                 ufoPool.free(ufo);
+            }
+        }
+
+        for (UfoEnergyBeamLeft ufoEnergyBeamLeft : activeEnergyBeamLefts){
+            if (!ufoEnergyBeamLeft.isActive()){
+                activeEnergyBeamLefts.removeValue(ufoEnergyBeamLeft, false);
+                ufoEnergyBeamLeftPool.free(ufoEnergyBeamLeft);
+            }
+        }
+
+        for (UfoEnergyBeamRight ufoEnergyBeamRight : activeEnergyBeamRights){
+            if (!ufoEnergyBeamRight.isActive()){
+                activeEnergyBeamRights.removeValue(ufoEnergyBeamRight, false);
+                ufoEnergyBeamRightPool.free(ufoEnergyBeamRight);
+            }
+        }
+
+        for (UfoEnergyBeamDown ufoEnergyBeamDown : activeEnergyBeamDowns){
+            if (!ufoEnergyBeamDown.isActive()){
+                activeEnergyBeamDowns.removeValue(ufoEnergyBeamDown, false);
+                ufoEnergyBeamDownPool.free(ufoEnergyBeamDown);
+            }
+        }
+
+        for (UfoEnergyBeamUp ufoEnergyBeamUp : activeEnergyBeamUps){
+            if (!ufoEnergyBeamUp.isActive()){
+                activeEnergyBeamUps.removeValue(ufoEnergyBeamUp, false);
+                ufoEnergyBeamUpPool.free(ufoEnergyBeamUp);
             }
         }
 
