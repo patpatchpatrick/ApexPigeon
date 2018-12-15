@@ -12,9 +12,13 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBird;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelTwoBird;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Teleport;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
@@ -26,14 +30,13 @@ public class Teleports {
     private OrthographicCamera camera;
 
     //Teleport variables
-    private Array<Body> teleportArray = new Array<Body>();
+    private final Array<Teleport> activeTeleports = new Array<Teleport>();
+    private final Pool<Teleport> teleportsPool;
     private Animation<TextureRegion> teleportAnimation;
     private Texture teleportSheet;
     private long lastTeleportSpawnTime;
-    private final float TELEPORT_WIDTH = 10f;
-    private final float TELEPORT_HEIGHT = 10f;
 
-    public Teleports(World gameWorld, AlphaPigeon game, OrthographicCamera camera){
+    public Teleports(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera){
 
         this.gameWorld = gameWorld;
         this.game = game;
@@ -41,26 +44,41 @@ public class Teleports {
 
         initializeTeleportAnimation();
 
+        teleportsPool = new Pool<Teleport>() {
+            @Override
+            protected Teleport newObject() {
+                return new Teleport(gameWorld, game, camera);
+            }
+        };
+
     }
 
     public void render(float stateTime, SpriteBatch batch){
         TextureRegion teleportCurrentFrame = teleportAnimation.getKeyFrame(stateTime, true);
 
-        // draw all teleport dodgeables using the current animation frame
-        for (Body teleport : teleportArray) {
-
-            // draw the teleport if it is active (hasn't been grabbed by the pigeon), otherwise remove it from the array
-            if (teleport.isActive()) {
+        // Render all active teleports
+        for (Teleport teleport : activeTeleports) {
+            if (teleport.alive) {
                 batch.draw(teleportCurrentFrame, teleport.getPosition().x, teleport.getPosition().y,
-                        0, 0, TELEPORT_WIDTH, TELEPORT_HEIGHT, 1, 1, MathUtils.radiansToDegrees * teleport.getAngle());
+                        0, 0, teleport.WIDTH, teleport.HEIGHT, 1, 1, teleport.getAngle());
             } else {
-                teleportArray.removeValue(teleport, false);
+                activeTeleports.removeValue(teleport, false);
             }
-
         }
+
     }
 
     public void update(){
+
+        // For all teleports that are off the game screen, free the teleports in the pool
+        // so that they can be reused
+
+        for (Teleport teleport : activeTeleports){
+            if (teleport.getPosition().x < 0 -  2 * teleport.WIDTH || teleport.getPosition().x > camera.viewportWidth + 2 * teleport.WIDTH){
+                activeTeleports.removeValue(teleport, false);
+                teleportsPool.free(teleport);
+            }
+        }
 
     }
 
@@ -70,44 +88,28 @@ public class Teleports {
         //travel in opposite directions
 
         //spawn first teleport
-        BodyDef teleportBodyDef = new BodyDef();
-        teleportBodyDef.type = BodyDef.BodyType.DynamicBody;
-        //spawn teleport at random height
-        teleportBodyDef.position.set(camera.viewportWidth, MathUtils.random(0, camera.viewportHeight - TELEPORT_HEIGHT));
-        Body teleportBody = gameWorld.createBody(teleportBodyDef);
-        BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("json/Teleport.json"));
-        FixtureDef teleportFixtureDef = new FixtureDef();
-        teleportFixtureDef.density = 0.001f;
-        teleportFixtureDef.friction = 0.5f;
-        teleportFixtureDef.restitution = 0.3f;
-        // set the teleport filter categories and masks for collisions
-        teleportFixtureDef.filter.categoryBits = game.CATEGORY_TELEPORT;
-        teleportFixtureDef.filter.maskBits = game.MASK_TELEPORT;
-        //The JSON loader loaders a fixture 1 pixel by 1 pixel... the animation is 100 px x 100 px, so need to scale by a factor of 10
-        loader.attachFixture(teleportBody, "Teleport", teleportFixtureDef, TELEPORT_HEIGHT);
-        teleportBody.applyForceToCenter(-9.0f, 0, true);
+        // Spawn(obtain) a new teleport from the teleports pool and add to list of active teleports
 
-        //spawn second teleport which starts at the opposite side of screen as the first and travels in the opposite direction
-        BodyDef teleportTwoBodyDef = new BodyDef();
-        teleportTwoBodyDef.type = BodyDef.BodyType.DynamicBody;
-        teleportTwoBodyDef.position.set(0, MathUtils.random(0, camera.viewportHeight - TELEPORT_HEIGHT));
-        Body teleportTwoBody = gameWorld.createBody(teleportTwoBodyDef);
-        loader.attachFixture(teleportTwoBody, "Teleport", teleportFixtureDef, TELEPORT_HEIGHT);
-        teleportTwoBody.applyForceToCenter(7.0f, 0, true);
+        Teleport teleportOne = teleportsPool.obtain();
+        teleportOne.initTeleportOne();
+        activeTeleports.add(teleportOne);
+
+        //spawn second teleport
+        // Spawn(obtain) a new teleport from the teleports pool and add to list of active teleports
+
+        Teleport teleportTwo = teleportsPool.obtain();
+        teleportTwo.initTeleportTwo();
+        activeTeleports.add(teleportTwo);
 
         //Attach data of the opposite teleport to the teleport, so it can be used to transport the pigeon
         //to the opposite teleport's location
         BodyData teleportOneData = new BodyData(false);
-        teleportOneData.setOppositeTeleport(teleportTwoBody);
+        teleportOneData.setOppositeTeleport(teleportTwo);
+        teleportOne.setOppositeTeleportData(teleportOneData);
+
         BodyData teleportTwoData = new BodyData(false);
-        teleportTwoData.setOppositeTeleport(teleportBody);
-        teleportBody.setUserData(teleportOneData);
-        teleportTwoBody.setUserData(teleportTwoData);
-
-
-        //add teleport to teleports array
-        teleportArray.add(teleportBody);
-        teleportArray.add(teleportTwoBody);
+        teleportTwoData.setOppositeTeleport(teleportOne);
+        teleportTwo.setOppositeTeleportData(teleportTwoData);
 
         //keep track of time the teleport shield was spawned
         lastTeleportSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
@@ -143,6 +145,20 @@ public class Teleports {
 
     public long getLastTeleportSpawnTime(){
         return lastTeleportSpawnTime;
+    }
+
+    public void sweepDeadBodies(){
+
+        // If the teleport is flagged for deletion, free the object from the pool
+        // so that it moves off the screen and can be reused
+
+        for (Teleport teleport : activeTeleports){
+            if (!teleport.isActive()){
+                activeTeleports.removeValue(teleport, false);
+                teleportsPool.free(teleport);
+            }
+        }
+
     }
 
     public void dispose(){

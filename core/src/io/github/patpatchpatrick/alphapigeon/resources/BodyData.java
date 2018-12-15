@@ -2,6 +2,7 @@ package io.github.patpatchpatrick.alphapigeon.resources;
 import com.badlogic.gdx.physics.box2d.Body;
 
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.EnergyBall;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Teleport;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.UFO;
 
 public class BodyData {
@@ -13,7 +14,7 @@ public class BodyData {
     private long spawnTime= 9999;
 
     //TELEPORT DATA
-    private Body oppositeTeleport;
+    private Teleport oppositeTeleport;
 
     //ROCKET DATA
     private float rocketYForce = 0f;
@@ -53,14 +54,14 @@ public class BodyData {
 
     //TELEPORT DATA
 
-    public void setOppositeTeleport(Body oppositeTeleport){
+    public void setOppositeTeleport(Teleport oppositeTeleport){
         // Method used for teleport bodies, to store info about its counterpart teleport
         this.oppositeTeleport = oppositeTeleport;
     }
 
-    public Body getOppositeTeleport(){
+    public Teleport getOppositeTeleport(){
         // Method used for teleport bodies, to return info about its counterpart teleport
-        return oppositeTeleport;
+        return this.oppositeTeleport;
     }
 
     //ROCKET DATA

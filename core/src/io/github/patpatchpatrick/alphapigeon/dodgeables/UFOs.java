@@ -59,7 +59,6 @@ public class UFOs {
     private final Pool<UfoEnergyBeamDown> ufoEnergyBeamDownPool;
     private final Array<UfoEnergyBeamUp> activeEnergyBeamUps = new Array<UfoEnergyBeamUp>();
     private final Pool<UfoEnergyBeamUp> ufoEnergyBeamUpPool;
-    private Array<Body> energyBeamArray = new Array<Body>();
     private Animation<TextureRegion> energyBeamAnimation;
     private Texture energyBeamSheet;
     private final float ENERGY_BEAM_WIDTH = 80f;

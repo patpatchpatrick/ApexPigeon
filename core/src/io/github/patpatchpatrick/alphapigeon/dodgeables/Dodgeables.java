@@ -95,6 +95,8 @@ public class Dodgeables {
 
         } else if (totalGameTime >= WAVE_2 && totalGameTime < WAVE_3) {
 
+            /**
+
             if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() > L1BIRD_SPAWN_DURATION_WAVE_1){
                 birds.spawnLevelOneBird();
             }
@@ -115,6 +117,12 @@ public class Dodgeables {
             }
             if (currentTimeInMillis - ufos.getLastUfoSpawnTime() > 5000) {
                 ufos.spawnUfo();
+            }
+
+             */
+
+            if (currentTimeInMillis - teleports.getLastTeleportSpawnTime() > 5000) {
+                teleports.spawnTeleports();
             }
 
 
@@ -187,6 +195,7 @@ public class Dodgeables {
         this.meteors.sweepDeadBodies();
         this.alienMissiles.sweepDeadBodies();
         this.ufos.sweepDeadBodies();
+        this.teleports.sweepDeadBodies();
 
     }
 

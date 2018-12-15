@@ -14,6 +14,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.TimeUtils;
 
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Teleport;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 
@@ -86,8 +87,15 @@ public class Pigeon {
         //Get the teleport data from the teleport fixture that contacted the pigeon
         final Body teleport = teleportFixture.getBody();
         BodyData teleportData = (BodyData) teleport.getUserData();
-        final Body oppositeTeleport = teleportData.getOppositeTeleport();
-        final World worldRef = this.world;
+        final Teleport oppositeTeleport = teleportData.getOppositeTeleport();
+
+        final float positionX = oppositeTeleport.getPosition().x;
+        final float positionY = oppositeTeleport.getPosition().y;
+        final float angle = oppositeTeleport.getAngle();
+
+        final BodyData deleteObjectOne = new BodyData(true);
+        final BodyData deleteObjectTwo = new BodyData(true);
+
 
         //Move the pigeon to the opposite teleport's location and then destroy both teleports
         //This must be done using Runnable app.postRunnable so it occurs in the rendering thread which is currently locked
@@ -98,9 +106,9 @@ public class Pigeon {
 
             @Override
             public void run () {
-                pigeonBody.setTransform(oppositeTeleport.getPosition().x, oppositeTeleport.getPosition().y, oppositeTeleport.getAngle());
-                worldRef.destroyBody(oppositeTeleport);
-                worldRef.destroyBody(teleport);
+                pigeonBody.setTransform(positionX, positionY, angle);
+                oppositeTeleport.dodgeableBody.setUserData(deleteObjectOne);
+                teleport.setUserData(deleteObjectTwo);
             }
         });
 
