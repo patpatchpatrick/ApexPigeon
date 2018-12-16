@@ -39,7 +39,6 @@ public class UFO extends Dodgeable {
         ufoFixtureDef.filter.categoryBits = game.CATEGORY_UFO;
         ufoFixtureDef.filter.maskBits = game.MASK_UFO;
         loader.attachFixture(dodgeableBody, "Ufo", ufoFixtureDef, HEIGHT);
-        dodgeableBody.applyForceToCenter(FORCE_X, 0, true);
 
 
     }

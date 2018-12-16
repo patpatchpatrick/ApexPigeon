@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
@@ -297,7 +298,10 @@ public class UFOs {
                 if (!ufoData.ufoEnergyBallIsSpawned()) {
                     long ufoSpawnTime = ufoData.getSpawnTime();
                     if (currentTimeInMillis - ufoSpawnTime > 5000) {
-                        spawnEnergyBall(ufoData, ENERGY_BEAM_UP);
+                        //Spawn an energy ball in a random direction.
+                        //Directions are between 0f and 3f.
+                        float randomEnergyBeamDirection = MathUtils.random(0, 3);
+                        spawnEnergyBall(ufoData, randomEnergyBeamDirection);
                     }
                 } else {
                     EnergyBall energyBall = ufoData.getEnergyBall();

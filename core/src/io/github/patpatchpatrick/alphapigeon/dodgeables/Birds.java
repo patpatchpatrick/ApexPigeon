@@ -116,12 +116,12 @@ public class Birds {
 
     }
 
-    public void spawnLevelOneBird(){
+    public void spawnLevelOneBird(float totalGameTime){
 
         // Spawn(obtain) a new bird from the level one bird pool and add to list of active birds
         
         LevelOneBird levelOneBird = levelOneBirdPool.obtain();
-        levelOneBird.init();
+        levelOneBird.init(totalGameTime);
         activeLevelOneBirds.add(levelOneBird);
 
         //keep track of time the bird was spawned
@@ -129,12 +129,12 @@ public class Birds {
 
     }
 
-    public void spawnLevelTwoBird(){
+    public void spawnLevelTwoBird(float totalGameTime){
 
         // Spawn(obtain) a new bird from the level two bird pool and add to list of active birds
 
         LevelTwoBird levelTwoBird = levelTwoBirdPool.obtain();
-        levelTwoBird.init();
+        levelTwoBird.init(totalGameTime);
         activeLevelTwoBirds.add(levelTwoBird);
 
         //keep track of time the bird was spawned

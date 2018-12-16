@@ -19,6 +19,8 @@ public abstract class Dodgeable implements Pool.Poolable {
     public boolean alive;
     public Body dodgeableBody;
 
+    protected float forceMultiplier = 1f;
+
     protected AlphaPigeon game;
     protected World gameWorld;
     protected OrthographicCamera camera;

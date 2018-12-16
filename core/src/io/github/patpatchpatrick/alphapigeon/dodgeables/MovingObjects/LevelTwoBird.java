@@ -38,12 +38,29 @@ public class LevelTwoBird extends Dodgeable {
         loader.attachFixture(dodgeableBody, "LevelTwoBird", levelTwoBirdFixtureDef, WIDTH);
     }
 
-    public void init() {
+    public void init(float totalGameTime) {
 
+        //Set the force multiplier for object
+        setForceMultiplier(totalGameTime);
+
+        //Initiate the object
         dodgeableBody.setActive(true);
         dodgeableBody.setTransform(camera.viewportWidth, MathUtils.random(0, camera.viewportHeight - HEIGHT), dodgeableBody.getAngle());
-        dodgeableBody.applyForceToCenter(FORCE_X, 0, true);
+        dodgeableBody.applyForceToCenter(this.forceMultiplier * FORCE_X, 0, true);
         this.alive = true;
 
+    }
+
+    private void setForceMultiplier(float totalGameTime){
+
+        //Set the force multiplier for the object
+        //The force multiplier is the magnitude by which object's force/speed is increased
+        //The force multiplier increases over time
+
+        this.forceMultiplier = 1f + totalGameTime * 0.000013f;
+        // The maximum force multiplier for this object is 4
+        if (this.forceMultiplier >= 4f){
+            this.forceMultiplier = 4f;
+        }
     }
 }
