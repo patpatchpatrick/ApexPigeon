@@ -15,7 +15,7 @@ public class LevelTwoBird extends Dodgeable {
 
     public final float WIDTH = 12f;
     public final float HEIGHT = 12f;
-    public final float FORCE_X = -25.0f;
+    public final float FORCE_X = -18.0f;
 
     public LevelTwoBird(World gameWorld, AlphaPigeon game, OrthographicCamera camera) {
         super(gameWorld, game, camera);

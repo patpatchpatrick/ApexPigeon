@@ -26,6 +26,7 @@ import java.util.Iterator;
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.Pigeon;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
+import io.github.patpatchpatrick.alphapigeon.levels.Gameplay;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.HighScore;
@@ -44,6 +45,7 @@ public class GameScreen implements Screen {
     private float stateTime;
     private float deltaTime;
     private Body pigeonBody;
+    private Gameplay gameplay;
     Box2DDebugRenderer debugRenderer;
     World world;
 
@@ -70,6 +72,9 @@ public class GameScreen implements Screen {
         this.pigeon = new Pigeon(world, game);
         this.dodgeables = new Dodgeables(this.pigeon, world, game, camera);
         pigeonBody = this.pigeon.getBody();
+
+        // initialize the gameplay class
+        gameplay = new Gameplay(this.dodgeables);
 
         // load the game sound effects and background music
         dropSound = Gdx.audio.newSound(Gdx.files.internal("sounds/drop.wav"));
@@ -112,7 +117,7 @@ public class GameScreen implements Screen {
         game.batch.begin();
         scrollingBackground.render(game.batch);
         highScore.render(game.batch);
-        dodgeables.render(stateTime, game.batch);
+        gameplay.render(stateTime, game.batch);
         pigeon.render(stateTime, game.batch);
         game.batch.end();
 
@@ -167,7 +172,7 @@ public class GameScreen implements Screen {
         // update all the game resources
         scrollingBackground.update(deltaTime);
         highScore.update(deltaTime);
-        dodgeables.update(stateTime);
+        gameplay.update(stateTime);
         pigeon.update(stateTime);
 
         // process user input

@@ -28,38 +28,6 @@ public class Dodgeables {
     private Meteors meteors;
     private UFOs ufos;
 
-    //GAME TIMES
-    private float startTime = 0f;
-    private float totalGameTime;
-    private long currentTimeInMillis;
-    private float powerUpShieldInterval;
-    //WAVE TIMES in milliseconds
-    private final float WAVE_0 = 0f;
-    private final float WAVE_1 = 20000;
-    private final float WAVE_2 = 40000;
-    private final float WAVE_3 = 50000;
-    //Time durations in between spawns for dodgeables (milliseconds)
-    private final float L1BIRD_SPAWN_DURATION_WAVE_0 = 2000;
-    private final float L1BIRD_SPAWN_DURATION_WAVE_1 = 2000;
-    private final float L2BIRD_SPAWN_DURATION_WAVE_1 = 4000;
-
-    //RANDOM WAVE VARIABLES
-    //After enough game time, random waves/puzzles are spawned
-    //This boolean is used to track whether or not a random wave is in progress
-    private boolean randomWaveIsInitiated = false;
-    private long lastRandomWaveStartTime = 0;
-    private float randomWave = 0f;
-    private final float RANDOM_WAVE_UFO = 0f;
-    private final float RANDOM_WAVE_UFO_SPAWN_DURATION = 5000;
-    private final float RANDOM_WAVE_UFO_TOTAL_TIME = 10000;
-    private final float RANDOM_WAVE_ALIEN_MISSILE = 1f;
-    private final float RANDOM_WAVE_ALIEN_MISSILE_SPAWN_DURATION = 5000;
-    private final float RANDOM_WAVE_ALIEN_MISSILE_TOTAL_TIME = 10000;
-    private final float RANDOM_WAVE_ROCKETS = 2f;
-    private final float RANDOM_WAVE_ROCKETS_SPAWN_DURATION = 4000;
-    private final float RANDOM_WAVE_ROCKETS_TOTAL_TIME = 10000;
-    private final float RANDOM_WAVE_L1BIRD_SPAWN_DURATION = 2000;
-    private final float RANDOM_WAVE_L2BIRD_SPAWN_DURATION = 2000;
 
     public Dodgeables(Pigeon pigeon, World world, AlphaPigeon game, OrthographicCamera camera) {
 
@@ -75,142 +43,42 @@ public class Dodgeables {
         meteors = new Meteors(gameWorld, game, camera);
         ufos = new UFOs(gameWorld, game, camera);
 
-        startTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
-
     }
 
-
-    public void spawnDodgeables() {
-
-        //class to determine if we need to spawn new dodgeables depending on how much time has passed
-        //Get current time in milliseconds
-        currentTimeInMillis = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
-        totalGameTime = currentTimeInMillis - startTime;
-        powerUpShieldInterval = powerUps.getPowerUpShieldIntervalTime();
-
-
-        if (totalGameTime > WAVE_0 && totalGameTime < WAVE_1) {
-
-            if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() > L1BIRD_SPAWN_DURATION_WAVE_0) {
-                birds.spawnLevelOneBird(totalGameTime);
-            }
-            if (currentTimeInMillis - powerUps.getLastpowerUpShieldSpawnTime() > powerUpShieldInterval) {
-                powerUps.spawnPowerUpShield();
-            }
-
-
-        } else if (totalGameTime >= WAVE_1 && totalGameTime < WAVE_2) {
-
-            if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() > L1BIRD_SPAWN_DURATION_WAVE_1) {
-                birds.spawnLevelOneBird(totalGameTime);
-            }
-            if (currentTimeInMillis - birds.getLastLevelTwoBirdSpawnTime() > L2BIRD_SPAWN_DURATION_WAVE_1) {
-                birds.spawnLevelTwoBird(totalGameTime);
-            }
-            if (currentTimeInMillis - powerUps.getLastpowerUpShieldSpawnTime() > powerUpShieldInterval) {
-                powerUps.spawnPowerUpShield();
-            }
-
-        } else {
-
-            if (!randomWaveIsInitiated) {
-                //If a random isn't currently in progress:
-                //Generate a random number to determine which random wave to run
-                randomWave = MathUtils.random(0, 2);
-                //Save the time the last random wave was started
-                lastRandomWaveStartTime = currentTimeInMillis;
-                randomWaveIsInitiated = true;
-            } else if (randomWave == RANDOM_WAVE_UFO) {
-                runRandomWaveUFO();
-            } else if (randomWave == RANDOM_WAVE_ALIEN_MISSILE){
-                runRandomWaveAlienMissile();
-            } else if (randomWave == RANDOM_WAVE_ROCKETS){
-                runRandomWaveRockets();
-            }
-
-            /**
-
-             if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() > 2000)
-             birds.spawnLevelOneBird();
-             if (currentTimeInMillis - meteors.getLastMeteorSpawnTime() > 1000000)
-             meteors.spawnMeteor();
-             if (currentTimeInMillis - birds.getLastLevelTwoBirdSpawnTime() > 1000000)
-             birds.spawnLevelTwoBird();
-             if (currentTimeInMillis - rockets.getLastRocketSpawnTime() > 1000000)
-             rockets.spawnRocket();
-             if (currentTimeInMillis - alienMissiles.getLastAlienMissileSpawnTime() > 1000000)
-             alienMissiles.spawnAlienMissile();
-             if (currentTimeInMillis - powerUps.getLastpowerUpShieldSpawnTime() > 5000000)
-             powerUps.spawnPowerUpShield();
-             if (currentTimeInMillis - teleports.getLastTeleportSpawnTime() > 5000000)
-             teleports.spawnTeleports();
-             if (currentTimeInMillis - ufos.getLastUfoSpawnTime() > 1500000)
-             ufos.spawnUfo();
-
-             */
-
-        }
-
-
-    }
-
-    private void runRandomWaveUFO() {
-
-        if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() > RANDOM_WAVE_L1BIRD_SPAWN_DURATION) {
-            birds.spawnLevelOneBird(totalGameTime);
-        }
-        if (currentTimeInMillis - birds.getLastLevelTwoBirdSpawnTime() > RANDOM_WAVE_L2BIRD_SPAWN_DURATION) {
-            birds.spawnLevelTwoBird(totalGameTime);
-        }
-        if (currentTimeInMillis - ufos.getLastUfoSpawnTime() > RANDOM_WAVE_UFO_SPAWN_DURATION) {
-            ufos.spawnUfo();
-        }
-        if (currentTimeInMillis - lastRandomWaveStartTime > RANDOM_WAVE_UFO_TOTAL_TIME) {
-            randomWaveIsInitiated = false;
-        }
-
-    }
-
-    private void runRandomWaveAlienMissile() {
-
-        if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() > RANDOM_WAVE_L1BIRD_SPAWN_DURATION) {
-            birds.spawnLevelOneBird(totalGameTime);
-        }
-        if (currentTimeInMillis - birds.getLastLevelTwoBirdSpawnTime() > RANDOM_WAVE_L2BIRD_SPAWN_DURATION) {
-            birds.spawnLevelTwoBird(totalGameTime);
-        }
-        if (currentTimeInMillis - alienMissiles.getLastAlienMissileSpawnTime() > RANDOM_WAVE_ALIEN_MISSILE_SPAWN_DURATION) {
-            alienMissiles.spawnAlienMissile();
-        }
-        if (currentTimeInMillis - lastRandomWaveStartTime > RANDOM_WAVE_ALIEN_MISSILE_TOTAL_TIME) {
-            randomWaveIsInitiated = false;
-        }
-
-    }
-
-    private void runRandomWaveRockets() {
-
-        if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() > RANDOM_WAVE_L1BIRD_SPAWN_DURATION) {
-            birds.spawnLevelOneBird(totalGameTime);
-        }
-        if (currentTimeInMillis - birds.getLastLevelTwoBirdSpawnTime() > RANDOM_WAVE_L2BIRD_SPAWN_DURATION) {
-            birds.spawnLevelTwoBird(totalGameTime);
-        }
-        if (currentTimeInMillis - powerUps.getLastpowerUpShieldSpawnTime() > powerUpShieldInterval) {
-            powerUps.spawnPowerUpShield();
-        }
-        if (currentTimeInMillis - rockets.getLastRocketSpawnTime() > RANDOM_WAVE_ROCKETS_SPAWN_DURATION) {
-            rockets.spawnRocket();
-        }
-        if (currentTimeInMillis - lastRandomWaveStartTime > RANDOM_WAVE_ROCKETS_TOTAL_TIME) {
-            randomWaveIsInitiated = false;
-        }
-
-    }
 
     public void spawnRocketExplosion(float explosionPositionX, float explosionPositionY) {
         rockets.spawnRocketExplosion(explosionPositionX, explosionPositionY);
     }
+
+    public Birds getBirds(){
+        return this.birds;
+    }
+
+    public Rockets getRockets(){
+        return this.rockets;
+    }
+
+    public AlienMissiles getAlienMissiles(){
+        return this.alienMissiles;
+    }
+
+    public Teleports getTeleports(){
+        return this.teleports;
+    }
+
+    public PowerUps getPowerUps(){
+        return this.powerUps;
+    }
+
+    public  Meteors getMeteors(){
+        return this.meteors;
+    }
+
+    public UFOs getUfos(){
+        return this.ufos;
+    }
+
+
 
     public void render(float stateTime, SpriteBatch batch) {
 
@@ -226,8 +94,6 @@ public class Dodgeables {
     }
 
     public void update(float stateTime) {
-        //Check if we need to spawn new dodgeables depending on game time
-        spawnDodgeables();
 
         //Update all dodgeable classes
         birds.update();
