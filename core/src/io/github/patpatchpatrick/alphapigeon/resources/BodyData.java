@@ -1,5 +1,7 @@
 package io.github.patpatchpatrick.alphapigeon.resources;
+
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.utils.Array;
 
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.EnergyBall;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Teleport;
@@ -11,7 +13,7 @@ public class BodyData {
 
     private Boolean flaggedForDelete;
 
-    private long spawnTime= 9999;
+    private long spawnTime = 9999;
 
     //TELEPORT DATA
     private Teleport oppositeTeleport;
@@ -23,7 +25,7 @@ public class BodyData {
     //UFO DATA
     private boolean ufoEnergyBallSpawned = false;
     private boolean ufoEnergyBeamIsSpawned = false;
-    private EnergyBall energyBall;
+    private final Array<EnergyBall> energyBalls = new Array<EnergyBall>();
     private float energyBeamDirection;
     private UFO ufo;
 
@@ -40,96 +42,98 @@ public class BodyData {
         }
     }
 
-    public void setFlaggedForDelete(boolean flaggedForDelete){
+    public void setFlaggedForDelete(boolean flaggedForDelete) {
         this.flaggedForDelete = flaggedForDelete;
     }
 
-    public void setSpawnTime(long spawnTime){
+    public void setSpawnTime(long spawnTime) {
         this.spawnTime = spawnTime;
     }
 
-    public long getSpawnTime(){
+    public long getSpawnTime() {
         return this.spawnTime;
     }
 
     //TELEPORT DATA
 
-    public void setOppositeTeleport(Teleport oppositeTeleport){
+    public void setOppositeTeleport(Teleport oppositeTeleport) {
         // Method used for teleport bodies, to store info about its counterpart teleport
         this.oppositeTeleport = oppositeTeleport;
     }
 
-    public Teleport getOppositeTeleport(){
+    public Teleport getOppositeTeleport() {
         // Method used for teleport bodies, to return info about its counterpart teleport
         return this.oppositeTeleport;
     }
 
     //ROCKET DATA
 
-    public void setRocketData(float torque, boolean rocketSpawnedInBottomHalfOfScreen){
+    public void setRocketData(float torque, boolean rocketSpawnedInBottomHalfOfScreen) {
         // Based on the rockets torque and where the rocket is spawned, calculate what force should
         // be applied to rocket in the Y direction
-        if (rocketSpawnedInBottomHalfOfScreen){
+        if (rocketSpawnedInBottomHalfOfScreen) {
             rocketYForce = -0.2f * torque - 0.2f;
         } else {
             rocketYForce = -0.3f * torque - 0.6f;
         }
     }
 
-    public void setExplosionData(long lastRocketExplosionTime){
+    public void setExplosionData(long lastRocketExplosionTime) {
         this.lastRocketExplosionTime = lastRocketExplosionTime;
     }
 
-    public long getExplosionTime(){
+    public long getExplosionTime() {
         return this.lastRocketExplosionTime;
     }
 
-    public float getRocketYForce(){
+    public float getRocketYForce() {
         return rocketYForce;
     }
 
     //UFO DATA
 
-    public void setUfoEnergyBallIsSpawned(boolean ballSpawned){
+    public void setUfoEnergyBallIsSpawned(boolean ballSpawned) {
         this.ufoEnergyBallSpawned = ballSpawned;
     }
 
-    public boolean ufoEnergyBallIsSpawned(){
+    public boolean ufoEnergyBallIsSpawned() {
         return this.ufoEnergyBallSpawned;
     }
 
-    public void  setEnergyBall(EnergyBall energyBall){
-        this.energyBall = energyBall;
+    public void setEnergyBall(EnergyBall energyBall) {
+        // Add the energy ball to the array of energy balls associated with the UFO
+        this.energyBalls.add(energyBall);
     }
 
-    public EnergyBall getEnergyBall(){
-        return this.energyBall;
+    public Array<EnergyBall> getEnergyBalls() {
+        // Return the energy ball array associated with the UFO (contains all energy balls
+        // associated with a particular UFO)
+        return this.energyBalls;
     }
 
-    public void setUfo(UFO ufo){
+    public void setUfo(UFO ufo) {
         this.ufo = ufo;
     }
 
-    public UFO getUfo(){
+    public UFO getUfo() {
         return this.ufo;
     }
 
-    public void setEnergyBeamSpawned(Boolean energyBeamIsSpawned){
+    public void setEnergyBeamSpawned(Boolean energyBeamIsSpawned) {
         this.ufoEnergyBeamIsSpawned = energyBeamIsSpawned;
     }
 
-    public Boolean getEnergyBeamIsSpawned(){
+    public Boolean getEnergyBeamIsSpawned() {
         return this.ufoEnergyBeamIsSpawned;
     }
 
-    public void setEnergyBeamDirection(float energyBeamDirection){
+    public void setEnergyBeamDirection(float energyBeamDirection) {
         this.energyBeamDirection = energyBeamDirection;
     }
 
-    public float getEnergyBeamDirection(){
+    public float getEnergyBeamDirection() {
         return this.energyBeamDirection;
     }
-
 
 
 }

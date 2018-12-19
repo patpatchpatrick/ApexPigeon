@@ -6,6 +6,10 @@ import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
 
 public class LevelTwo extends Level {
 
+    // The second level of the game is considered the "EASY" level.
+    // Although not actually easy, this level consists of random waves/puzzles of dodgeable creatures
+    // that are randomly selected
+
     // GAME TIMES
     private float startTime = 0f;
     private float totalGameTime;
@@ -18,6 +22,7 @@ public class LevelTwo extends Level {
     private boolean randomWaveIsInitiated = false;
     private long lastRandomWaveStartTime = 0;
     private float randomWave = 0f;
+    private final int TOTAL_NUMBER_OF_WAVES = 2;
     private final float RANDOM_WAVE_UFO = 0f;
     private final float RANDOM_WAVE_UFO_SPAWN_DURATION = 10000;
     private final float RANDOM_WAVE_UFO_TOTAL_TIME = 10000;
@@ -43,7 +48,7 @@ public class LevelTwo extends Level {
         if (!randomWaveIsInitiated) {
             //If a random isn't currently in progress:
             //Generate a random number to determine which random wave to run
-            randomWave = MathUtils.random(0, 2);
+            randomWave = MathUtils.random(0, TOTAL_NUMBER_OF_WAVES);
             //Save the time the last random wave was started
             lastRandomWaveStartTime = currentTimeInMillis;
             randomWaveIsInitiated = true;
@@ -67,7 +72,8 @@ public class LevelTwo extends Level {
             birds.spawnLevelTwoBird(totalGameTime);
         }
         if (currentTimeInMillis - ufos.getLastUfoSpawnTime() > RANDOM_WAVE_UFO_SPAWN_DURATION) {
-            ufos.spawnUfo();
+            //Spawn a ufo that shoots an energy beam in a random direction
+            ufos.spawnUfo(ufos.ENERGY_BEAM_RANDOM);
         }
         if (currentTimeInMillis - lastRandomWaveStartTime > RANDOM_WAVE_UFO_TOTAL_TIME) {
             randomWaveIsInitiated = false;

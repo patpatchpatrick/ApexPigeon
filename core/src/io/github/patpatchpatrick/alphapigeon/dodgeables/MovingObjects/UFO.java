@@ -19,6 +19,7 @@ public class UFO extends Dodgeable {
     public final float WIDTH = 15f;
     public final float HEIGHT = WIDTH;
     private final float FORCE_X = -9.0f;
+    public float direction = 0f;
 
     public UFO(World gameWorld, AlphaPigeon game, OrthographicCamera camera) {
         super(gameWorld, game, camera);
@@ -43,7 +44,10 @@ public class UFO extends Dodgeable {
 
     }
 
-    public void init() {
+    public void init(float direction) {
+
+        //Set the direction which the energy beams associated with the UFO should fire
+        this.direction = direction;
 
         dodgeableBody.setActive(true);
         dodgeableBody.setTransform(camera.viewportWidth, MathUtils.random(0, camera.viewportHeight - HEIGHT), dodgeableBody.getAngle());

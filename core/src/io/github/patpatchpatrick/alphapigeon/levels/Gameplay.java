@@ -48,6 +48,7 @@ public class Gameplay extends Level {
 
     public void update(float stateTime) {
 
+        // Update all levels and gameplay
         updateLevels();
 
         // Update all the dodgeable objects

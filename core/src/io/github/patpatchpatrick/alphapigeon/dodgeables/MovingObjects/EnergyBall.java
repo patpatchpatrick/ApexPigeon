@@ -10,6 +10,7 @@ public class EnergyBall implements MovingObject {
     private float frameNumber = 0;
     private boolean animationIsComplete = false;
     private float direction;
+    private boolean energyBeamIsSpawned = false;
 
     public EnergyBall() {
     }
@@ -18,6 +19,15 @@ public class EnergyBall implements MovingObject {
         this.width = width;
         this.height = height;
         this.direction = direction;
+    }
+
+    public void setEnergyBeamIsSpawned(Boolean energyBeamSpawned){
+        // Boolean to keep track of whether energy beam associated with energy ball is spawned
+        this.energyBeamIsSpawned = energyBeamSpawned;
+    }
+
+    public boolean getEnergyBeamIsSpawned(){
+        return this.energyBeamIsSpawned;
     }
 
 
