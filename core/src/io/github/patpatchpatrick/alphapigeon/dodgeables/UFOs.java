@@ -70,6 +70,8 @@ public class UFOs {
     public final float ENERGY_BEAM_DOWN = 3f;
     public final float ENERGY_BEAM_RANDOM = 4f;
     public final float ENERGY_BEAM_ALL_DIRECTIONS = 5f;
+    public final float ENERGY_BEAM_HORIZONAL_DIRECTIONS = 6f;
+    public final float ENERGY_BEAM_VERTICAL_DIRECTIONS = 7f;
 
     //UFO Static Energy Beam variables
     private Animation<TextureRegion> energyBeamStaticAnimation;
@@ -431,6 +433,24 @@ public class UFOs {
 
     }
 
+    public void spawnHorizontalUfo(float direction){
+
+        // Spawn(obtain) a new UFO from the UFO pool and add to list of active UFOs
+        // Horizontal Ufos start in the vertical middle of the right of the screen and move slowly
+        // towards the left of the screen horizontally
+
+        UFO ufo = ufoPool.obtain();
+        ufo.initHorizontal(direction);
+        activeUFOs.add(ufo);
+
+
+        //keep track of time the ufo was spawned
+        lastUfoSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+
+
+
+    }
+
     public void spawnEnergyBall(BodyData ufoData, float direction) {
 
         //Spawn a UFO energy ball
@@ -450,6 +470,14 @@ public class UFOs {
             ufoData.setEnergyBall(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_LEFT));
             ufoData.setEnergyBall(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_UP));
             ufoData.setEnergyBall(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_RIGHT));
+            ufoData.setEnergyBall(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_DOWN));
+            ufoData.setUfoEnergyBallIsSpawned(true);
+        } else if (direction == ENERGY_BEAM_HORIZONAL_DIRECTIONS){
+            ufoData.setEnergyBall(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_LEFT));
+            ufoData.setEnergyBall(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_RIGHT));
+            ufoData.setUfoEnergyBallIsSpawned(true);
+        } else if (direction == ENERGY_BEAM_VERTICAL_DIRECTIONS){
+            ufoData.setEnergyBall(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_UP));
             ufoData.setEnergyBall(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_DOWN));
             ufoData.setUfoEnergyBallIsSpawned(true);
         } else {

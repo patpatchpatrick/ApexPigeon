@@ -63,4 +63,23 @@ public class UFO extends Dodgeable {
 
     }
 
+    public void initHorizontal(float direction){
+
+        //Set the direction which the energy beams associated with the UFO should fire
+        this.direction = direction;
+
+        dodgeableBody.setActive(true);
+        dodgeableBody.setTransform(camera.viewportWidth, ( camera.viewportHeight - HEIGHT)/2, dodgeableBody.getAngle());
+        dodgeableBody.applyForceToCenter(FORCE_X, 0, true);
+        this.alive = true;
+
+        //keep track of time the ufo was spawned
+        long lastUfoSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+
+        BodyData ufoBodyData = new BodyData(false);
+        ufoBodyData.setSpawnTime(lastUfoSpawnTime);
+        dodgeableBody.setUserData(ufoBodyData);
+
+    }
+
 }
