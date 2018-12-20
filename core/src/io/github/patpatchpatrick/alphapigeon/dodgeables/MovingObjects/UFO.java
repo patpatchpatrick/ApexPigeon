@@ -62,6 +62,7 @@ public class UFO extends Dodgeable {
         spawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
 
 
+
     }
 
     public void initHorizontal(float direction){
@@ -78,6 +79,16 @@ public class UFO extends Dodgeable {
         spawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
 
 
-    }
+        }
 
+    @Override
+    public void reset() {
+        super.reset();
+
+        //Clear all values set on previous UFOs
+        this.energyBallIsSpawned = false;
+        this.energyBalls.clear();
+        this.spawnTime = 0;
+
+    }
 }
