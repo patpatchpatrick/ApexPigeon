@@ -23,9 +23,6 @@ public class BodyData {
     private long lastRocketExplosionTime = 99999;
 
     //UFO DATA
-    private boolean ufoEnergyBallSpawned = false;
-    private boolean ufoEnergyBeamIsSpawned = false;
-    private final Array<EnergyBall> energyBalls = new Array<EnergyBall>();
     private float energyBeamDirection;
     private UFO ufo;
 
@@ -92,25 +89,6 @@ public class BodyData {
 
     //UFO DATA
 
-    public void setUfoEnergyBallIsSpawned(boolean ballSpawned) {
-        this.ufoEnergyBallSpawned = ballSpawned;
-    }
-
-    public boolean ufoEnergyBallIsSpawned() {
-        return this.ufoEnergyBallSpawned;
-    }
-
-    public void setEnergyBall(EnergyBall energyBall) {
-        // Add the energy ball to the array of energy balls associated with the UFO
-        this.energyBalls.add(energyBall);
-    }
-
-    public Array<EnergyBall> getEnergyBalls() {
-        // Return the energy ball array associated with the UFO (contains all energy balls
-        // associated with a particular UFO)
-        return this.energyBalls;
-    }
-
     public void setUfo(UFO ufo) {
         this.ufo = ufo;
     }
@@ -119,13 +97,6 @@ public class BodyData {
         return this.ufo;
     }
 
-    public void setEnergyBeamSpawned(Boolean energyBeamIsSpawned) {
-        this.ufoEnergyBeamIsSpawned = energyBeamIsSpawned;
-    }
-
-    public Boolean getEnergyBeamIsSpawned() {
-        return this.ufoEnergyBeamIsSpawned;
-    }
 
     public void setEnergyBeamDirection(float energyBeamDirection) {
         this.energyBeamDirection = energyBeamDirection;

@@ -138,20 +138,15 @@ public class UFOs {
         // Render all active ufos
         for (UFO ufo : activeUFOs) {
             if (ufo.alive) {
-                BodyData ufoData = (BodyData) ufo.dodgeableBody.getUserData();
-                Boolean energyBallIsSpawned = false;
-                if (ufoData != null) {
-                    energyBallIsSpawned = ufoData.ufoEnergyBallIsSpawned();
-                }
+
                 // draw the UFO vehicle at the UFO body position
                 batch.draw(ufoCurrentFrame, ufo.getPosition().x, ufo.getPosition().y, 0, 0, ufo.WIDTH, ufo.HEIGHT, 1, 1, ufo.getAngle());
 
                 // Energy ball/beam render methods
-                if (energyBallIsSpawned) {
+                if (ufo.energyBallIsSpawned) {
 
                     //Render all energy balls associated with the UFO
-                    Array<EnergyBall> energyBalls = ufoData.getEnergyBalls();
-                    for (EnergyBall energyBall : energyBalls){
+                    for (EnergyBall energyBall : ufo.energyBalls){
 
                         float energyBallWidth = energyBall.getWidth();
                         float energyBallHeight = energyBall.getHeight();
@@ -299,20 +294,22 @@ public class UFOs {
         //If the ufo is spawned long enough... create an energy ball that will ultimately turn
         //into an energy beam when it is fully charged
         //Slowly increment the energy ball size until it is fully charged
-        //After the energy ball width matches the beam width, it is fully charged and ready to be a beam
+        //After the energy ball width matches the beam width, it is fully charged and ready spawn an energy beam object
         for (UFO ufo : activeUFOs){
-            BodyData ufoData = (BodyData) ufo.dodgeableBody.getUserData();
-            if (ufoData != null) {
-                if (!ufoData.ufoEnergyBallIsSpawned()) {
-                    long ufoSpawnTime = ufoData.getSpawnTime();
-                    if (currentTimeInMillis - ufoSpawnTime > 5000) {
-                            //Spawn an energy ball after a set amount of time
-                            spawnEnergyBall(ufoData, ufo.direction);
+                if (!ufo.energyBallIsSpawned) {
+                    if (currentTimeInMillis - ufo.spawnTime > 5000) {
+                            //Spawn an energy ball after a set amount of time if it is not spawned
+                            spawnEnergyBall(ufo);
                     }
                 } else {
-                    Array<EnergyBall> energyBalls = ufoData.getEnergyBalls();
-                    for (int i = 0, n = energyBalls.size; i < n ; i ++){
-                        EnergyBall energyBall = energyBalls.get(i);
+                    // If energy balls are spawned, for each energy ball, grow the energy ball
+                    // until the energy ball width equals the beam width.  After the ball width equals
+                    // the beam width it is charged.
+                    // After the ball is charged, the animation for a charged energy ball turning into a beam
+                    // will begin.  The animation last 12 frames, so after all 12 frames are complete, the
+                    // energy ball has officially turned into an energy beam and an energy beam object can be spawned
+                    for (int i = 0, n = ufo.energyBalls.size; i < n ; i ++){
+                        EnergyBall energyBall = ufo.energyBalls.get(i);
                         Boolean energyBeamIsSpawned = energyBall.getEnergyBeamIsSpawned();
                         if (energyBall != null) {
                             if (energyBall.getWidth() >= ENERGY_BEAM_WIDTH) {
@@ -321,7 +318,7 @@ public class UFOs {
                                 if (energyBall.getFrameNumber() > 12f && !energyBeamIsSpawned) {
                                     energyBall.setAnimationIsComplete(true);
                                     energyBall.setEnergyBeamIsSpawned(true);
-                                    spawnEnergyBeam(ufo, ufoData);
+                                    spawnEnergyBeam(ufo);
                                 }
                             } else {
                                 energyBall.increaseWidth(0.2f);
@@ -330,7 +327,7 @@ public class UFOs {
                         }
                     }
                 }
-            }
+
         }
 
         //REMOVE OFF SCREEN UFOs
@@ -451,7 +448,7 @@ public class UFOs {
 
     }
 
-    public void spawnEnergyBall(BodyData ufoData, float direction) {
+    public void spawnEnergyBall(UFO ufo) {
 
         //Spawn a UFO energy ball
         //The energy ball is what spawns next to the UFO before the energy beam is launched
@@ -462,38 +459,37 @@ public class UFOs {
         //If the direction is ALL, spawn four balls in all directions
         //Otherwise, spawn the ball in chosen direction
 
-        if (direction == ENERGY_BEAM_RANDOM){
+        if (ufo.direction == ENERGY_BEAM_RANDOM){
             float randomEnergyBeamDirection = MathUtils.random(0, 3);
-            ufoData.setEnergyBall(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, randomEnergyBeamDirection));
-            ufoData.setUfoEnergyBallIsSpawned(true);
-        } else if (direction == ENERGY_BEAM_ALL_DIRECTIONS){
-            ufoData.setEnergyBall(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_LEFT));
-            ufoData.setEnergyBall(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_UP));
-            ufoData.setEnergyBall(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_RIGHT));
-            ufoData.setEnergyBall(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_DOWN));
-            ufoData.setUfoEnergyBallIsSpawned(true);
-        } else if (direction == ENERGY_BEAM_HORIZONAL_DIRECTIONS){
-            ufoData.setEnergyBall(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_LEFT));
-            ufoData.setEnergyBall(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_RIGHT));
-            ufoData.setUfoEnergyBallIsSpawned(true);
-        } else if (direction == ENERGY_BEAM_VERTICAL_DIRECTIONS){
-            ufoData.setEnergyBall(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_UP));
-            ufoData.setEnergyBall(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_DOWN));
-            ufoData.setUfoEnergyBallIsSpawned(true);
+            ufo.energyBalls.add(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, randomEnergyBeamDirection));
+            ufo.energyBallIsSpawned = true;
+        } else if (ufo.direction == ENERGY_BEAM_ALL_DIRECTIONS){
+            ufo.energyBalls.add(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_LEFT));
+            ufo.energyBalls.add(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_UP));
+            ufo.energyBalls.add(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_RIGHT));
+            ufo.energyBalls.add(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_DOWN));
+            ufo.energyBallIsSpawned = true;
+        } else if (ufo.direction == ENERGY_BEAM_HORIZONAL_DIRECTIONS){
+            ufo.energyBalls.add(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_LEFT));
+            ufo.energyBalls.add(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_RIGHT));
+            ufo.energyBallIsSpawned = true;
+        } else if (ufo.direction == ENERGY_BEAM_VERTICAL_DIRECTIONS){
+            ufo.energyBalls.add(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_UP));
+            ufo.energyBalls.add(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_DOWN));
+            ufo.energyBallIsSpawned = true;
         } else {
-            ufoData.setEnergyBall(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, direction));
-            ufoData.setUfoEnergyBallIsSpawned(true);
+            ufo.energyBalls.add(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ufo.direction));
+            ufo.energyBallIsSpawned = true;
         }
 
 
     }
 
-    private void spawnEnergyBeam(UFO ufo, BodyData ufoData) {
+    private void spawnEnergyBeam(UFO ufo) {
 
         // For all  energy balls associated with the UFO, spawn energy beams
 
-        Array<EnergyBall> energyBalls = ufoData.getEnergyBalls();
-        for (EnergyBall energyBall : energyBalls){
+        for (EnergyBall energyBall : ufo.energyBalls){
 
             //get the direction of the beam from the direction of the energy ball attached to the UFO
             float energyBeamDirection = energyBall.getDirection();

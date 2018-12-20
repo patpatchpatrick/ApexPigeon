@@ -7,6 +7,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
@@ -20,6 +21,9 @@ public class UFO extends Dodgeable {
     public final float HEIGHT = WIDTH;
     private final float FORCE_X = -9.0f;
     public float direction = 0f;
+    public boolean energyBallIsSpawned = false;
+    public long spawnTime;
+    public Array<EnergyBall> energyBalls = new Array<EnergyBall>();
 
     public UFO(World gameWorld, AlphaPigeon game, OrthographicCamera camera) {
         super(gameWorld, game, camera);
@@ -55,11 +59,8 @@ public class UFO extends Dodgeable {
         this.alive = true;
 
         //keep track of time the ufo was spawned
-        long lastUfoSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        spawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
 
-        BodyData ufoBodyData = new BodyData(false);
-        ufoBodyData.setSpawnTime(lastUfoSpawnTime);
-        dodgeableBody.setUserData(ufoBodyData);
 
     }
 
@@ -74,11 +75,8 @@ public class UFO extends Dodgeable {
         this.alive = true;
 
         //keep track of time the ufo was spawned
-        long lastUfoSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        spawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
 
-        BodyData ufoBodyData = new BodyData(false);
-        ufoBodyData.setSpawnTime(lastUfoSpawnTime);
-        dodgeableBody.setUserData(ufoBodyData);
 
     }
 
