@@ -23,6 +23,7 @@ public abstract class Level {
 
     //LEVEL TIMES in milliseconds
     protected final float LEVEL_ONE_START_TIME = 0f;
+    //L1W1 is only level 1 birds,  L1W2 is level 1 and 2 birds
     protected final float LEVEL_ONE_WAVE_1 = 20000f;
     protected final float LEVEL_ONE_END_TIME = 40000f;
     protected final float LEVEL_TWO_START_TIME = LEVEL_ONE_END_TIME;

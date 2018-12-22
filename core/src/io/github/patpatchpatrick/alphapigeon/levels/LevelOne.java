@@ -28,9 +28,9 @@ public class LevelOne extends Level {
             if (currentTimeInMillis - powerUps.getLastpowerUpShieldSpawnTime() > powerUpShieldInterval) {
                 powerUps.spawnPowerUpShield();
             }
-            if (currentTimeInMillis - ufos.getLastUfoSpawnTime() > 10000) {
-                //Spawn a ufo that shoots an energy beam in a random direction
-                ufos.spawnUfo(ufos.ENERGY_BEAM_RANDOM);
+            if (currentTimeInMillis - ufos.getLastUfoSpawnTime() > 20000) {
+                //Spawn a ufo that shoots an energy beam in all directions and stops in center for 10 seconds
+                ufos.spawnStopInCenterUfo(ufos.ENERGY_BEAM_ALL_DIRECTIONS, 10);
             }
 
         } else if (totalGameTime >= LEVEL_ONE_WAVE_1 && totalGameTime < LEVEL_ONE_END_TIME) {

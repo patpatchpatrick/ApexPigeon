@@ -18,13 +18,14 @@ public class LevelThree extends Level {
     private float powerUpShieldInterval;
 
     //RANDOM WAVE VARIABLES
-    // Level Two consists of "EASY" waves of dodgeables that occur randomly
+    // Level Three consists of "MEDIUM" difficulty waves of dodgeables that occur randomly
     //The randomWaveIsInitiated boolean is used to track whether or not a random wave is in progress
     private boolean randomWaveIsInitiated = false;
     private long lastRandomWaveStartTime = 0;
     private float randomWave = 0f;
     private final int TOTAL_NUMBER_OF_WAVES = 2;
     private final float RANDOM_WAVE_UFO_IN_MIDDLE = 0f;
+    private final float RANDOM_WAVE_METEORS = 1f;
 
     public LevelThree(Dodgeables dodgeables) {
         super(dodgeables);
@@ -45,6 +46,8 @@ public class LevelThree extends Level {
             randomWaveIsInitiated = true;
         } else if (randomWave == RANDOM_WAVE_UFO_IN_MIDDLE) {
             //runRandomWaveUFO();
+        } else if (randomWave == RANDOM_WAVE_METEORS){
+
         }
 
     }

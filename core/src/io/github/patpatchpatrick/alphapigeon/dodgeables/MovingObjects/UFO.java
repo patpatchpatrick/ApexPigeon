@@ -19,9 +19,15 @@ public class UFO extends Dodgeable {
 
     public final float WIDTH = 15f;
     public final float HEIGHT = WIDTH;
-    private final float FORCE_X = -9.0f;
+    public final float FORCE_X = -9.0f;
     public float direction = 0f;
     public boolean energyBallIsSpawned = false;
+
+    // Variables controlling how long ufo should stop in center of screen
+    public boolean stopInCenterOfScreen = false;
+    public long timeToHoldInCenter = 0;
+
+
     public long spawnTime;
     public Array<EnergyBall> energyBalls = new Array<EnergyBall>();
 
@@ -33,7 +39,7 @@ public class UFO extends Dodgeable {
         ufoBodyDef.type = BodyDef.BodyType.DynamicBody;
 
         //spawn ufo at random height
-        ufoBodyDef.position.set(-100,-100);
+        ufoBodyDef.position.set(-100, -100);
         dodgeableBody = gameWorld.createBody(ufoBodyDef);
         BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("json/Ufo.json"));
         FixtureDef ufoFixtureDef = new FixtureDef();
@@ -62,24 +68,52 @@ public class UFO extends Dodgeable {
         spawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
 
 
-
     }
 
-    public void initHorizontal(float direction){
+    public void initHorizontal(float direction) {
 
         //Set the direction which the energy beams associated with the UFO should fire
         this.direction = direction;
 
         dodgeableBody.setActive(true);
-        dodgeableBody.setTransform(camera.viewportWidth, ( camera.viewportHeight - HEIGHT)/2, dodgeableBody.getAngle());
+        dodgeableBody.setTransform(camera.viewportWidth, (camera.viewportHeight - HEIGHT) / 2, dodgeableBody.getAngle());
         dodgeableBody.applyForceToCenter(FORCE_X, 0, true);
         this.alive = true;
 
         //keep track of time the ufo was spawned
         spawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
 
+    }
 
+    public void initStopInCenter(float direction, long timeToHoldInCenter) {
+
+        //This version of the UFO will stop in the center of the screen for a specified period of time
+
+        //Set the direction which the energy beams associated with the UFO should fire
+        this.direction = direction;
+
+        dodgeableBody.setActive(true);
+        dodgeableBody.setTransform(camera.viewportWidth, (camera.viewportHeight - HEIGHT) / 2, dodgeableBody.getAngle());
+        dodgeableBody.applyForceToCenter(FORCE_X, 0, true);
+        this.alive = true;
+
+        //keep track of time the ufo was spawned
+        spawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+
+        this.stopInCenterOfScreen = true;
+        this.timeToHoldInCenter = timeToHoldInCenter;
+
+    }
+
+    @Override
+    public void checkIfCanBeUnheld() {
+        super.checkIfCanBeUnheld();
+
+        long currentTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        if (this.timeHoldWillBeReleased <= currentTime){
+            this.stopInCenterOfScreen = false;
         }
+    }
 
     @Override
     public void reset() {
@@ -89,6 +123,8 @@ public class UFO extends Dodgeable {
         this.energyBallIsSpawned = false;
         this.energyBalls.clear();
         this.spawnTime = 0;
+        this.stopInCenterOfScreen = false;
+        this.timeToHoldInCenter = 0;
 
     }
 }

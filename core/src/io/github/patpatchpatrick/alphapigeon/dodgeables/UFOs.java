@@ -299,7 +299,7 @@ public class UFOs {
                 if (!ufo.energyBallIsSpawned) {
                     if (currentTimeInMillis - ufo.spawnTime > 5000) {
                             //Spawn an energy ball after a set amount of time if it is not spawned
-                            spawnEnergyBall(ufo);
+                            spawnEnergyBalls(ufo);
                     }
                 } else {
                     // If energy balls are spawned, for each energy ball, grow the energy ball
@@ -318,7 +318,8 @@ public class UFOs {
                                 if (energyBall.getFrameNumber() > 12f && !energyBeamIsSpawned) {
                                     energyBall.setAnimationIsComplete(true);
                                     energyBall.setEnergyBeamIsSpawned(true);
-                                    spawnEnergyBeam(ufo);
+                                    //Spawn the energy beam associated with the energy ball
+                                    spawnEnergyBeam(ufo, energyBall);
                                 }
                             } else {
                                 energyBall.increaseWidth(0.2f);
@@ -326,6 +327,17 @@ public class UFOs {
                             }
                         }
                     }
+                }
+
+                if (ufo.stopInCenterOfScreen && !ufo.isHeld && ufo.getPosition().x < camera.viewportWidth/2 - ufo.WIDTH/2 ){
+                    //If ufo is set to stop in center of the screen and the x position is equal to center of screen,
+                    //hold the UFO
+                    ufo.holdPosition(ufo.timeToHoldInCenter, ufo.FORCE_X, 0);
+                }
+
+                if (ufo.isHeld){
+
+                    ufo.checkIfCanBeUnheld();
                 }
 
         }
@@ -338,8 +350,13 @@ public class UFOs {
             }
         }
 
-        //REMOVE ENERGY BEAMS ATTACHED TO UFOs that aren't alive
+
+        //UPDATE ENERGY BEAMS ATTACHED TO UFOs
+        //Ensure energy beam velocities match ufo velocities
+        //Remove energy beams that are off screen
         for (UfoEnergyBeamLeft ufoEnergyBeamLeft : activeEnergyBeamLefts){
+            //Make the energy beam velocity match the UFO velocity
+            ufoEnergyBeamLeft.dodgeableBody.setLinearVelocity(ufoEnergyBeamLeft.ufo.dodgeableBody.getLinearVelocity());
             Boolean removeBeamFromPool = false;
             BodyData ufoData = (BodyData) ufoEnergyBeamLeft.dodgeableBody.getUserData();
             if (ufoData != null){
@@ -357,8 +374,12 @@ public class UFOs {
             }
         }
 
-        //REMOVE ENERGY BEAMS ATTACHED TO UFOs that aren't alive
+        //UPDATE ENERGY BEAMS ATTACHED TO UFOs
+        //Ensure energy beam velocities match ufo velocities
+        //Remove energy beams that are off screen
         for (UfoEnergyBeamRight ufoEnergyBeamRight : activeEnergyBeamRights){
+            //Make the energy beam velocity match the UFO velocity
+            ufoEnergyBeamRight.dodgeableBody.setLinearVelocity(ufoEnergyBeamRight.ufo.dodgeableBody.getLinearVelocity());
             Boolean removeBeamFromPool = false;
             BodyData ufoData = (BodyData) ufoEnergyBeamRight.dodgeableBody.getUserData();
             if (ufoData != null){
@@ -376,8 +397,12 @@ public class UFOs {
             }
         }
 
-        //REMOVE ENERGY BEAMS ATTACHED TO UFOs that aren't alive
+        //UPDATE ENERGY BEAMS ATTACHED TO UFOs
+        //Ensure energy beam velocities match ufo velocities
+        //Remove energy beams that are off screen
         for (UfoEnergyBeamDown ufoEnergyBeamDown : activeEnergyBeamDowns){
+            //Make the energy beam velocity match the UFO velocity
+            ufoEnergyBeamDown.dodgeableBody.setLinearVelocity(ufoEnergyBeamDown.ufo.dodgeableBody.getLinearVelocity());
             Boolean removeBeamFromPool = false;
             BodyData ufoData = (BodyData) ufoEnergyBeamDown.dodgeableBody.getUserData();
             if (ufoData != null){
@@ -395,8 +420,12 @@ public class UFOs {
             }
         }
 
-        //REMOVE ENERGY BEAMS ATTACHED TO UFOs that aren't alive
+        //UPDATE ENERGY BEAMS ATTACHED TO UFOs
+        //Ensure energy beam velocities match ufo velocities
+        //Remove energy beams that are off screen
         for (UfoEnergyBeamUp ufoEnergyBeamUp : activeEnergyBeamUps){
+            //Make the energy beam velocity match the UFO velocity
+            ufoEnergyBeamUp.dodgeableBody.setLinearVelocity(ufoEnergyBeamUp.ufo.dodgeableBody.getLinearVelocity());
             Boolean removeBeamFromPool = false;
             BodyData ufoData = (BodyData) ufoEnergyBeamUp.dodgeableBody.getUserData();
             if (ufoData != null){
@@ -444,11 +473,25 @@ public class UFOs {
         //keep track of time the ufo was spawned
         lastUfoSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
 
+    }
 
+    public void spawnStopInCenterUfo(float direction, long timeToHoldInCenter){
+
+
+        // Spawn(obtain) a new UFO from the UFO pool and add to list of active UFOs
+        // StopInCenter Ufos stop in the center of the screen for a certain amount of time
+
+        UFO ufo = ufoPool.obtain();
+        ufo.initStopInCenter(direction, timeToHoldInCenter);
+        activeUFOs.add(ufo);
+
+
+        //keep track of time the ufo was spawned
+        lastUfoSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
 
     }
 
-    public void spawnEnergyBall(UFO ufo) {
+    public void spawnEnergyBalls(UFO ufo) {
 
         //Spawn a UFO energy ball
         //The energy ball is what spawns next to the UFO before the energy beam is launched
@@ -457,6 +500,7 @@ public class UFOs {
 
         //If the direction is RANDOM, spawn the ball in a random direction
         //If the direction is ALL, spawn four balls in all directions
+        //If the direction is HORIZONTAL or VERTICAL,  spawn two balls to make a line in that direction
         //Otherwise, spawn the ball in chosen direction
 
         if (ufo.direction == ENERGY_BEAM_RANDOM){
@@ -485,11 +529,9 @@ public class UFOs {
 
     }
 
-    private void spawnEnergyBeam(UFO ufo) {
+    private void spawnEnergyBeam(UFO ufo, EnergyBall energyBall) {
 
-        // For all  energy balls associated with the UFO, spawn energy beams
-
-        for (EnergyBall energyBall : ufo.energyBalls){
+        // Spawn energy beam associated with the energy ball
 
             //get the direction of the beam from the direction of the energy ball attached to the UFO
             float energyBeamDirection = energyBall.getDirection();
@@ -530,7 +572,7 @@ public class UFOs {
             }
 
 
-        }
+
 
 
     }

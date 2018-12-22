@@ -46,8 +46,8 @@ public class ScrollingBackground {
 
     public void render(SpriteBatch batch) {
         //Render
-        batch.draw(backgroundImage, x1, 0, backgroundImage.getWidth()/imageScale, Gdx.graphics.getHeight()/10);
-        batch.draw(backgroundImage, x2, 0, backgroundImage.getWidth()/imageScale, Gdx.graphics.getHeight()/10 );
+        //batch.draw(backgroundImage, x1, 0, backgroundImage.getWidth()/imageScale, Gdx.graphics.getHeight()/10);
+        //batch.draw(backgroundImage, x2, 0, backgroundImage.getWidth()/imageScale, Gdx.graphics.getHeight()/10 );
     }
 
     public void resize (int width, int height){

@@ -20,6 +20,9 @@ public class UfoEnergyBeamRight extends Dodgeable {
     private final float UFO_WIDTH = 15f;
     private final float UFO_HEIGHT = UFO_WIDTH;
 
+    //UFO associated with beam
+    public UFO ufo;
+
     public UfoEnergyBeamRight(World gameWorld, AlphaPigeon game, OrthographicCamera camera) {
         super(gameWorld, game, camera);
 
@@ -66,6 +69,8 @@ public class UfoEnergyBeamRight extends Dodgeable {
         energyBeamData.setUfo(ufo);
         energyBeamData.setEnergyBeamDirection(energyBeamDirection);
         dodgeableBody.setUserData(energyBeamData);
+
+        this.ufo = ufo;
 
     }
 
