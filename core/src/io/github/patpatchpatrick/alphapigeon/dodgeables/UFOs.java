@@ -344,7 +344,7 @@ public class UFOs {
 
         //REMOVE OFF SCREEN UFOs
         for (UFO ufo : activeUFOs){
-            if (ufo.getPosition().x < 0 - ufo.WIDTH){
+            if (ufo.getPosition().x < 0 - ufo.WIDTH || ufo.getPosition().y < 0 - ufo.HEIGHT){
                 activeUFOs.removeValue(ufo, false);
                 ufoPool.free(ufo);
             }
@@ -475,6 +475,20 @@ public class UFOs {
 
     }
 
+    public void spawnVerticalUfo(float direction){
+        // Spawn(obtain) a new UFO from the UFO pool and add to list of active UFOs
+        // Vertical Ufos start in the top of the screen in the horizontal middle and move slowly
+        // towards the bottom of the screen vertically
+
+        UFO ufo = ufoPool.obtain();
+        ufo.initVertical(direction);
+        activeUFOs.add(ufo);
+
+
+        //keep track of time the ufo was spawned
+        lastUfoSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+    }
+
     public void spawnStopInCenterUfo(float direction, long timeToHoldInCenter){
 
 
@@ -543,6 +557,7 @@ public class UFOs {
                 UfoEnergyBeamLeft ufoEnergyBeamLeft = ufoEnergyBeamLeftPool.obtain();
                 ufoEnergyBeamLeft.init(ufo, energyBeamDirection);
                 activeEnergyBeamLefts.add(ufoEnergyBeamLeft);
+                ufo.energyBeams.add(ufoEnergyBeamLeft);
 
 
             } else if (energyBeamDirection == ENERGY_BEAM_RIGHT) {
@@ -552,6 +567,7 @@ public class UFOs {
                 UfoEnergyBeamRight ufoEnergyBeamRight = ufoEnergyBeamRightPool.obtain();
                 ufoEnergyBeamRight.init(ufo, energyBeamDirection);
                 activeEnergyBeamRights.add(ufoEnergyBeamRight);
+                ufo.energyBeams.add(ufoEnergyBeamRight);
 
             } else if (energyBeamDirection == ENERGY_BEAM_DOWN) {
 
@@ -560,6 +576,7 @@ public class UFOs {
                 UfoEnergyBeamDown ufoEnergyBeamDown = ufoEnergyBeamDownPool.obtain();
                 ufoEnergyBeamDown.init(ufo, energyBeamDirection);
                 activeEnergyBeamDowns.add(ufoEnergyBeamDown);
+                ufo.energyBeams.add(ufoEnergyBeamDown);
 
             } else if (energyBeamDirection == ENERGY_BEAM_UP) {
 
@@ -568,6 +585,7 @@ public class UFOs {
                 UfoEnergyBeamUp ufoEnergyBeamUp = ufoEnergyBeamUpPool.obtain();
                 ufoEnergyBeamUp.init(ufo, energyBeamDirection);
                 activeEnergyBeamUps.add(ufoEnergyBeamUp);
+                ufo.energyBeams.add(ufoEnergyBeamUp);
 
             }
 

@@ -20,6 +20,7 @@ public class UFO extends Dodgeable {
     public final float WIDTH = 15f;
     public final float HEIGHT = WIDTH;
     public final float FORCE_X = -9.0f;
+    public final float FORCE_Y = -5.0f;
     public float direction = 0f;
     public boolean energyBallIsSpawned = false;
 
@@ -29,7 +30,10 @@ public class UFO extends Dodgeable {
 
 
     public long spawnTime;
+    //Energy balls associated with UFO
     public Array<EnergyBall> energyBalls = new Array<EnergyBall>();
+    //Energy beams associated with UFO
+    public Array<Dodgeable> energyBeams = new Array<Dodgeable>();
 
     public UFO(World gameWorld, AlphaPigeon game, OrthographicCamera camera) {
         super(gameWorld, game, camera);
@@ -85,6 +89,20 @@ public class UFO extends Dodgeable {
 
     }
 
+    public void initVertical(float direction){
+        //Set the direction which the energy beams associated with the UFO should fire
+        this.direction = direction;
+
+        dodgeableBody.setActive(true);
+        dodgeableBody.setTransform(camera.viewportWidth/2 - WIDTH/2, camera.viewportHeight, dodgeableBody.getAngle());
+        dodgeableBody.applyForceToCenter(0, FORCE_Y, true);
+        this.alive = true;
+
+        //keep track of time the ufo was spawned
+        spawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+
+    }
+
     public void initStopInCenter(float direction, long timeToHoldInCenter) {
 
         //This version of the UFO will stop in the center of the screen for a specified period of time
@@ -112,6 +130,10 @@ public class UFO extends Dodgeable {
         long currentTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
         if (this.timeHoldWillBeReleased <= currentTime){
             this.stopInCenterOfScreen = false;
+            //Kill all energy beams when UFO is unheld
+            for(Dodgeable energyBeam : this.energyBeams){
+                energyBeam.alive = false;
+            }
         }
     }
 
@@ -122,6 +144,7 @@ public class UFO extends Dodgeable {
         //Clear all values set on previous UFOs
         this.energyBallIsSpawned = false;
         this.energyBalls.clear();
+        this.energyBeams.clear();
         this.spawnTime = 0;
         this.stopInCenterOfScreen = false;
         this.timeToHoldInCenter = 0;
