@@ -23,9 +23,13 @@ public class LevelThree extends Level {
     private boolean randomWaveIsInitiated = false;
     private long lastRandomWaveStartTime = 0;
     private float randomWave = 0f;
-    private final int TOTAL_NUMBER_OF_WAVES = 2;
-    private final float RANDOM_WAVE_UFO_IN_MIDDLE = 0f;
+    private final int TOTAL_NUMBER_OF_WAVES = 1;
+    private final float RANDOM_WAVE_UFO_HORIZONTAL = 0f;
+    private final float RANDOM_WAVE_UFO_HORIZ_SPAWN_DURATION = 10000f;
+    private final float RANDOM_WAVE_UFO_HORIZ_TOTAL_TIME = 10000f;
     private final float RANDOM_WAVE_METEORS = 1f;
+    private final float RANDOM_WAVE_L1BIRD_SPAWN_DURATION = 2000;
+    private final float RANDOM_WAVE_L2BIRD_SPAWN_DURATION = 2000;
 
     public LevelThree(Dodgeables dodgeables) {
         super(dodgeables);
@@ -44,10 +48,32 @@ public class LevelThree extends Level {
             //Save the time the last random wave was started
             lastRandomWaveStartTime = currentTimeInMillis;
             randomWaveIsInitiated = true;
-        } else if (randomWave == RANDOM_WAVE_UFO_IN_MIDDLE) {
-            //runRandomWaveUFO();
+        } else if (randomWave == RANDOM_WAVE_UFO_HORIZONTAL) {
+            runRandomWaveHorizontalUFO();
         } else if (randomWave == RANDOM_WAVE_METEORS){
+            runRandomWaveHorizontalUFO();
+        }
 
+    }
+
+    private void runRandomWaveHorizontalUFO() {
+
+        if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() > RANDOM_WAVE_L1BIRD_SPAWN_DURATION) {
+            birds.spawnLevelOneBird(totalGameTime);
+        }
+        if (currentTimeInMillis - birds.getLastLevelTwoBirdSpawnTime() > RANDOM_WAVE_L2BIRD_SPAWN_DURATION) {
+            birds.spawnLevelTwoBird(totalGameTime);
+        }
+
+        if (currentTimeInMillis - ufos.getLastUfoSpawnTime() > RANDOM_WAVE_UFO_HORIZ_SPAWN_DURATION) {
+
+            //Spawn a UFO that travels horizontally from right to left and shoots a straight horizontal
+            //line of energy beams (i.e. a left and right beam)
+            ufos.spawnHorizontalUfo(ufos.ENERGY_BEAM_HORIZONAL_DIRECTIONS);
+        }
+
+        if (currentTimeInMillis - lastRandomWaveStartTime > RANDOM_WAVE_UFO_HORIZ_TOTAL_TIME) {
+            randomWaveIsInitiated = false;
         }
 
     }
