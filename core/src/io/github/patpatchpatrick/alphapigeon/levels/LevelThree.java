@@ -72,7 +72,10 @@ public class LevelThree extends Level {
             //Spawn a UFO that stops in center and shoots beams in all directions for a specified
             //amount of time
             ufos.spawnStopInCenterUfo(ufos.ENERGY_BEAM_ALL_DIRECTIONS, 5);
+            //Spawn a teleport that can be used to dodge the center UFO
+            teleports.spawnTeleports();
         }
+
 
         checkIfRandomWaveIsComplete(RANDOM_WAVE_UFO_CENTER_TOTAL_TIME);
 

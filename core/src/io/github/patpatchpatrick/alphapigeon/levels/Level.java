@@ -39,12 +39,16 @@ public abstract class Level {
     //Start time should be 0f and end time should be 40000f
     protected final float LEVEL_ONE_WAVE_1 = 20000f;
     protected final float LEVEL_ONE_END_TIME = 2000f;
-    //L2 is "medium" difficulty
+    //L2 is "easy" difficulty
     //End time should be 120000f
     protected final float LEVEL_TWO_START_TIME = LEVEL_ONE_END_TIME;
     protected final float LEVEL_TWO_END_TIME = 4000f;
-    //L3 is "hard" difficulty
+    //L3 is "medium" difficulty
     protected final float LEVEL_THREE_START_TIME = LEVEL_TWO_END_TIME;
+    protected final float LEVEL_THREE_END_TIME = 6000f;
+    //L4 is "hard" difficulty
+    protected final float LEVEL_FOUR_START_TIME = LEVEL_THREE_END_TIME;
+    protected final float LEVEL_FOUR_END_TIME = 8000f;
 
     public Level(Dodgeables dodgeables){
 

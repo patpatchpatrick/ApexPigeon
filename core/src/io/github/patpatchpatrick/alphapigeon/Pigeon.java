@@ -87,30 +87,36 @@ public class Pigeon {
         //Get the teleport data from the teleport fixture that contacted the pigeon
         final Body teleport = teleportFixture.getBody();
         BodyData teleportData = (BodyData) teleport.getUserData();
-        final Teleport oppositeTeleport = teleportData.getOppositeTeleport();
+        if (teleportData != null){
+            final Teleport oppositeTeleport = teleportData.getOppositeTeleport();
+            if (oppositeTeleport != null){
 
-        final float positionX = oppositeTeleport.getPosition().x;
-        final float positionY = oppositeTeleport.getPosition().y;
-        final float angle = oppositeTeleport.getAngle();
+                final float positionX = oppositeTeleport.getPosition().x;
+                final float positionY = oppositeTeleport.getPosition().y;
+                final float angle = oppositeTeleport.getAngle();
 
-        final BodyData deleteObjectOne = new BodyData(true);
-        final BodyData deleteObjectTwo = new BodyData(true);
+                final BodyData deleteObjectOne = new BodyData(true);
+                final BodyData deleteObjectTwo = new BodyData(true);
 
+                //Move the pigeon to the opposite teleport's location and then destroy both teleports
+                //This must be done using Runnable app.postRunnable so it occurs in the rendering thread which is currently locked
+                //while the world is still stepping
+                //Everything in the postRunnable Runnable is called on the render thread before the game render method is called
 
-        //Move the pigeon to the opposite teleport's location and then destroy both teleports
-        //This must be done using Runnable app.postRunnable so it occurs in the rendering thread which is currently locked
-        //while the world is still stepping
-        //Everything in the postRunnable Runnable is called on the render thread before the game render method is called
+                Gdx.app.postRunnable(new Runnable() {
 
-        Gdx.app.postRunnable(new Runnable() {
-
-            @Override
-            public void run () {
-                pigeonBody.setTransform(positionX, positionY, angle);
-                oppositeTeleport.dodgeableBody.setUserData(deleteObjectOne);
-                teleport.setUserData(deleteObjectTwo);
+                    @Override
+                    public void run () {
+                        pigeonBody.setTransform(positionX, positionY, angle);
+                        oppositeTeleport.dodgeableBody.setUserData(deleteObjectOne);
+                        teleport.setUserData(deleteObjectTwo);
+                    }
+                });
             }
-        });
+
+
+        }
+
 
 
 

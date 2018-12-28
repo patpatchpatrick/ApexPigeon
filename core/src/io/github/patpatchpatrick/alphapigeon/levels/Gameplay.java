@@ -20,6 +20,7 @@ public class Gameplay extends Level {
     private LevelOne levelOne;
     private LevelTwo levelTwo;
     private LevelThree levelThree;
+    private LevelFour levelFour;
 
     //GAME TIMES
     private float startTime = 0f;
@@ -34,6 +35,7 @@ public class Gameplay extends Level {
         levelOne = new LevelOne(dodgeables);
         levelTwo = new LevelTwo(dodgeables);
         levelThree = new LevelThree(dodgeables);
+        levelFour = new LevelFour(dodgeables);
 
         startTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
 
@@ -74,10 +76,12 @@ public class Gameplay extends Level {
 
             levelTwo.run(totalGameTime, currentTimeInMillis, powerUpShieldInterval);
 
-        } else if (totalGameTime > LEVEL_THREE_START_TIME){
+        } else if (totalGameTime > LEVEL_THREE_START_TIME & totalGameTime <= LEVEL_THREE_END_TIME){
 
             levelThree.run(totalGameTime,  currentTimeInMillis, powerUpShieldInterval);
 
+        } else if (totalGameTime > LEVEL_FOUR_START_TIME){
+            levelFour.run(totalGameTime, currentTimeInMillis, powerUpShieldInterval);
         }
 
 
