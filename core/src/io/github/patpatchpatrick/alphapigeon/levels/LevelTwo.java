@@ -71,7 +71,7 @@ public class LevelTwo extends Level {
         spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
 
         if (currentTimeInMillis - alienMissiles.getLastAlienMissileSpawnTime() > RANDOM_WAVE_ALIEN_MISSILE_SPAWN_DURATION) {
-            alienMissiles.spawnAlienMissile();
+            alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_LEFTWARD);
         }
 
         checkIfRandomWaveIsComplete(RANDOM_WAVE_ALIEN_MISSILE_TOTAL_TIME);

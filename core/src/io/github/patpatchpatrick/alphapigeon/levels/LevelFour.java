@@ -13,11 +13,14 @@ public class LevelFour extends Level {
     // that are randomly selected
 
     //RANDOM WAVE VARIABLES
-    private final int TOTAL_NUMBER_OF_WAVES = 1;
+    private final int TOTAL_NUMBER_OF_WAVES = 2;
     private final float RANDOM_WAVE_TELEPORT_MADNESS = 1f;
     private final float RANDOM_WAVE_TELEPORT_MADNESS_L1BIRD_DURATION = 500f;
     private final float RANDOM_WAVE_TELEPORT_SPAWN_DURATION = 3000f;
     private final float RANDOM_WAVE_TELEPORT_MADNESS_TOTAL_TIME = 15000f;
+    private final float RANDOM_WAVE_ALIEN_MISSILE_MADNESS = 2f;
+    private final float RANDOM_WAVE_ALIEN_MISSILE_SPAWN_DURATION = 5000f;
+    private final float RANDOM_WAVE_ALIEN_MISSILE_MADNESS_TOTAL_TIME = 15000f;
 
 
     public LevelFour(Dodgeables dodgeables){
@@ -39,6 +42,8 @@ public class LevelFour extends Level {
             randomWaveIsInitiated = true;
         } else if (randomWave == RANDOM_WAVE_TELEPORT_MADNESS) {
             runRandomWaveTeleportMadness();
+        } else if (randomWave == RANDOM_WAVE_ALIEN_MISSILE_MADNESS){
+            runRandomWaveAlienMissileMadness();
         }
 
     }
@@ -53,6 +58,21 @@ public class LevelFour extends Level {
         }
 
         checkIfRandomWaveIsComplete(RANDOM_WAVE_TELEPORT_MADNESS_TOTAL_TIME);
+
+    }
+
+    private void runRandomWaveAlienMissileMadness(){
+
+        // Spawn loads of alien missiles
+        if (currentTimeInMillis - alienMissiles.getLastAlienMissileSpawnTime() > RANDOM_WAVE_ALIEN_MISSILE_SPAWN_DURATION) {
+            alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_LEFTWARD);
+            alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_UPWARD);
+            alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_RIGHTWARD);
+            alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_DOWNWARD);
+        }
+
+        checkIfRandomWaveIsComplete(RANDOM_WAVE_ALIEN_MISSILE_MADNESS_TOTAL_TIME);
+
 
     }
 

@@ -38,8 +38,10 @@ public class AlienMissiles {
     private Animation<TextureRegion> alienMissileAnimation;
     private Texture alienMissileSheet;
     private long lastAlienMissileSpawnTime;
-    private final float ALIEN_MISSILE_WIDTH = 10f;
-    private final float ALIEN_MISSILE_HEIGHT = 10f;
+    public final float SPAWN_DIRECTION_LEFTWARD = 0f;
+    public final float SPAWN_DIRECTION_UPWARD = 1f;
+    public final float SPAWN_DIRECTION_RIGHTWARD = 2f;
+    public final float SPAWN_DIRECTION_DOWNWARD = 3f;
 
     //Alien Missile Explosion variables
     private final Array<AlienMissileExplosion> activeAlienMissileExplosions = new Array<AlienMissileExplosion>();
@@ -48,8 +50,6 @@ public class AlienMissiles {
     private Animation<TextureRegion> alienMissileExplosionAnimation;
     private Texture alienMissileExplosionSheet;
     private long lastAlienMissileExplosionSpawnTime;
-    private final float ALIEN_MISSILE_EXPLOSION_WIDTH = 20f;
-    private final float ALIEN_MISSILE_EXPLOSION_HEIGHT = 20f;
 
     //Alien Missile Corner variables
     private final Array<AlienMissileCorner> activeAlienMissileCorners = new Array<AlienMissileCorner>();
@@ -225,12 +225,21 @@ public class AlienMissiles {
 
     }
 
-    public void spawnAlienMissile() {
+    public void spawnAlienMissile(float direction) {
 
         // Spawn(obtain) a new alien missile from the alien missile pool and add to list of active alien missiles
+        // Spawn the the missile in the inputted direction
 
         AlienMissile alienMissile = alienMissilePool.obtain();
-        alienMissile.init();
+        if (direction == SPAWN_DIRECTION_UPWARD){
+            alienMissile.initUpward();
+        } else if (direction == SPAWN_DIRECTION_RIGHTWARD){
+            alienMissile.initRightward();
+        } else if (direction == SPAWN_DIRECTION_DOWNWARD){
+            alienMissile.initDownward();
+        } else {
+            alienMissile.initLeftward();
+        }
         activeAlienMissiles.add(alienMissile);
 
         //keep track of time the bird was spawned

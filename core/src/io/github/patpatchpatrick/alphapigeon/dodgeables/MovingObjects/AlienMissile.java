@@ -19,6 +19,7 @@ public class AlienMissile extends Dodgeable {
     public final float WIDTH = 10f;
     public final float HEIGHT = 10f;
     private final float FORCE_X = -40.0f;
+    private final float FORCE_Y = 40.0f;
 
     public AlienMissile(World gameWorld, AlphaPigeon game, OrthographicCamera camera) {
         super(gameWorld, game, camera);
@@ -42,11 +43,53 @@ public class AlienMissile extends Dodgeable {
 
     }
 
-    public void init() {
+    public void initLeftward() {
 
         dodgeableBody.setActive(true);
         dodgeableBody.setTransform(camera.viewportWidth, MathUtils.random(0, camera.viewportHeight - HEIGHT / 2), dodgeableBody.getAngle());
         dodgeableBody.applyForceToCenter(FORCE_X, 0, true);
+        this.alive = true;
+
+        BodyData missileData = new BodyData(false);
+        missileData.setSpawnTime(TimeUtils.nanoTime() / GameVariables.MILLION_SCALE);
+        dodgeableBody.setUserData(missileData);
+
+    }
+
+    public void initRightward(){
+
+        //Initialize an alien missile that moves rightward
+        dodgeableBody.setActive(true);
+        dodgeableBody.setTransform(0 - WIDTH, MathUtils.random(0, camera.viewportHeight - HEIGHT / 2), dodgeableBody.getAngle());
+        dodgeableBody.applyForceToCenter(-FORCE_X, 0, true);
+        this.alive = true;
+
+        BodyData missileData = new BodyData(false);
+        missileData.setSpawnTime(TimeUtils.nanoTime() / GameVariables.MILLION_SCALE);
+        dodgeableBody.setUserData(missileData);
+
+    }
+
+    public void initUpward(){
+
+        //Initialize an alien missile that moves upward
+        dodgeableBody.setActive(true);
+        dodgeableBody.setTransform(MathUtils.random(0, camera.viewportWidth - WIDTH / 2), 0 - HEIGHT, dodgeableBody.getAngle());
+        dodgeableBody.applyForceToCenter(0, FORCE_Y, true);
+        this.alive = true;
+
+        BodyData missileData = new BodyData(false);
+        missileData.setSpawnTime(TimeUtils.nanoTime() / GameVariables.MILLION_SCALE);
+        dodgeableBody.setUserData(missileData);
+
+    }
+
+    public void initDownward(){
+
+        //Initialize an alien missile that moves downward
+        dodgeableBody.setActive(true);
+        dodgeableBody.setTransform(MathUtils.random(0, camera.viewportWidth - WIDTH / 2), camera.viewportHeight + HEIGHT, dodgeableBody.getAngle());
+        dodgeableBody.applyForceToCenter(0, -FORCE_Y, true);
         this.alive = true;
 
         BodyData missileData = new BodyData(false);

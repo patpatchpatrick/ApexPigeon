@@ -107,7 +107,7 @@ public class LevelThree extends Level {
             rockets.spawnRocket();
         }
         if (currentTimeInMillis - alienMissiles.getLastAlienMissileSpawnTime() > RANDOM_WAVE_MISSILES_SPAWN_DURATION) {
-            alienMissiles.spawnAlienMissile();
+            alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_LEFTWARD);
         }
 
         checkIfRandomWaveIsComplete(RANDOM_WAVE_MISSILES_TOTAL_TIME);
