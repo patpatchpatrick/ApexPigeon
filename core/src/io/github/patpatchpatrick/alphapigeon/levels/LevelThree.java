@@ -11,18 +11,8 @@ public class LevelThree extends Level {
     // This level consists of random waves/puzzles of dodgeable creatures
     // that are randomly selected
 
-    // GAME TIMES
-    private float startTime = 0f;
-    private float totalGameTime;
-    private long currentTimeInMillis;
-    private float powerUpShieldInterval;
-
     //RANDOM WAVE VARIABLES
     // Level Three consists of "MEDIUM" difficulty waves of dodgeables that occur randomly
-    //The randomWaveIsInitiated boolean is used to track whether or not a random wave is in progress
-    private boolean randomWaveIsInitiated = false;
-    private long lastRandomWaveStartTime = 0;
-    private float randomWave = 0f;
     private final int TOTAL_NUMBER_OF_WAVES = 5;
     private final float RANDOM_WAVE_UFO_HORIZONTAL = 1f;
     private final float RANDOM_WAVE_UFO_HORIZ_SPAWN_DURATION = 30000f;
@@ -75,12 +65,7 @@ public class LevelThree extends Level {
 
     private void runRandomWaveCenterUFO(){
 
-        if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() > RANDOM_WAVE_L1BIRD_SPAWN_DURATION) {
-            birds.spawnLevelOneBird(totalGameTime);
-        }
-        if (currentTimeInMillis - birds.getLastLevelTwoBirdSpawnTime() > RANDOM_WAVE_L2BIRD_SPAWN_DURATION) {
-            birds.spawnLevelTwoBird(totalGameTime);
-        }
+        spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
 
         if (currentTimeInMillis - ufos.getLastUfoSpawnTime() > RANDOM_WAVE_UFO_CENTER_SPAWN_DURATION) {
 
@@ -89,20 +74,13 @@ public class LevelThree extends Level {
             ufos.spawnStopInCenterUfo(ufos.ENERGY_BEAM_ALL_DIRECTIONS, 5);
         }
 
-        if (currentTimeInMillis - lastRandomWaveStartTime > RANDOM_WAVE_UFO_CENTER_TOTAL_TIME) {
-            randomWaveIsInitiated = false;
-        }
+        checkIfRandomWaveIsComplete(RANDOM_WAVE_UFO_CENTER_TOTAL_TIME);
 
     }
 
     private void runRandomWaveVerticalUFO() {
 
-        if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() > RANDOM_WAVE_L1BIRD_SPAWN_DURATION) {
-            birds.spawnLevelOneBird(totalGameTime);
-        }
-        if (currentTimeInMillis - birds.getLastLevelTwoBirdSpawnTime() > RANDOM_WAVE_L2BIRD_SPAWN_DURATION) {
-            birds.spawnLevelTwoBird(totalGameTime);
-        }
+        spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
 
         if (currentTimeInMillis - ufos.getLastUfoSpawnTime() > RANDOM_WAVE_UFO_VERT_SPAWN_DURATION) {
 
@@ -111,9 +89,7 @@ public class LevelThree extends Level {
             ufos.spawnVerticalUfo(ufos.ENERGY_BEAM_VERTICAL_DIRECTIONS);
         }
 
-        if (currentTimeInMillis - lastRandomWaveStartTime > RANDOM_WAVE_UFO_VERT_TOTAL_TIME) {
-            randomWaveIsInitiated = false;
-        }
+        checkIfRandomWaveIsComplete(RANDOM_WAVE_UFO_VERT_TOTAL_TIME);
 
 
 
@@ -121,52 +97,36 @@ public class LevelThree extends Level {
 
     private void runRandomWaveMissiles() {
         //Spawn both regular rockets and alien missiles
-        if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() > RANDOM_WAVE_L1BIRD_SPAWN_DURATION) {
-            birds.spawnLevelOneBird(totalGameTime);
-        }
-        if (currentTimeInMillis - birds.getLastLevelTwoBirdSpawnTime() > RANDOM_WAVE_L2BIRD_SPAWN_DURATION) {
-            birds.spawnLevelTwoBird(totalGameTime);
-        }
+
+        spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
+
         if (currentTimeInMillis - rockets.getLastRocketSpawnTime() > RANDOM_WAVE_MISSILES_SPAWN_DURATION) {
             rockets.spawnRocket();
         }
         if (currentTimeInMillis - alienMissiles.getLastAlienMissileSpawnTime() > RANDOM_WAVE_MISSILES_SPAWN_DURATION) {
             alienMissiles.spawnAlienMissile();
         }
-        if (currentTimeInMillis - lastRandomWaveStartTime > RANDOM_WAVE_MISSILES_TOTAL_TIME) {
-            randomWaveIsInitiated = false;
-        }
 
+        checkIfRandomWaveIsComplete(RANDOM_WAVE_MISSILES_TOTAL_TIME);
 
     }
 
     private void runRandomWaveMeteors() {
-        if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() > RANDOM_WAVE_L1BIRD_SPAWN_DURATION) {
-            birds.spawnLevelOneBird(totalGameTime);
-        }
-        if (currentTimeInMillis - birds.getLastLevelTwoBirdSpawnTime() > RANDOM_WAVE_L2BIRD_SPAWN_DURATION) {
-            birds.spawnLevelTwoBird(totalGameTime);
-        }
+
+        spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
 
         if (currentTimeInMillis - meteors.getLastMeteorSpawnTime() > RANDOM_WAVE_METEORS_SPAWN_DURATION) {
             //Spawn meteors
             meteors.spawnMeteor();
         }
 
-        if (currentTimeInMillis - lastRandomWaveStartTime > RANDOM_WAVE_METEORS_TOTAL_TIME) {
-            randomWaveIsInitiated = false;
-        }
+        checkIfRandomWaveIsComplete(RANDOM_WAVE_METEORS_TOTAL_TIME);
 
     }
 
     private void runRandomWaveHorizontalUFO() {
 
-        if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() > RANDOM_WAVE_L1BIRD_SPAWN_DURATION) {
-            birds.spawnLevelOneBird(totalGameTime);
-        }
-        if (currentTimeInMillis - birds.getLastLevelTwoBirdSpawnTime() > RANDOM_WAVE_L2BIRD_SPAWN_DURATION) {
-            birds.spawnLevelTwoBird(totalGameTime);
-        }
+        spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
 
         if (currentTimeInMillis - ufos.getLastUfoSpawnTime() > RANDOM_WAVE_UFO_HORIZ_SPAWN_DURATION) {
 
@@ -175,9 +135,8 @@ public class LevelThree extends Level {
             ufos.spawnHorizontalUfo(ufos.ENERGY_BEAM_HORIZONAL_DIRECTIONS);
         }
 
-        if (currentTimeInMillis - lastRandomWaveStartTime > RANDOM_WAVE_UFO_HORIZ_TOTAL_TIME) {
-            randomWaveIsInitiated = false;
-        }
+
+        checkIfRandomWaveIsComplete(RANDOM_WAVE_UFO_HORIZ_TOTAL_TIME);
 
     }
 }

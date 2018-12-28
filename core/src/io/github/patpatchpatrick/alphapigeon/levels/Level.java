@@ -21,6 +21,18 @@ public abstract class Level {
     protected Meteors meteors;
     protected UFOs ufos;
 
+    // RANDOM WAVE VARIABLES
+    // Used to keep track of whether or not a random wave has started, and when
+    protected boolean randomWaveIsInitiated = false;
+    protected long lastRandomWaveStartTime = 0;
+    protected float randomWave = 0f;
+
+    // GAME TIMES
+    protected float startTime = 0f;
+    protected float totalGameTime;
+    protected long currentTimeInMillis;
+    protected float powerUpShieldInterval;
+
     //LEVEL TIMES in milliseconds
     protected final float LEVEL_ONE_START_TIME = 0f;
     //L1W1 is only level 1 birds,  L1W2 is level 1 and 2 birds
@@ -45,6 +57,30 @@ public abstract class Level {
         this.meteors = dodgeables.getMeteors();
         this.ufos = dodgeables.getUfos();
 
+    }
+
+
+    // METHODS USED BY ALL LEVELS:
+
+    protected void spawnBirds(float levelOneBirdSpawnDuration, float levelTwoBirdSpawnDuration){
+        //Method shared by all of the levels
+        //Spawns level one and level two birds based on inputted spawn durations
+
+        if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() > levelOneBirdSpawnDuration) {
+            birds.spawnLevelOneBird(totalGameTime);
+        }
+        if (currentTimeInMillis - birds.getLastLevelTwoBirdSpawnTime() > levelTwoBirdSpawnDuration) {
+            birds.spawnLevelTwoBird(totalGameTime);
+        }
+
+    }
+
+    protected void checkIfRandomWaveIsComplete(float randomWaveDuration){
+        //Check if a wave is complete, if so, mark randomWaveInitiated as false so that a new random
+        // wave will be run
+        if (currentTimeInMillis - lastRandomWaveStartTime > randomWaveDuration) {
+            randomWaveIsInitiated = false;
+        }
     }
 
 }

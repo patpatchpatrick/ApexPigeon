@@ -10,18 +10,8 @@ public class LevelTwo extends Level {
     // Although not actually easy, this level consists of random waves/puzzles of dodgeable creatures
     // that are randomly selected
 
-    // GAME TIMES
-    private float startTime = 0f;
-    private float totalGameTime;
-    private long currentTimeInMillis;
-    private float powerUpShieldInterval;
-
     //RANDOM WAVE VARIABLES
     // Level Two consists of "EASY" waves of dodgeables that occur randomly
-    //The randomWaveIsInitiated boolean is used to track whether or not a random wave is in progress
-    private boolean randomWaveIsInitiated = false;
-    private long lastRandomWaveStartTime = 0;
-    private float randomWave = 0f;
     private final int TOTAL_NUMBER_OF_WAVES = 2;
     private final float RANDOM_WAVE_UFO = 0f;
     private final float RANDOM_WAVE_UFO_SPAWN_DURATION = 10000;
@@ -65,56 +55,41 @@ public class LevelTwo extends Level {
 
     private void runRandomWaveUFO() {
 
-        if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() > RANDOM_WAVE_L1BIRD_SPAWN_DURATION) {
-            birds.spawnLevelOneBird(totalGameTime);
-        }
-        if (currentTimeInMillis - birds.getLastLevelTwoBirdSpawnTime() > RANDOM_WAVE_L2BIRD_SPAWN_DURATION) {
-            birds.spawnLevelTwoBird(totalGameTime);
-        }
+        spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
+
         if (currentTimeInMillis - ufos.getLastUfoSpawnTime() > RANDOM_WAVE_UFO_SPAWN_DURATION) {
             //Spawn a ufo that shoots an energy beam in a random direction
             ufos.spawnUfo(ufos.ENERGY_BEAM_RANDOM);
         }
-        if (currentTimeInMillis - lastRandomWaveStartTime > RANDOM_WAVE_UFO_TOTAL_TIME) {
-            randomWaveIsInitiated = false;
-        }
+
+        checkIfRandomWaveIsComplete(RANDOM_WAVE_UFO_TOTAL_TIME);
 
     }
 
     private void runRandomWaveAlienMissile() {
 
-        if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() > RANDOM_WAVE_L1BIRD_SPAWN_DURATION) {
-            birds.spawnLevelOneBird(totalGameTime);
-        }
-        if (currentTimeInMillis - birds.getLastLevelTwoBirdSpawnTime() > RANDOM_WAVE_L2BIRD_SPAWN_DURATION) {
-            birds.spawnLevelTwoBird(totalGameTime);
-        }
+        spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
+
         if (currentTimeInMillis - alienMissiles.getLastAlienMissileSpawnTime() > RANDOM_WAVE_ALIEN_MISSILE_SPAWN_DURATION) {
             alienMissiles.spawnAlienMissile();
         }
-        if (currentTimeInMillis - lastRandomWaveStartTime > RANDOM_WAVE_ALIEN_MISSILE_TOTAL_TIME) {
-            randomWaveIsInitiated = false;
-        }
+
+        checkIfRandomWaveIsComplete(RANDOM_WAVE_ALIEN_MISSILE_TOTAL_TIME);
 
     }
 
     private void runRandomWaveRockets() {
 
-        if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() > RANDOM_WAVE_L1BIRD_SPAWN_DURATION) {
-            birds.spawnLevelOneBird(totalGameTime);
-        }
-        if (currentTimeInMillis - birds.getLastLevelTwoBirdSpawnTime() > RANDOM_WAVE_L2BIRD_SPAWN_DURATION) {
-            birds.spawnLevelTwoBird(totalGameTime);
-        }
+        spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
+
         if (currentTimeInMillis - powerUps.getLastpowerUpShieldSpawnTime() > powerUpShieldInterval) {
             powerUps.spawnPowerUpShield();
         }
         if (currentTimeInMillis - rockets.getLastRocketSpawnTime() > RANDOM_WAVE_ROCKETS_SPAWN_DURATION) {
             rockets.spawnRocket();
         }
-        if (currentTimeInMillis - lastRandomWaveStartTime > RANDOM_WAVE_ROCKETS_TOTAL_TIME) {
-            randomWaveIsInitiated = false;
-        }
+
+        checkIfRandomWaveIsComplete(RANDOM_WAVE_ROCKETS_TOTAL_TIME);
 
     }
 
