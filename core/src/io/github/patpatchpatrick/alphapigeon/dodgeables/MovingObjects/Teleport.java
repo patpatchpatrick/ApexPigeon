@@ -18,6 +18,7 @@ public class Teleport extends Dodgeable {
     public final float HEIGHT = 10f;
     private final float FORCE_ONE = -9.0f;
     private final float FORCE_TWO = 7.0f;
+    public  float yPosition = 0f;
 
     public Teleport(World gameWorld, AlphaPigeon game, OrthographicCamera camera) {
         super(gameWorld, game, camera);
@@ -43,20 +44,22 @@ public class Teleport extends Dodgeable {
     public void initTeleportOne() {
 
         // Initialize first teleport (moves in different direction from second teleport)
+        yPosition = MathUtils.random(0, camera.viewportHeight - HEIGHT);
 
         dodgeableBody.setActive(true);
-        dodgeableBody.setTransform(camera.viewportWidth, MathUtils.random(0, camera.viewportHeight - HEIGHT), dodgeableBody.getAngle());
+        dodgeableBody.setTransform(camera.viewportWidth, yPosition, dodgeableBody.getAngle());
         dodgeableBody.applyForceToCenter(FORCE_ONE, 0, true);
         this.alive = true;
 
     }
 
-    public void initTeleportTwo() {
+    public void initTeleportTwo(float spawnHeight) {
 
         // Initialize second teleport (moves in different direction from first teleport)
+        // The spawn height of the 2nd teleport is equal to that of the first teleport
 
         dodgeableBody.setActive(true);
-        dodgeableBody.setTransform(0, MathUtils.random(0, camera.viewportHeight - HEIGHT), dodgeableBody.getAngle());
+        dodgeableBody.setTransform(0, spawnHeight, dodgeableBody.getAngle());
         dodgeableBody.applyForceToCenter(FORCE_TWO, 0, true);
         this.alive = true;
 

@@ -12,14 +12,14 @@ public class LevelTwo extends Level {
 
     //RANDOM WAVE VARIABLES
     // Level Two consists of "EASY" waves of dodgeables that occur randomly
-    private final int TOTAL_NUMBER_OF_WAVES = 2;
-    private final float RANDOM_WAVE_UFO = 0f;
+    private final int TOTAL_NUMBER_OF_WAVES = 3;
+    private final float RANDOM_WAVE_UFO = 1f;
     private final float RANDOM_WAVE_UFO_SPAWN_DURATION = 10000;
     private final float RANDOM_WAVE_UFO_TOTAL_TIME = 10000;
-    private final float RANDOM_WAVE_ALIEN_MISSILE = 1f;
+    private final float RANDOM_WAVE_ALIEN_MISSILE = 2f;
     private final float RANDOM_WAVE_ALIEN_MISSILE_SPAWN_DURATION = 2500;
     private final float RANDOM_WAVE_ALIEN_MISSILE_TOTAL_TIME = 10000;
-    private final float RANDOM_WAVE_ROCKETS = 2f;
+    private final float RANDOM_WAVE_ROCKETS = 3f;
     private final float RANDOM_WAVE_ROCKETS_SPAWN_DURATION = 4000;
     private final float RANDOM_WAVE_ROCKETS_TOTAL_TIME = 10000;
     private final float RANDOM_WAVE_L1BIRD_SPAWN_DURATION = 2000;
@@ -38,7 +38,7 @@ public class LevelTwo extends Level {
         if (!randomWaveIsInitiated) {
             //If a random isn't currently in progress:
             //Generate a random number to determine which random wave to run
-            randomWave = MathUtils.random(0, TOTAL_NUMBER_OF_WAVES);
+            randomWave = MathUtils.random(1, TOTAL_NUMBER_OF_WAVES);
             //Save the time the last random wave was started
             lastRandomWaveStartTime = currentTimeInMillis;
             randomWaveIsInitiated = true;

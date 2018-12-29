@@ -13,7 +13,7 @@ public class LevelFour extends Level {
     // that are randomly selected
 
     //RANDOM WAVE VARIABLES
-    private final int TOTAL_NUMBER_OF_WAVES = 2;
+    private final int TOTAL_NUMBER_OF_WAVES = 3;
     private final float RANDOM_WAVE_TELEPORT_MADNESS = 1f;
     private final float RANDOM_WAVE_TELEPORT_MADNESS_L1BIRD_DURATION = 500f;
     private final float RANDOM_WAVE_TELEPORT_SPAWN_DURATION = 3000f;
@@ -21,6 +21,10 @@ public class LevelFour extends Level {
     private final float RANDOM_WAVE_ALIEN_MISSILE_MADNESS = 2f;
     private final float RANDOM_WAVE_ALIEN_MISSILE_SPAWN_DURATION = 5000f;
     private final float RANDOM_WAVE_ALIEN_MISSILE_MADNESS_TOTAL_TIME = 15000f;
+    private final float RANDOM_WAVE_UFOS_IN_CORNERS = 3f;
+    private final float RANDOM_WAVE_UFOS_IN_CORNERS_SPAWN_DURATION = 25000f;
+    private final float RANDOM_WAVE_UFOS_IN_CORNERS_BIRD_DURATION = 2000f;
+    private final float RANDOM_WAVE_UFOS_IN_CORNERS_TOTAL_TIME = 30000f;
 
 
     public LevelFour(Dodgeables dodgeables){
@@ -36,7 +40,7 @@ public class LevelFour extends Level {
         if (!randomWaveIsInitiated) {
             //If a random isn't currently in progress:
             //Generate a random number to determine which random wave to run
-            randomWave = MathUtils.random(1, TOTAL_NUMBER_OF_WAVES);
+            randomWave = MathUtils.random(3, TOTAL_NUMBER_OF_WAVES);
             //Save the time the last random wave was started
             lastRandomWaveStartTime = currentTimeInMillis;
             randomWaveIsInitiated = true;
@@ -44,6 +48,8 @@ public class LevelFour extends Level {
             runRandomWaveTeleportMadness();
         } else if (randomWave == RANDOM_WAVE_ALIEN_MISSILE_MADNESS){
             runRandomWaveAlienMissileMadness();
+        } else if (randomWave == RANDOM_WAVE_UFOS_IN_CORNERS){
+            runRandomWaveUFOsInCorners();
         }
 
     }
@@ -72,6 +78,23 @@ public class LevelFour extends Level {
         }
 
         checkIfRandomWaveIsComplete(RANDOM_WAVE_ALIEN_MISSILE_MADNESS_TOTAL_TIME);
+
+
+    }
+
+    private void runRandomWaveUFOsInCorners(){
+        // Spawn two ufos in the top-right and bottom-left corners of the screen
+        // The ufos shoot energy beams in all directions, causing the entire border of screen to be blocked off by beams
+
+        spawnBirds(RANDOM_WAVE_UFOS_IN_CORNERS_BIRD_DURATION, RANDOM_WAVE_UFOS_IN_CORNERS_BIRD_DURATION);
+
+        if (currentTimeInMillis - ufos.getLastUfoSpawnTime() > RANDOM_WAVE_UFOS_IN_CORNERS_SPAWN_DURATION) {
+            //Spawn corner UFOs and hold them in the corner for 30 seconds
+            ufos.spawnTopRightCornerUfo(ufos.ENERGY_BEAM_ALL_DIRECTIONS, 20);
+            ufos.spawnBottomLeftCornerUfo(ufos.ENERGY_BEAM_ALL_DIRECTIONS, 20);
+        }
+
+        checkIfRandomWaveIsComplete(RANDOM_WAVE_UFOS_IN_CORNERS_TOTAL_TIME);
 
 
     }

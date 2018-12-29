@@ -98,7 +98,7 @@ public class Teleports {
         // Spawn(obtain) a new teleport from the teleports pool and add to list of active teleports
 
         Teleport teleportTwo = teleportsPool.obtain();
-        teleportTwo.initTeleportTwo();
+        teleportTwo.initTeleportTwo(teleportOne.yPosition);
         activeTeleports.add(teleportTwo);
 
         //Attach data of the opposite teleport to the teleport, so it can be used to transport the pigeon
