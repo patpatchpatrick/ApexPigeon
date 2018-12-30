@@ -26,6 +26,7 @@ import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
 public class UFOs {
 
+    Dodgeables dodgeables;
     World gameWorld;
     private AlphaPigeon game;
     private OrthographicCamera camera;
@@ -77,11 +78,12 @@ public class UFOs {
     private Animation<TextureRegion> energyBeamStaticAnimation;
     private Texture energyBeamStaticSheet;
 
-    public UFOs(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera) {
+    public UFOs(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables) {
 
         this.gameWorld = gameWorld;
         this.game = game;
         this.camera = camera;
+        this.dodgeables = dodgeables;
 
         //Initialize ufo animations
         initializeUfoAnimation();
@@ -200,6 +202,7 @@ public class UFOs {
                 }
             } else {
                 activeUFOs.removeValue(ufo, false);
+                dodgeables.activeDodgeables.removeValue(ufo, false);
             }
         }
 
@@ -209,6 +212,7 @@ public class UFOs {
                 renderEnergyBeam(ufoEnergyBeamLeft, batch, energyBallCurrentFrame, energyBeamStaticCurrentFrame, energyBeamCurrentFrame);
             } else {
                 activeEnergyBeamLefts.removeValue(ufoEnergyBeamLeft, false);
+                dodgeables.activeDodgeables.removeValue(ufoEnergyBeamLeft, false);
             }
         }
 
@@ -218,6 +222,7 @@ public class UFOs {
                 renderEnergyBeam(ufoEnergyBeamRight, batch, energyBallCurrentFrame, energyBeamStaticCurrentFrame, energyBeamCurrentFrame);
             } else {
                 activeEnergyBeamRights.removeValue(ufoEnergyBeamRight, false);
+                dodgeables.activeDodgeables.removeValue(ufoEnergyBeamRight, false);
             }
         }
 
@@ -227,6 +232,7 @@ public class UFOs {
                 renderEnergyBeam(ufoEnergyBeamDown, batch, energyBallCurrentFrame, energyBeamStaticCurrentFrame, energyBeamCurrentFrame);
             } else {
                 activeEnergyBeamDowns.removeValue(ufoEnergyBeamDown, false);
+                dodgeables.activeDodgeables.removeValue(ufoEnergyBeamDown, false);
             }
         }
 
@@ -236,6 +242,7 @@ public class UFOs {
                 renderEnergyBeam(ufoEnergyBeamUp, batch, energyBallCurrentFrame, energyBeamStaticCurrentFrame, energyBeamCurrentFrame);
             } else {
                 activeEnergyBeamUps.removeValue(ufoEnergyBeamUp, false);
+                dodgeables.activeDodgeables.removeValue(ufoEnergyBeamUp, false);
             }
         }
 
@@ -356,6 +363,7 @@ public class UFOs {
         for (UFO ufo : activeUFOs) {
             if (ufo.getPosition().x < 0 - ufo.WIDTH || ufo.getPosition().y < 0 - ufo.HEIGHT) {
                 activeUFOs.removeValue(ufo, false);
+                dodgeables.activeDodgeables.removeValue(ufo, false);
                 ufoPool.free(ufo);
             }
         }
@@ -380,6 +388,7 @@ public class UFOs {
 
             if (removeBeamFromPool) {
                 activeEnergyBeamLefts.removeValue(ufoEnergyBeamLeft, false);
+                dodgeables.activeDodgeables.removeValue(ufoEnergyBeamLeft, false);
                 ufoEnergyBeamLeftPool.free(ufoEnergyBeamLeft);
             }
         }
@@ -403,6 +412,7 @@ public class UFOs {
 
             if (removeBeamFromPool) {
                 activeEnergyBeamRights.removeValue(ufoEnergyBeamRight, false);
+                dodgeables.activeDodgeables.removeValue(ufoEnergyBeamRight, false);
                 ufoEnergyBeamRightPool.free(ufoEnergyBeamRight);
             }
         }
@@ -426,6 +436,7 @@ public class UFOs {
 
             if (removeBeamFromPool) {
                 activeEnergyBeamDowns.removeValue(ufoEnergyBeamDown, false);
+                dodgeables.activeDodgeables.removeValue(ufoEnergyBeamDown, false);
                 ufoEnergyBeamDownPool.free(ufoEnergyBeamDown);
             }
         }
@@ -449,6 +460,7 @@ public class UFOs {
 
             if (removeBeamFromPool) {
                 activeEnergyBeamUps.removeValue(ufoEnergyBeamUp, false);
+                dodgeables.activeDodgeables.removeValue(ufoEnergyBeamUp,  false);
                 ufoEnergyBeamUpPool.free(ufoEnergyBeamUp);
             }
         }
@@ -462,6 +474,7 @@ public class UFOs {
         UFO ufo = ufoPool.obtain();
         ufo.init(direction);
         activeUFOs.add(ufo);
+        dodgeables.activeDodgeables.add(ufo);
 
 
         //keep track of time the ufo was spawned
@@ -478,6 +491,7 @@ public class UFOs {
         UFO ufo = ufoPool.obtain();
         ufo.initHorizontal(direction);
         activeUFOs.add(ufo);
+        dodgeables.activeDodgeables.add(ufo);
 
 
         //keep track of time the ufo was spawned
@@ -493,6 +507,7 @@ public class UFOs {
         UFO ufo = ufoPool.obtain();
         ufo.initVertical(direction);
         activeUFOs.add(ufo);
+        dodgeables.activeDodgeables.add(ufo);
 
 
         //keep track of time the ufo was spawned
@@ -508,6 +523,7 @@ public class UFOs {
         UFO ufo = ufoPool.obtain();
         ufo.initStopInCenter(direction, timeToHoldInCenter);
         activeUFOs.add(ufo);
+        dodgeables.activeDodgeables.add(ufo);
 
 
         //keep track of time the ufo was spawned
@@ -523,6 +539,7 @@ public class UFOs {
         UFO ufo = ufoPool.obtain();
         ufo.initStopInTopRightCorner(direction, timeToHold);
         activeUFOs.add(ufo);
+        dodgeables.activeDodgeables.add(ufo);
 
 
         //keep track of time the ufo was spawned
@@ -538,6 +555,7 @@ public class UFOs {
         UFO ufo = ufoPool.obtain();
         ufo.initStopInBottomLeftCorner(direction, timeToHold);
         activeUFOs.add(ufo);
+        dodgeables.activeDodgeables.add(ufo);
 
 
         //keep track of time the ufo was spawned
@@ -597,6 +615,7 @@ public class UFOs {
             UfoEnergyBeamLeft ufoEnergyBeamLeft = ufoEnergyBeamLeftPool.obtain();
             ufoEnergyBeamLeft.init(ufo, energyBeamDirection);
             activeEnergyBeamLefts.add(ufoEnergyBeamLeft);
+            dodgeables.activeDodgeables.add(ufoEnergyBeamLeft);
             ufo.energyBeams.add(ufoEnergyBeamLeft);
 
 
@@ -607,6 +626,7 @@ public class UFOs {
             UfoEnergyBeamRight ufoEnergyBeamRight = ufoEnergyBeamRightPool.obtain();
             ufoEnergyBeamRight.init(ufo, energyBeamDirection);
             activeEnergyBeamRights.add(ufoEnergyBeamRight);
+            dodgeables.activeDodgeables.add(ufoEnergyBeamRight);
             ufo.energyBeams.add(ufoEnergyBeamRight);
 
         } else if (energyBeamDirection == ENERGY_BEAM_DOWN) {
@@ -616,6 +636,7 @@ public class UFOs {
             UfoEnergyBeamDown ufoEnergyBeamDown = ufoEnergyBeamDownPool.obtain();
             ufoEnergyBeamDown.init(ufo, energyBeamDirection);
             activeEnergyBeamDowns.add(ufoEnergyBeamDown);
+            dodgeables.activeDodgeables.add(ufoEnergyBeamDown);
             ufo.energyBeams.add(ufoEnergyBeamDown);
 
         } else if (energyBeamDirection == ENERGY_BEAM_UP) {
@@ -625,6 +646,7 @@ public class UFOs {
             UfoEnergyBeamUp ufoEnergyBeamUp = ufoEnergyBeamUpPool.obtain();
             ufoEnergyBeamUp.init(ufo, energyBeamDirection);
             activeEnergyBeamUps.add(ufoEnergyBeamUp);
+            dodgeables.activeDodgeables.add(ufoEnergyBeamUp);
             ufo.energyBeams.add(ufoEnergyBeamUp);
 
         }
@@ -757,6 +779,7 @@ public class UFOs {
         for (UFO ufo : activeUFOs) {
             if (!ufo.isActive()) {
                 activeUFOs.removeValue(ufo, false);
+                dodgeables.activeDodgeables.removeValue(ufo, false);
                 ufoPool.free(ufo);
             }
         }
@@ -764,6 +787,7 @@ public class UFOs {
         for (UfoEnergyBeamLeft ufoEnergyBeamLeft : activeEnergyBeamLefts) {
             if (!ufoEnergyBeamLeft.isActive()) {
                 activeEnergyBeamLefts.removeValue(ufoEnergyBeamLeft, false);
+                dodgeables.activeDodgeables.removeValue(ufoEnergyBeamLeft, false);
                 ufoEnergyBeamLeftPool.free(ufoEnergyBeamLeft);
             }
         }
@@ -771,6 +795,7 @@ public class UFOs {
         for (UfoEnergyBeamRight ufoEnergyBeamRight : activeEnergyBeamRights) {
             if (!ufoEnergyBeamRight.isActive()) {
                 activeEnergyBeamRights.removeValue(ufoEnergyBeamRight, false);
+                dodgeables.activeDodgeables.removeValue(ufoEnergyBeamRight, false);
                 ufoEnergyBeamRightPool.free(ufoEnergyBeamRight);
             }
         }
@@ -778,6 +803,7 @@ public class UFOs {
         for (UfoEnergyBeamDown ufoEnergyBeamDown : activeEnergyBeamDowns) {
             if (!ufoEnergyBeamDown.isActive()) {
                 activeEnergyBeamDowns.removeValue(ufoEnergyBeamDown, false);
+                dodgeables.activeDodgeables.removeValue(ufoEnergyBeamDown, false);
                 ufoEnergyBeamDownPool.free(ufoEnergyBeamDown);
             }
         }
@@ -785,6 +811,7 @@ public class UFOs {
         for (UfoEnergyBeamUp ufoEnergyBeamUp : activeEnergyBeamUps) {
             if (!ufoEnergyBeamUp.isActive()) {
                 activeEnergyBeamUps.removeValue(ufoEnergyBeamUp, false);
+                dodgeables.activeDodgeables.removeValue(ufoEnergyBeamUp, false);
                 ufoEnergyBeamUpPool.free(ufoEnergyBeamUp);
             }
         }

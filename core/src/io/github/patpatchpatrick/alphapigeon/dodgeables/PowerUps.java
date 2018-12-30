@@ -27,6 +27,7 @@ public class PowerUps {
     World gameWorld;
     private AlphaPigeon game;
     private OrthographicCamera camera;
+    private Dodgeables dodgeables;
 
     //PowerUp Shield variables
     private final Array<PowerUp> activePowerUps = new Array<PowerUp>();
@@ -40,10 +41,11 @@ public class PowerUps {
     private final float SHIELD_INITIAL_SPAWN_INTERVAL_END_RANGE = 60000;
     private float shieldRandomSpawnInterval;
 
-    public PowerUps(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera){
+    public PowerUps(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables){
         this.gameWorld = gameWorld;
         this.game = game;
         this.camera = camera;
+        this.dodgeables = dodgeables;
 
         // initialize powerup animations
         initializePowerUpShieldAnimation();
@@ -72,6 +74,7 @@ public class PowerUps {
                         0, 0, powerUp.WIDTH, powerUp.HEIGHT, 1, 1, powerUp.getAngle());
             } else {
                 activePowerUps.removeValue(powerUp, false);
+                dodgeables.activeDodgeables.removeValue(powerUp, false);
             }
         }
 
@@ -85,6 +88,7 @@ public class PowerUps {
         for (PowerUp powerUp : activePowerUps){
             if (powerUp.getPosition().x < 0 - powerUp.WIDTH){
                 activePowerUps.removeValue(powerUp, false);
+                dodgeables.activeDodgeables.removeValue(powerUp, false);
                 powerUpsPool.free(powerUp);
             }
         }
@@ -98,6 +102,7 @@ public class PowerUps {
         PowerUp powerUp = powerUpsPool.obtain();
         powerUp.init();
         activePowerUps.add(powerUp);
+        dodgeables.activeDodgeables.add(powerUp);
 
         //keep track of time the PowerUp shield was spawned
         lastpowerUpShieldSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
@@ -148,6 +153,7 @@ public class PowerUps {
         for (PowerUp powerUp : activePowerUps){
             if (!powerUp.isActive()){
                 activePowerUps.removeValue(powerUp, false);
+                dodgeables.activeDodgeables.removeValue(powerUp, false);
                 powerUpsPool.free(powerUp);
             }
         }

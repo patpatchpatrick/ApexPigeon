@@ -28,6 +28,7 @@ public class Rockets {
     World gameWorld;
     private AlphaPigeon game;
     private OrthographicCamera camera;
+    private Dodgeables dodgeables;
 
     //Rocket variables
     private final Array<Rocket> activeRockets = new Array<Rocket>();
@@ -43,10 +44,11 @@ public class Rockets {
     private Texture rocketExplosionSheet;
     private long lastRocketExplosionSpawnTime;
 
-    public Rockets(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera) {
+    public Rockets(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables) {
         this.gameWorld = gameWorld;
         this.game = game;
         this.camera = camera;
+        this.dodgeables = dodgeables;
 
         initializeRocketAnimation();
         initializeRocketExplosionAnimation();
@@ -77,6 +79,7 @@ public class Rockets {
                 batch.draw(rocketCurrentFrame, rocket.getPosition().x, rocket.getPosition().y, 0, 0, rocket.WIDTH, rocket.HEIGHT, 1, 1, rocket.getAngle());
             } else {
                 activeRockets.removeValue(rocket, false);
+                dodgeables.activeDodgeables.removeValue(rocket, false);
             }
         }
 
@@ -86,6 +89,7 @@ public class Rockets {
                 batch.draw(rocketExplosionCurrentFrame, rocketExplosion.getPosition().x, rocketExplosion.getPosition().y, 0, 0, rocketExplosion.WIDTH, rocketExplosion.HEIGHT, 1, 1, rocketExplosion.getAngle());
             } else {
                 activeRocketExplosions.removeValue(rocketExplosion, false);
+                dodgeables.activeDodgeables.removeValue(rocketExplosion, false);
             }
         }
 
@@ -139,6 +143,7 @@ public class Rockets {
         for (Rocket rocket : activeRockets) {
             if (rocket.getPosition().x < 0 - rocket.WIDTH) {
                 activeRockets.removeValue(rocket, false);
+                dodgeables.activeDodgeables.removeValue(rocket, false);
                 rocketPool.free(rocket);
             }
         }
@@ -146,6 +151,7 @@ public class Rockets {
         for (RocketExplosion rocketExplosion : activeRocketExplosions) {
             if (rocketExplosion.getPosition().x < 0 - rocketExplosion.WIDTH) {
                 activeRocketExplosions.removeValue(rocketExplosion, false);
+                dodgeables.activeDodgeables.removeValue(rocketExplosion, false);
                 rocketExplosionPool.free(rocketExplosion);
             }
         }
@@ -159,6 +165,7 @@ public class Rockets {
         Rocket rocket = rocketPool.obtain();
         rocket.init();
         activeRockets.add(rocket);
+        dodgeables.activeDodgeables.add(rocket);
 
         //keep track of time the rocket was spawned
         lastRocketSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
@@ -172,6 +179,7 @@ public class Rockets {
         RocketExplosion rocketExplosion = rocketExplosionPool.obtain();
         rocketExplosion.init(explosionPositionX, explosionPositionY);
         activeRocketExplosions.add(rocketExplosion);
+        dodgeables.activeDodgeables.add(rocketExplosion);
 
         //keep track of time the rocket explosion was spawned
         lastRocketExplosionSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
@@ -252,6 +260,7 @@ public class Rockets {
         for (Rocket rocket : activeRockets) {
             if (!rocket.isActive()) {
                 activeRockets.removeValue(rocket, false);
+                dodgeables.activeDodgeables.removeValue(rocket, false);
                 rocketPool.free(rocket);
             }
         }
@@ -259,6 +268,7 @@ public class Rockets {
         for (RocketExplosion rocketExplosion : activeRocketExplosions) {
             if (!rocketExplosion.isActive()) {
                 activeRocketExplosions.removeValue(rocketExplosion, false);
+                dodgeables.activeDodgeables.removeValue(rocketExplosion, false);
                 rocketExplosionPool.free(rocketExplosion);
             }
         }

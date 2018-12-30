@@ -31,6 +31,7 @@ public class AlienMissiles {
     World gameWorld;
     private AlphaPigeon game;
     private OrthographicCamera camera;
+    private  Dodgeables dodgeables;
 
     //Alien Missile variables
     private final Array<AlienMissile> activeAlienMissiles = new Array<AlienMissile>();
@@ -66,10 +67,11 @@ public class AlienMissiles {
     private Texture alienMissileCornerExplosionSheet;
     private long lastAlienMissileCornerExplosionSpawnTime;
 
-    public AlienMissiles(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera){
+    public AlienMissiles(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables){
         this.gameWorld = gameWorld;
         this.game = game;
         this.camera = camera;
+        this.dodgeables = dodgeables;
 
         initializeAlienMissileAnimation();
         initializeAlienMissileExplosionAnimation();
@@ -118,6 +120,7 @@ public class AlienMissiles {
                 batch.draw(alienMissileCurrentFrame, alienMissile.getPosition().x, alienMissile.getPosition().y, alienMissile.WIDTH / 2, alienMissile.HEIGHT / 2, alienMissile.WIDTH, alienMissile.HEIGHT, 1, 1, alienMissile.getAngle());
             } else {
                 activeAlienMissiles.removeValue(alienMissile, false);
+                dodgeables.activeDodgeables.removeValue(alienMissile, false);
             }
         }
 
@@ -127,6 +130,7 @@ public class AlienMissiles {
                 batch.draw(alienMissileExplosionCurrentFrame, alienMissileExplosion.getPosition().x, alienMissileExplosion.getPosition().y, 0, 0, alienMissileExplosion.WIDTH, alienMissileExplosion.HEIGHT, 1, 1, 0);
             } else {
                 activeAlienMissileExplosions.removeValue(alienMissileExplosion, false);
+                dodgeables.activeDodgeables.removeValue(alienMissileExplosion, false);
             }
         }
 
@@ -136,6 +140,7 @@ public class AlienMissiles {
                 batch.draw(alienCornerCurrentFrame, alienMissileCorner.getPosition().x, alienMissileCorner.getPosition().y, 0, 0, alienMissileCorner.WIDTH, alienMissileCorner.HEIGHT, 1, 1, 0);
             } else {
                 activeAlienMissileCorners.removeValue(alienMissileCorner, false);
+                dodgeables.activeDodgeables.removeValue(alienMissileCorner, false);
             }
         }
 
@@ -145,6 +150,7 @@ public class AlienMissiles {
                 batch.draw(alienMissileExplosionCurrentFrame, alienMissileCornerExplosion.getPosition().x, alienMissileCornerExplosion.getPosition().y, 0, 0, alienMissileCornerExplosion.WIDTH, alienMissileCornerExplosion.HEIGHT, 1, 1, 0);
             } else {
                 activeAlienMissileCornerExplosions.removeValue(alienMissileCornerExplosion, false);
+                dodgeables.activeDodgeables.removeValue(alienMissileCornerExplosion, false);
             }
         }
 
@@ -241,6 +247,7 @@ public class AlienMissiles {
             alienMissile.initLeftward();
         }
         activeAlienMissiles.add(alienMissile);
+        dodgeables.activeDodgeables.add(alienMissile);
 
         //keep track of time the bird was spawned
         lastAlienMissileSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
@@ -254,6 +261,7 @@ public class AlienMissiles {
         AlienMissileExplosion alienMissileExplosion = alienMissileExplosionsPool.obtain();
         alienMissileExplosion.init(explosionPositionX, explosionPositionY);
         activeAlienMissileExplosions.add(alienMissileExplosion);
+        dodgeables.activeDodgeables.add(alienMissileExplosion);
 
         //keep track of time the missile was spawned
         lastAlienMissileExplosionSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
@@ -274,18 +282,22 @@ public class AlienMissiles {
         AlienMissileCorner alienMissileCorner = alienMissileCornersPool.obtain();
         alienMissileCorner.initFirstCorner(explosionPositionX, explosionPositionY, theta);
         activeAlienMissileCorners.add(alienMissileCorner);
+        dodgeables.activeDodgeables.add(alienMissileCorner);
 
         AlienMissileCorner alienMissileCornerTwo = alienMissileCornersPool.obtain();
         alienMissileCornerTwo.initSecondCorner(explosionPositionX, explosionPositionY, theta);
         activeAlienMissileCorners.add(alienMissileCornerTwo);
+        dodgeables.activeDodgeables.add(alienMissileCornerTwo);
 
         AlienMissileCorner alienMissileCornerThree = alienMissileCornersPool.obtain();
         alienMissileCornerThree.initThirdCorner(explosionPositionX, explosionPositionY, theta);
         activeAlienMissileCorners.add(alienMissileCornerThree);
+        dodgeables.activeDodgeables.add(alienMissileCornerThree);
 
         AlienMissileCorner alienMissileCornerFour = alienMissileCornersPool.obtain();
         alienMissileCornerFour.initFourthCorner(explosionPositionX, explosionPositionY, theta);
         activeAlienMissileCorners.add(alienMissileCornerFour);
+        dodgeables.activeDodgeables.add(alienMissileCornerFour);
     }
 
     public void spawnAlienMissileCornerExplosions(float explosionPositionX, float explosionPositionY){
@@ -295,6 +307,7 @@ public class AlienMissiles {
         AlienMissileCornerExplosion alienMissileCornerExplosion = alienMissileCornerExplosionsPool.obtain();
         alienMissileCornerExplosion.init(explosionPositionX, explosionPositionY);
         activeAlienMissileCornerExplosions.add(alienMissileCornerExplosion);
+        dodgeables.activeDodgeables.add(alienMissileCornerExplosion);
 
         //keep track of time the missile was spawned
         lastAlienMissileCornerExplosionSpawnTime = TimeUtils.nanoTime();
@@ -394,6 +407,7 @@ public class AlienMissiles {
         for (AlienMissile alienMissile : activeAlienMissiles){
             if (!alienMissile.isActive()){
                 activeAlienMissiles.removeValue(alienMissile, false);
+                dodgeables.activeDodgeables.removeValue(alienMissile, false);
                 alienMissilePool.free(alienMissile);
             }
         }
@@ -401,6 +415,7 @@ public class AlienMissiles {
         for (AlienMissileExplosion alienMissileExplosion : activeAlienMissileExplosions){
             if (!alienMissileExplosion.isActive()){
                 activeAlienMissileExplosions.removeValue(alienMissileExplosion, false);
+                dodgeables.activeDodgeables.removeValue(alienMissileExplosion, false);
                 alienMissileExplosionsPool.free(alienMissileExplosion);
             }
         }
@@ -408,6 +423,7 @@ public class AlienMissiles {
         for (AlienMissileCorner alienMissileCorner : activeAlienMissileCorners){
             if (!alienMissileCorner.isActive()){
                 activeAlienMissileCorners.removeValue(alienMissileCorner, false);
+                dodgeables.activeDodgeables.removeValue(alienMissileCorner, false);
                 alienMissileCornersPool.free(alienMissileCorner);
             }
         }
@@ -415,6 +431,7 @@ public class AlienMissiles {
         for (AlienMissileCornerExplosion alienMissileCornerExplosion : activeAlienMissileCornerExplosions){
             if (!alienMissileCornerExplosion.isActive()){
                 activeAlienMissileCornerExplosions.removeValue(alienMissileCornerExplosion, false);
+                dodgeables.activeDodgeables.removeValue(alienMissileCornerExplosion, false);
                 alienMissileCornerExplosionsPool.free(alienMissileCornerExplosion);
             }
         }

@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Dodgeable;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBird;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelTwoBird;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Meteor;
@@ -27,6 +28,7 @@ public class Meteors {
     World gameWorld;
     private AlphaPigeon game;
     private OrthographicCamera camera;
+    private Dodgeables dodgeables;
 
     //Meteor global variables
     private final Array<Meteor> activeMeteors = new Array<Meteor>();
@@ -37,11 +39,12 @@ public class Meteors {
     private final float METEOR_WIDTH = 80f;
     private final float METEOR_HEIGHT = METEOR_WIDTH / 2;
 
-    public Meteors(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera){
+    public Meteors(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables){
 
         this.gameWorld = gameWorld;
         this.game = game;
         this.camera = camera;
+        this.dodgeables = dodgeables;
 
         // initialize meteor animations
         initializeMeteorAnimation();
@@ -65,6 +68,7 @@ public class Meteors {
                 batch.draw(meteorCurrentFrame, meteor.getPosition().x, meteor.getPosition().y, 0, 0, meteor.WIDTH, meteor.HEIGHT, 1, 1, meteor.getAngle());
             } else {
                 activeMeteors.removeValue(meteor, false);
+                dodgeables.activeDodgeables.removeValue(meteor, false);
             }
         }
 
@@ -75,6 +79,7 @@ public class Meteors {
         for (Meteor meteor : activeMeteors){
             if (meteor.getPosition().x < 0 - meteor.WIDTH){
                 activeMeteors.removeValue(meteor, false);
+                dodgeables.activeDodgeables.removeValue(meteor, false);
                 meteorsPool.free(meteor);
             }
         }
@@ -88,6 +93,7 @@ public class Meteors {
         Meteor meteor = meteorsPool.obtain();
         meteor.init();
         activeMeteors.add(meteor);
+        dodgeables.activeDodgeables.add(meteor);
 
         //keep track of time the meteor was spawned
         lastMeteorSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
@@ -139,6 +145,7 @@ public class Meteors {
         for (Meteor meteor : activeMeteors){
             if (!meteor.isActive()){
                 activeMeteors.removeValue(meteor, false);
+                dodgeables.activeDodgeables.removeValue(meteor, false);
                 meteorsPool.free(meteor);
             }
         }

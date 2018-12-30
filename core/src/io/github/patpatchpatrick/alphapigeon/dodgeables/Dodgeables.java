@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.Pigeon;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Dodgeable;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.UFO;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
 public class Dodgeables {
@@ -20,6 +21,7 @@ public class Dodgeables {
     World gameWorld;
     private AlphaPigeon game;
     private OrthographicCamera camera;
+    public final Array<Dodgeable> activeDodgeables = new Array<Dodgeable>();
 
     //Dodgeable variables
     private Birds birds;
@@ -37,13 +39,13 @@ public class Dodgeables {
         this.game = game;
         this.camera = camera;
 
-        birds = new Birds(gameWorld, game, camera);
-        rockets = new Rockets(gameWorld, game, camera);
-        alienMissiles = new AlienMissiles(gameWorld, game, camera);
-        teleports = new Teleports(gameWorld, game, camera);
-        powerUps = new PowerUps(gameWorld, game, camera);
-        meteors = new Meteors(gameWorld, game, camera);
-        ufos = new UFOs(gameWorld, game, camera);
+        birds = new Birds(gameWorld, game, camera, this);
+        rockets = new Rockets(gameWorld, game, camera, this);
+        alienMissiles = new AlienMissiles(gameWorld, game, camera, this);
+        teleports = new Teleports(gameWorld, game, camera, this);
+        powerUps = new PowerUps(gameWorld, game, camera, this);
+        meteors = new Meteors(gameWorld, game, camera, this);
+        ufos = new UFOs(gameWorld, game, camera, this);
 
     }
 
@@ -52,34 +54,33 @@ public class Dodgeables {
         rockets.spawnRocketExplosion(explosionPositionX, explosionPositionY);
     }
 
-    public Birds getBirds(){
+    public Birds getBirds() {
         return this.birds;
     }
 
-    public Rockets getRockets(){
+    public Rockets getRockets() {
         return this.rockets;
     }
 
-    public AlienMissiles getAlienMissiles(){
+    public AlienMissiles getAlienMissiles() {
         return this.alienMissiles;
     }
 
-    public Teleports getTeleports(){
+    public Teleports getTeleports() {
         return this.teleports;
     }
 
-    public PowerUps getPowerUps(){
+    public PowerUps getPowerUps() {
         return this.powerUps;
     }
 
-    public  Meteors getMeteors(){
+    public Meteors getMeteors() {
         return this.meteors;
     }
 
-    public UFOs getUfos(){
+    public UFOs getUfos() {
         return this.ufos;
     }
-
 
 
     public void render(float stateTime, SpriteBatch batch) {

@@ -26,6 +26,7 @@ public class Birds {
     World gameWorld;
     private AlphaPigeon game;
     private OrthographicCamera camera;
+    private Dodgeables dodgeables;
 
     //Level One Bird variables
     private final Array<LevelOneBird> activeLevelOneBirds = new Array<LevelOneBird>();
@@ -41,11 +42,12 @@ public class Birds {
     private Texture levelTwoBirdFlySheet;
     private long lastLevelTwoBirdSpawnTime;
 
-    public Birds(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera){
+    public Birds(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables){
 
         this.gameWorld = gameWorld;
         this.game = game;
         this.camera = camera;
+        this.dodgeables = dodgeables;
 
         initializeLevelOneBirdAnimation();
         initializeLevelTwoBirdAnimation();
@@ -80,6 +82,7 @@ public class Birds {
                 batch.draw(levelOneCurrentFrame, levelOneBird.getPosition().x, levelOneBird.getPosition().y, 0, 0, levelOneBird.WIDTH, levelOneBird.HEIGHT, 1, 1, levelOneBird.getAngle());
             } else {
                 activeLevelOneBirds.removeValue(levelOneBird, false);
+                dodgeables.activeDodgeables.removeValue(levelOneBird, false);
             }
         }
 
@@ -89,6 +92,7 @@ public class Birds {
                 batch.draw(levelTwoCurrentFrame, levelTwoBird.getPosition().x, levelTwoBird.getPosition().y - 2f, 0, 2, levelTwoBird.WIDTH, levelTwoBird.HEIGHT, 1, 1, levelTwoBird.getAngle());
             } else {
                 activeLevelTwoBirds.removeValue(levelTwoBird, false);
+                dodgeables.activeDodgeables.removeValue(levelTwoBird, false);
             }
         }
 
@@ -102,6 +106,7 @@ public class Birds {
         for (LevelOneBird levelOneBird : activeLevelOneBirds){
             if (levelOneBird.getPosition().x < 0 - levelOneBird.WIDTH){
                 activeLevelOneBirds.removeValue(levelOneBird, false);
+                dodgeables.activeDodgeables.removeValue(levelOneBird, false);
                 levelOneBirdPool.free(levelOneBird);
             }
         }
@@ -109,6 +114,7 @@ public class Birds {
         for (LevelTwoBird levelTwoBird : activeLevelTwoBirds){
             if (levelTwoBird.getPosition().x < 0 - levelTwoBird.WIDTH){
                 activeLevelTwoBirds.removeValue(levelTwoBird, false);
+                dodgeables.activeDodgeables.removeValue(levelTwoBird, false);
                 levelTwoBirdPool.free(levelTwoBird);
             }
         }
@@ -123,6 +129,7 @@ public class Birds {
         LevelOneBird levelOneBird = levelOneBirdPool.obtain();
         levelOneBird.init(totalGameTime);
         activeLevelOneBirds.add(levelOneBird);
+        dodgeables.activeDodgeables.add(levelOneBird);
 
         //keep track of time the bird was spawned
         lastLevelOneBirdSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
@@ -136,6 +143,7 @@ public class Birds {
         LevelTwoBird levelTwoBird = levelTwoBirdPool.obtain();
         levelTwoBird.init(totalGameTime);
         activeLevelTwoBirds.add(levelTwoBird);
+        dodgeables.activeDodgeables.add(levelTwoBird);
 
         //keep track of time the bird was spawned
         lastLevelTwoBirdSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
@@ -212,6 +220,7 @@ public class Birds {
         for (LevelOneBird levelOneBird : activeLevelOneBirds){
             if (!levelOneBird.isActive()){
                 activeLevelOneBirds.removeValue(levelOneBird, false);
+                dodgeables.activeDodgeables.removeValue(levelOneBird, false);
                 levelOneBirdPool.free(levelOneBird);
             }
         }
@@ -219,6 +228,7 @@ public class Birds {
         for (LevelTwoBird levelTwoBird : activeLevelTwoBirds){
             if (!levelTwoBird.isActive()){
                 activeLevelTwoBirds.removeValue(levelTwoBird, false);
+                dodgeables.activeDodgeables.removeValue(levelTwoBird, false);
                 levelTwoBirdPool.free(levelTwoBird);
             }
         }

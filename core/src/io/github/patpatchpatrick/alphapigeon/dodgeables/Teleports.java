@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Dodgeable;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBird;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelTwoBird;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Teleport;
@@ -28,6 +29,7 @@ public class Teleports {
     World gameWorld;
     private AlphaPigeon game;
     private OrthographicCamera camera;
+    private Dodgeables dodgeables;
 
     //Teleport variables
     private final Array<Teleport> activeTeleports = new Array<Teleport>();
@@ -36,11 +38,12 @@ public class Teleports {
     private Texture teleportSheet;
     private long lastTeleportSpawnTime;
 
-    public Teleports(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera){
+    public Teleports(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables){
 
         this.gameWorld = gameWorld;
         this.game = game;
         this.camera = camera;
+        this.dodgeables = dodgeables;
 
         initializeTeleportAnimation();
 
@@ -63,6 +66,7 @@ public class Teleports {
                         0, 0, teleport.WIDTH, teleport.HEIGHT, 1, 1, teleport.getAngle());
             } else {
                 activeTeleports.removeValue(teleport, false);
+                dodgeables.activeDodgeables.removeValue(teleport, false);
             }
         }
 
@@ -76,6 +80,7 @@ public class Teleports {
         for (Teleport teleport : activeTeleports){
             if (teleport.getPosition().x < 0 -  2 * teleport.WIDTH || teleport.getPosition().x > camera.viewportWidth + 2 * teleport.WIDTH){
                 activeTeleports.removeValue(teleport, false);
+                dodgeables.activeDodgeables.removeValue(teleport, false);
                 teleportsPool.free(teleport);
             }
         }
@@ -93,6 +98,7 @@ public class Teleports {
         Teleport teleportOne = teleportsPool.obtain();
         teleportOne.initTeleportOne();
         activeTeleports.add(teleportOne);
+        dodgeables.activeDodgeables.add(teleportOne);
 
         //spawn second teleport
         // Spawn(obtain) a new teleport from the teleports pool and add to list of active teleports
@@ -100,6 +106,7 @@ public class Teleports {
         Teleport teleportTwo = teleportsPool.obtain();
         teleportTwo.initTeleportTwo(teleportOne.yPosition);
         activeTeleports.add(teleportTwo);
+        dodgeables.activeDodgeables.add(teleportTwo);
 
         //Attach data of the opposite teleport to the teleport, so it can be used to transport the pigeon
         //to the opposite teleport's location
@@ -155,6 +162,7 @@ public class Teleports {
         for (Teleport teleport : activeTeleports){
             if (!teleport.isActive()){
                 activeTeleports.removeValue(teleport, false);
+                dodgeables.activeDodgeables.removeValue(teleport,false);
                 teleportsPool.free(teleport);
             }
         }
