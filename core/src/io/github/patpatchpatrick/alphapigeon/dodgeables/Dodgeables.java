@@ -5,10 +5,12 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.Pigeon;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Dodgeable;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
 public class Dodgeables {
