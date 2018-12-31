@@ -8,6 +8,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Dodgeable;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.UFO;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
@@ -16,15 +17,15 @@ import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 public class UfoEnergyBeamDown extends Dodgeable {
 
     public final float WIDTH = 40f;
-    public final float HEIGHT = 80f;
     private final float UFO_WIDTH = 15f;
     private final float UFO_HEIGHT = UFO_WIDTH;
 
     //UFO associated with beam
     public UFO ufo;
 
-    public UfoEnergyBeamDown(World gameWorld, AlphaPigeon game, OrthographicCamera camera) {
-        super(gameWorld, game, camera);
+    public UfoEnergyBeamDown(World gameWorld, AlphaPigeon game, OrthographicCamera camera, Dodgeables dodgeables) {
+        super(gameWorld, game, camera, dodgeables);
+        this.HEIGHT = 80f;
 
         //spawn a new energybeam
         BodyDef energyBeamBodyDef = new BodyDef();

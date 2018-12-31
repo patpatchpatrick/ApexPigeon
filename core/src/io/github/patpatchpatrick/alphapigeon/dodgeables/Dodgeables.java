@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -32,6 +33,10 @@ public class Dodgeables {
     private Meteors meteors;
     private UFOs ufos;
 
+    //Scrolling Force
+    //The force with which the current dodgeables are scrolling
+    //When new dodgeables are spawned, they are automatically spawned with this force by default
+    public Vector2 scrollingVelocity = new Vector2(0, 0);
 
     public Dodgeables(Pigeon pigeon, World world, AlphaPigeon game, OrthographicCamera camera) {
 
@@ -106,6 +111,22 @@ public class Dodgeables {
         powerUps.update();
         meteors.update();
         ufos.update(stateTime);
+
+        //Update all dodgeables so that they scroll when they leave the bounds of the screen
+        for (Dodgeable dodgeable : activeDodgeables){
+            float upperBound = camera.viewportHeight + GameVariables.BUFFER_HEIGHT;
+            float lowerBound = 0 - dodgeable.HEIGHT;
+            Boolean dodgeableOverUpperBound = dodgeable.getPosition().y > upperBound;
+            Boolean dodgeableUnderLowerBound = dodgeable.getPosition().y < lowerBound;
+
+          //Scroll dodgeables if they are out of bounds
+            if (dodgeableUnderLowerBound){
+                dodgeable.dodgeableBody.setTransform(dodgeable.getPosition().x, upperBound, dodgeable.getAngle());
+            } else if (dodgeableOverUpperBound){
+                dodgeable.dodgeableBody.setTransform(dodgeable.getPosition().x, lowerBound, dodgeable.getAngle());
+            }
+
+        }
 
     }
 

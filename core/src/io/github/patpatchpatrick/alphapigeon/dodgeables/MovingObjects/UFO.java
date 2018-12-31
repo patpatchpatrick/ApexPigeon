@@ -10,13 +10,13 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
 public class UFO extends Dodgeable {
 
     public final float WIDTH = 15f;
-    public final float HEIGHT = WIDTH;
     public final float FORCE_X = -9.0f;
     public final float FORCE_Y = -5.0f;
     public float direction = 0f;
@@ -35,8 +35,9 @@ public class UFO extends Dodgeable {
     //Energy beams associated with UFO
     public Array<Dodgeable> energyBeams = new Array<Dodgeable>();
 
-    public UFO(World gameWorld, AlphaPigeon game, OrthographicCamera camera) {
-        super(gameWorld, game, camera);
+    public UFO(World gameWorld, AlphaPigeon game, OrthographicCamera camera, Dodgeables dodgeables) {
+        super(gameWorld, game, camera, dodgeables);
+        this.HEIGHT = WIDTH;
 
         //spawn a new ufo
         BodyDef ufoBodyDef = new BodyDef();
@@ -71,6 +72,8 @@ public class UFO extends Dodgeable {
         //keep track of time the ufo was spawned
         spawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
 
+        applyScrollSpeed();
+
 
     }
 
@@ -87,6 +90,8 @@ public class UFO extends Dodgeable {
         //keep track of time the ufo was spawned
         spawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
 
+        applyScrollSpeed();
+
     }
 
     public void initVertical(float direction){
@@ -100,6 +105,8 @@ public class UFO extends Dodgeable {
 
         //keep track of time the ufo was spawned
         spawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+
+        applyScrollSpeed();
 
     }
 
@@ -121,6 +128,8 @@ public class UFO extends Dodgeable {
         this.stopInCenterOfScreen = true;
         this.timeToHold = timeToHoldInCenter;
 
+        applyScrollSpeed();
+
     }
 
     public void initStopInTopRightCorner(float direction, long timeToHold){
@@ -139,6 +148,8 @@ public class UFO extends Dodgeable {
 
         this.stopInTopRightCornerOfScreen = true;
         this.timeToHold = timeToHold;
+
+        applyScrollSpeed();
     }
 
     public void initStopInBottomLeftCorner(float direction, long timeToHold){
@@ -157,6 +168,8 @@ public class UFO extends Dodgeable {
 
         this.stopInBottomLeftCornerOfScreen = true;
         this.timeToHold = timeToHold;
+
+        applyScrollSpeed();
     }
 
     @Override

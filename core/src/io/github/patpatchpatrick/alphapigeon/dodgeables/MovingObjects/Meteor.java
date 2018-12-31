@@ -9,17 +9,18 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 
 public class Meteor extends Dodgeable {
 
     public final float WIDTH = 80f;
-    public final float HEIGHT = WIDTH / 2;
     private final float FORCE_X = -3000.0f;
     private final float FORCE_Y = -3000.0f;
 
-    public Meteor(World gameWorld, AlphaPigeon game, OrthographicCamera camera) {
-        super(gameWorld, game, camera);
+    public Meteor(World gameWorld, AlphaPigeon game, OrthographicCamera camera, Dodgeables dodgeables) {
+        super(gameWorld, game, camera, dodgeables);
+        this.HEIGHT = WIDTH/2;
 
         //spawn a new meteor bird
         BodyDef meteorBodyDef = new BodyDef();
@@ -48,6 +49,8 @@ public class Meteor extends Dodgeable {
         dodgeableBody.setTransform(MathUtils.random(0 - WIDTH/2, camera.viewportWidth), camera.viewportHeight + HEIGHT/2, dodgeableBody.getAngle());
         dodgeableBody.applyForceToCenter(FORCE_X, FORCE_Y, true);
         this.alive = true;
+
+        applyScrollSpeed();
 
     }
 

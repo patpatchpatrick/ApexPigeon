@@ -78,7 +78,7 @@ public class UFOs {
     private Animation<TextureRegion> energyBeamStaticAnimation;
     private Texture energyBeamStaticSheet;
 
-    public UFOs(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables) {
+    public UFOs(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, final Dodgeables dodgeables) {
 
         this.gameWorld = gameWorld;
         this.game = game;
@@ -96,35 +96,35 @@ public class UFOs {
         ufoPool = new Pool<UFO>() {
             @Override
             protected UFO newObject() {
-                return new UFO(gameWorld, game, camera);
+                return new UFO(gameWorld, game, camera, dodgeables);
             }
         };
 
         ufoEnergyBeamLeftPool = new Pool<UfoEnergyBeamLeft>() {
             @Override
             protected UfoEnergyBeamLeft newObject() {
-                return new UfoEnergyBeamLeft(gameWorld, game, camera);
+                return new UfoEnergyBeamLeft(gameWorld, game, camera, dodgeables);
             }
         };
 
         ufoEnergyBeamRightPool = new Pool<UfoEnergyBeamRight>() {
             @Override
             protected UfoEnergyBeamRight newObject() {
-                return new UfoEnergyBeamRight(gameWorld, game, camera);
+                return new UfoEnergyBeamRight(gameWorld, game, camera, dodgeables);
             }
         };
 
         ufoEnergyBeamDownPool = new Pool<UfoEnergyBeamDown>() {
             @Override
             protected UfoEnergyBeamDown newObject() {
-                return new UfoEnergyBeamDown(gameWorld, game, camera);
+                return new UfoEnergyBeamDown(gameWorld, game, camera, dodgeables);
             }
         };
 
         ufoEnergyBeamUpPool = new Pool<UfoEnergyBeamUp>() {
             @Override
             protected UfoEnergyBeamUp newObject() {
-                return new UfoEnergyBeamUp(gameWorld, game, camera);
+                return new UfoEnergyBeamUp(gameWorld, game, camera, dodgeables);
             }
         };
 
@@ -361,7 +361,7 @@ public class UFOs {
 
         //REMOVE OFF SCREEN UFOs
         for (UFO ufo : activeUFOs) {
-            if (ufo.getPosition().x < 0 - ufo.WIDTH || ufo.getPosition().y < 0 - ufo.HEIGHT) {
+            if (ufo.getPosition().x < 0 - ufo.WIDTH) {
                 activeUFOs.removeValue(ufo, false);
                 dodgeables.activeDodgeables.removeValue(ufo, false);
                 ufoPool.free(ufo);

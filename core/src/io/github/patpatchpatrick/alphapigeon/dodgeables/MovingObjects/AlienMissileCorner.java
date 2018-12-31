@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
@@ -17,12 +18,12 @@ import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 public class AlienMissileCorner extends Dodgeable {
 
     public final float WIDTH = 10f;
-    public final float HEIGHT = 10f;
     private final float FORCE = 5f;
 
 
-    public AlienMissileCorner(World gameWorld, AlphaPigeon game, OrthographicCamera camera) {
-        super(gameWorld, game, camera);
+    public AlienMissileCorner(World gameWorld, AlphaPigeon game, OrthographicCamera camera, Dodgeables dodgeables) {
+        super(gameWorld, game, camera, dodgeables);
+        this.HEIGHT = 10f;
 
         //spawn first alien missile corner
         BodyDef alienCornerBodyDef = new BodyDef();
@@ -55,6 +56,8 @@ public class AlienMissileCorner extends Dodgeable {
         alienCornerData.setSpawnTime(TimeUtils.nanoTime()/GameVariables.MILLION_SCALE);
         dodgeableBody.setUserData(alienCornerData);
 
+        applyScrollSpeed();
+
     }
 
     public void initSecondCorner(float explosionPositionX, float explosionPositionY, float theta) {
@@ -69,6 +72,8 @@ public class AlienMissileCorner extends Dodgeable {
         BodyData alienCornerData = new BodyData(false);
         alienCornerData.setSpawnTime(TimeUtils.nanoTime()/GameVariables.MILLION_SCALE);
         dodgeableBody.setUserData(alienCornerData);
+
+        applyScrollSpeed();
 
 
     }
@@ -86,6 +91,8 @@ public class AlienMissileCorner extends Dodgeable {
         alienCornerData.setSpawnTime(TimeUtils.nanoTime()/GameVariables.MILLION_SCALE);
         dodgeableBody.setUserData(alienCornerData);
 
+        applyScrollSpeed();
+
 
     }
 
@@ -101,6 +108,8 @@ public class AlienMissileCorner extends Dodgeable {
         BodyData alienCornerData = new BodyData(false);
         alienCornerData.setSpawnTime(TimeUtils.nanoTime()/GameVariables.MILLION_SCALE);
         dodgeableBody.setUserData(alienCornerData);
+
+        applyScrollSpeed();
 
     }
 

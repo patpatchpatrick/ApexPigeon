@@ -4,12 +4,12 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
@@ -26,6 +26,10 @@ public abstract class Dodgeable implements Pool.Poolable {
     protected AlphaPigeon game;
     protected World gameWorld;
     protected OrthographicCamera camera;
+    protected Dodgeables dodgeables;
+
+    //Dimensions
+    public float HEIGHT = 0f;
 
     // HOLD
     // Hold the object for a set amount of time (seconds)
@@ -35,13 +39,17 @@ public abstract class Dodgeable implements Pool.Poolable {
     protected float forceXApplyAfterHold = 0f;
     protected float forceYApplyAfterHold = 0f;
 
+    // SCROLL VARIABLES (variables used to scroll dodgeables)
+    public boolean isScrolling = false;
+    public Vector2 scrollVelocity = new Vector2(0, 0);
 
-    public Dodgeable(World gameWorld, AlphaPigeon game, OrthographicCamera camera){
+    public Dodgeable(World gameWorld, AlphaPigeon game, OrthographicCamera camera, Dodgeables dodgeables){
 
         this.alive = false;
         this.gameWorld = gameWorld;
         this.game = game;
         this.camera = camera;
+        this.dodgeables = dodgeables;
 
     }
 
@@ -95,6 +103,12 @@ public abstract class Dodgeable implements Pool.Poolable {
 
     }
 
+    protected void applyScrollSpeed(){
+
+        // Make sure speed of new spawned dodgeables matches up with scroll speed of other dodgeables
+        dodgeableBody.setLinearVelocity(dodgeableBody.getLinearVelocity().x + dodgeables.scrollingVelocity.x, dodgeableBody.getLinearVelocity().y + dodgeables.scrollingVelocity.y);
+    }
+
 
     @Override
     public void reset() {
@@ -109,6 +123,9 @@ public abstract class Dodgeable implements Pool.Poolable {
         dodgeableBody.setLinearVelocity(vel);
         dodgeableBody.setAngularVelocity(0);
         this.alive = false;
+
+        //Reset scroll variables
+        this.isScrolling = false;
 
         //Reset hold variables
         this.isHeld = false;

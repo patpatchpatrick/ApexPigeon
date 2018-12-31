@@ -9,16 +9,17 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 
 public class LevelTwoBird extends Dodgeable {
 
     public final float WIDTH = 12f;
-    public final float HEIGHT = 12f;
     public final float FORCE_X = -18.0f;
 
-    public LevelTwoBird(World gameWorld, AlphaPigeon game, OrthographicCamera camera) {
-        super(gameWorld, game, camera);
+    public LevelTwoBird(World gameWorld, AlphaPigeon game, OrthographicCamera camera, Dodgeables dodgeables) {
+        super(gameWorld, game, camera, dodgeables);
+        this.HEIGHT = 12f;
 
         //spawn a new level two bird
         BodyDef levelTwoBirdBodyDef = new BodyDef();
@@ -48,6 +49,8 @@ public class LevelTwoBird extends Dodgeable {
         dodgeableBody.setTransform(camera.viewportWidth, MathUtils.random(0, camera.viewportHeight - HEIGHT), dodgeableBody.getAngle());
         dodgeableBody.applyForceToCenter(this.forceMultiplier * FORCE_X, 0, true);
         this.alive = true;
+
+        applyScrollSpeed();
 
     }
 

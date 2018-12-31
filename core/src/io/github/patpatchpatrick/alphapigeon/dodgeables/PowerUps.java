@@ -41,7 +41,7 @@ public class PowerUps {
     private final float SHIELD_INITIAL_SPAWN_INTERVAL_END_RANGE = 60000;
     private float shieldRandomSpawnInterval;
 
-    public PowerUps(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables){
+    public PowerUps(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, final Dodgeables dodgeables){
         this.gameWorld = gameWorld;
         this.game = game;
         this.camera = camera;
@@ -53,7 +53,7 @@ public class PowerUps {
         powerUpsPool = new Pool<PowerUp>() {
             @Override
             protected PowerUp newObject() {
-                return new PowerUp(gameWorld, game, camera);
+                return new PowerUp(gameWorld, game, camera, dodgeables);
             }
         };
 

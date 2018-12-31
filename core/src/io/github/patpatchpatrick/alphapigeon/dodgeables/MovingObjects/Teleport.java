@@ -9,19 +9,20 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 
 public class Teleport extends Dodgeable {
 
     public final float WIDTH = 10f;
-    public final float HEIGHT = 10f;
     private final float FORCE_ONE = -9.0f;
     private final float FORCE_TWO = 7.0f;
     public  float yPosition = 0f;
 
-    public Teleport(World gameWorld, AlphaPigeon game, OrthographicCamera camera) {
-        super(gameWorld, game, camera);
+    public Teleport(World gameWorld, AlphaPigeon game, OrthographicCamera camera, Dodgeables dodgeables) {
+        super(gameWorld, game, camera, dodgeables);
+        this.HEIGHT = 10f;
 
         //create teleport body
         BodyDef teleportBodyDef = new BodyDef();
@@ -51,6 +52,8 @@ public class Teleport extends Dodgeable {
         dodgeableBody.applyForceToCenter(FORCE_ONE, 0, true);
         this.alive = true;
 
+        applyScrollSpeed();
+
     }
 
     public void initTeleportTwo(float spawnHeight) {
@@ -62,6 +65,8 @@ public class Teleport extends Dodgeable {
         dodgeableBody.setTransform(0, spawnHeight, dodgeableBody.getAngle());
         dodgeableBody.applyForceToCenter(FORCE_TWO, 0, true);
         this.alive = true;
+
+        applyScrollSpeed();
 
     }
 

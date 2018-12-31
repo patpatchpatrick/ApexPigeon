@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -27,6 +28,9 @@ public class Pigeon {
     AlphaPigeon game;
     World world;
     private float stateTime;
+
+    //Starting Positions
+    public final Vector2 STARTING_POSITION = new Vector2(20, 24);
 
     //Power Up Variables
     private short currentPowerUp;
@@ -50,7 +54,7 @@ public class Pigeon {
         // Box 2D editor
         BodyDef pigeonBodyDef = new BodyDef();
         pigeonBodyDef.type = BodyDef.BodyType.DynamicBody;
-        pigeonBodyDef.position.set(10, 10);
+        pigeonBodyDef.position.set(STARTING_POSITION.x, STARTING_POSITION.y);
         pigeonBody = world.createBody(pigeonBodyDef);
         BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("json/AlphaPigeonBody.json"));
         FixtureDef pigeonFixtureDef = new FixtureDef();

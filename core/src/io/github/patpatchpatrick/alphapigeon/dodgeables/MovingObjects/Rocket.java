@@ -10,16 +10,17 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 
 public class Rocket extends Dodgeable {
 
     public final float WIDTH = 10f;
-    public final float HEIGHT = 20f;
 
-    public Rocket(World gameWorld, AlphaPigeon game, OrthographicCamera camera) {
-        super(gameWorld, game, camera);
+    public Rocket(World gameWorld, AlphaPigeon game, OrthographicCamera camera, Dodgeables dodgeables) {
+        super(gameWorld, game, camera, dodgeables);
+        this.HEIGHT = 20f;
 
         //spawn a new rocket
         BodyDef rocketBodyDef = new BodyDef();
@@ -96,6 +97,8 @@ public class Rocket extends Dodgeable {
         // ROCKET_HEIGHT is used  for x coordinate of force instead of ROCKET_WIDTH because the rocket is rotated 90 degrees
         dodgeableBody.applyForce(-15.0f, 0, camera.viewportWidth + HEIGHT, rocketSpawnHeight - 5, true);
         this.alive = true;
+
+        applyScrollSpeed();
 
 
 

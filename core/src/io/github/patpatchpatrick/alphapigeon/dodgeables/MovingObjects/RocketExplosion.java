@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
@@ -17,10 +18,10 @@ import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 public class RocketExplosion extends Dodgeable {
 
     public final float WIDTH = 30f;
-    public final float HEIGHT = 30f;
 
-    public RocketExplosion(World gameWorld, AlphaPigeon game, OrthographicCamera camera) {
-        super(gameWorld, game, camera);
+    public RocketExplosion(World gameWorld, AlphaPigeon game, OrthographicCamera camera, Dodgeables dodgeables) {
+        super(gameWorld, game, camera, dodgeables);
+        this.HEIGHT = 30f;
 
         //spawn a new rocket explosion
         BodyDef rocketExplosionBodyDef = new BodyDef();
@@ -39,6 +40,7 @@ public class RocketExplosion extends Dodgeable {
         loader.attachFixture(dodgeableBody, "RocketExplosion", rocketExplosionFixtureDef, WIDTH);
         dodgeableBody.applyForceToCenter(0, 0, true);
 
+
     }
 
     public void init(float explosionPositionX, float explosionPositionY) {
@@ -56,6 +58,8 @@ public class RocketExplosion extends Dodgeable {
         BodyData rocketExplosionData = new BodyData(false);
         rocketExplosionData.setExplosionData(TimeUtils.nanoTime() / GameVariables.MILLION_SCALE);
         dodgeableBody.setUserData(rocketExplosionData);
+
+        applyScrollSpeed();
 
     }
 

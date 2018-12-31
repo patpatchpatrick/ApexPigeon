@@ -9,17 +9,18 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 
 public class PowerUp extends Dodgeable {
 
     public final float WIDTH = 8f;
-    public final float HEIGHT = 4.8f;
     private final float FORCE_X = -9.0f;
 
 
-    public PowerUp(World gameWorld, AlphaPigeon game, OrthographicCamera camera) {
-        super(gameWorld, game, camera);
+    public PowerUp(World gameWorld, AlphaPigeon game, OrthographicCamera camera, Dodgeables dodgeables) {
+        super(gameWorld, game, camera, dodgeables);
+        this.HEIGHT = 4.8f;
 
         //spawn a new PowerUp Shield
         BodyDef powerUpShieldBodyDef = new BodyDef();
@@ -48,6 +49,8 @@ public class PowerUp extends Dodgeable {
         dodgeableBody.setTransform(camera.viewportWidth, MathUtils.random(0, camera.viewportHeight - HEIGHT), dodgeableBody.getAngle());
         dodgeableBody.applyForceToCenter(FORCE_X, 0, true);
         this.alive = true;
+
+        applyScrollSpeed();
 
     }
 }

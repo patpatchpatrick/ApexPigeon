@@ -44,7 +44,7 @@ public class Rockets {
     private Texture rocketExplosionSheet;
     private long lastRocketExplosionSpawnTime;
 
-    public Rockets(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables) {
+    public Rockets(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, final Dodgeables dodgeables) {
         this.gameWorld = gameWorld;
         this.game = game;
         this.camera = camera;
@@ -56,14 +56,14 @@ public class Rockets {
         rocketPool = new Pool<Rocket>() {
             @Override
             protected Rocket newObject() {
-                return new Rocket(gameWorld, game, camera);
+                return new Rocket(gameWorld, game, camera, dodgeables);
             }
         };
 
         rocketExplosionPool = new Pool<RocketExplosion>() {
             @Override
             protected RocketExplosion newObject() {
-                return new RocketExplosion(gameWorld, game, camera);
+                return new RocketExplosion(gameWorld, game, camera, dodgeables);
             }
         };
 

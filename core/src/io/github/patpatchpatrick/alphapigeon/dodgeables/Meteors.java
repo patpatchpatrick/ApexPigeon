@@ -39,7 +39,7 @@ public class Meteors {
     private final float METEOR_WIDTH = 80f;
     private final float METEOR_HEIGHT = METEOR_WIDTH / 2;
 
-    public Meteors(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables){
+    public Meteors(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, final Dodgeables dodgeables){
 
         this.gameWorld = gameWorld;
         this.game = game;
@@ -52,7 +52,7 @@ public class Meteors {
         meteorsPool = new Pool<Meteor>() {
             @Override
             protected Meteor newObject() {
-                return new Meteor(gameWorld, game, camera);
+                return new Meteor(gameWorld, game, camera, dodgeables);
             }
         };
 

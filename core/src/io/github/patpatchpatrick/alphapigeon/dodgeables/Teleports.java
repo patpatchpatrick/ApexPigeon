@@ -38,7 +38,7 @@ public class Teleports {
     private Texture teleportSheet;
     private long lastTeleportSpawnTime;
 
-    public Teleports(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables){
+    public Teleports(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, final Dodgeables dodgeables){
 
         this.gameWorld = gameWorld;
         this.game = game;
@@ -50,7 +50,7 @@ public class Teleports {
         teleportsPool = new Pool<Teleport>() {
             @Override
             protected Teleport newObject() {
-                return new Teleport(gameWorld, game, camera);
+                return new Teleport(gameWorld, game, camera, dodgeables);
             }
         };
 

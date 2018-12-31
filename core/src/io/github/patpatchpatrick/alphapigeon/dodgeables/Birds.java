@@ -42,7 +42,7 @@ public class Birds {
     private Texture levelTwoBirdFlySheet;
     private long lastLevelTwoBirdSpawnTime;
 
-    public Birds(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables){
+    public Birds(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, final Dodgeables dodgeables){
 
         this.gameWorld = gameWorld;
         this.game = game;
@@ -55,14 +55,14 @@ public class Birds {
         levelOneBirdPool = new Pool<LevelOneBird>() {
             @Override
             protected LevelOneBird newObject() {
-                return new LevelOneBird(gameWorld, game, camera);
+                return new LevelOneBird(gameWorld, game, camera, dodgeables);
             }
         };
 
         levelTwoBirdPool = new Pool<LevelTwoBird>() {
             @Override
             protected LevelTwoBird newObject() {
-                return new LevelTwoBird(gameWorld, game, camera);
+                return new LevelTwoBird(gameWorld, game, camera, dodgeables);
             }
         };
         

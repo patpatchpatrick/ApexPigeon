@@ -10,25 +10,20 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.utils.Array;
-
-import java.util.Iterator;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.Pigeon;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Dodgeable;
 import io.github.patpatchpatrick.alphapigeon.levels.Gameplay;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
-import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.HighScore;
 import io.github.patpatchpatrick.alphapigeon.resources.ScrollingBackground;
 
@@ -52,6 +47,13 @@ public class GameScreen implements Screen {
     //Variables
     final float PIGEON_WIDTH = 10.0f;
     final float PIGEON_HEIGHT = 5.0f;
+    final float PIGEON_INPUT_FORCE = 9.0f;
+    final float PIGEON_INPUT_VELOCITY = 5.0f;
+
+    //Inputs
+    private boolean pigeonIsMovingDownwardOutOfBounds = false;
+    private boolean pigeonIsMovingUpwardsOutOfBounds = false;
+    private Vector2 pigeonRelativeVelocity = new Vector2(0, 0);
 
     public GameScreen(AlphaPigeon game) {
         this.game = game;
@@ -184,40 +186,71 @@ public class GameScreen implements Screen {
             camera.unproject(touchPos);
             pigeonBody.applyForceToCenter(0.3f * (touchPos.x - pigeonBody.getPosition().x), 0.3f * (touchPos.y - pigeonBody.getPosition().y), true);
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
-            pigeonBody.applyForceToCenter(-9f, 0,  true);
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)){
+            pigeonBody.applyForceToCenter(-PIGEON_INPUT_FORCE, 0, true);
+        }
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
-            pigeonBody.applyForceToCenter(9f, 0,  true);
-        if (Gdx.input.isKeyPressed(Input.Keys.UP))
-            pigeonBody.applyForceToCenter(0, 9f,  true);
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
-            pigeonBody.applyForceToCenter(0, -9f,  true);
+            pigeonBody.applyForceToCenter(PIGEON_INPUT_FORCE, 0, true);
+        if (Gdx.input.isKeyPressed(Input.Keys.UP)){
+            for (Dodgeable dodgeable : dodgeables.activeDodgeables){
+                //Speed up the dodgeables so that they move relative to the pigeon, and set the scroll speed
+                // so it can be set on new dodgeables when they are spawned
+                dodgeable.dodgeableBody.setLinearVelocity(dodgeable.dodgeableBody.getLinearVelocity().x, dodgeable.dodgeableBody.getLinearVelocity().y + -PIGEON_INPUT_VELOCITY );
+                dodgeables.scrollingVelocity = dodgeable.dodgeableBody.getLinearVelocity();
+            }
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)){
+            for (Dodgeable dodgeable : dodgeables.activeDodgeables){
+                //Speed up the dodgeables so that they move relative to the pigeon, and set the scroll speed
+                // so it can be set on new dodgeables when they are spawned
+                dodgeable.dodgeableBody.setLinearVelocity(dodgeable.dodgeableBody.getLinearVelocity().x, dodgeable.dodgeableBody.getLinearVelocity().y + PIGEON_INPUT_VELOCITY );
+                dodgeables.scrollingVelocity = dodgeable.dodgeableBody.getLinearVelocity();
+            }
+        }
 
 
-        // make sure the pigeon stays within the screen bounds
+
+        // CHECK IF PIGEON IS OUT OF SCREEN BOUNDS
         if (pigeonBody.getPosition().x < 0) {
             Vector2 vel = pigeonBody.getLinearVelocity();
             vel.x = 0f;
             pigeonBody.setLinearVelocity(vel);
             pigeonBody.setTransform(new Vector2(0, pigeonBody.getPosition().y), pigeonBody.getAngle());
-        }
-        if (pigeonBody.getPosition().x > camera.viewportWidth - PIGEON_WIDTH) {
+        } else if (pigeonBody.getPosition().x > camera.viewportWidth - PIGEON_WIDTH) {
             Vector2 vel = pigeonBody.getLinearVelocity();
             vel.x = 0f;
             pigeonBody.setLinearVelocity(vel);
             pigeonBody.setTransform(new Vector2(camera.viewportWidth - PIGEON_WIDTH, pigeonBody.getPosition().y), pigeonBody.getAngle());
-        }
-        if (pigeonBody.getPosition().y < 0) {
+        } else if (pigeonBody.getPosition().y < pigeon.STARTING_POSITION.y) {
+
+            //If the pigeon is out of bounds, set the pigeon's y position to 0, then set the pigeon velocity
+            // to 0 and add the pigeon's relative velocity to the other dodgeables so that it looks like the pigeon is
+            // moving downwards
+
+            Vector2 pigeonVel = pigeonBody.getLinearVelocity();
+            pigeonVel.y = 0f;
+
+            pigeonBody.setLinearVelocity(pigeonVel);
+            pigeonBody.setTransform(new Vector2(pigeonBody.getPosition().x, pigeon.STARTING_POSITION.y), pigeonBody.getAngle());
+
+        } else if (pigeonBody.getPosition().y > pigeon.STARTING_POSITION.y) {
+
             Vector2 vel = pigeonBody.getLinearVelocity();
-            vel.y = 0f;
-            pigeonBody.setLinearVelocity(vel);
-            pigeonBody.setTransform(new Vector2(pigeonBody.getPosition().x, 0), pigeonBody.getAngle());
-        }
-        if (pigeonBody.getPosition().y > camera.viewportHeight - PIGEON_HEIGHT) {
-            Vector2 vel = pigeonBody.getLinearVelocity();
-            vel.y = 0f;
-            pigeonBody.setLinearVelocity(vel);
-            pigeonBody.setTransform(new Vector2(pigeonBody.getPosition().x, camera.viewportHeight - PIGEON_HEIGHT), pigeonBody.getAngle());
+
+            //If the pigeon is out of bounds, set the pigeon's y position to top border of screen, then set the pigeon velocity
+            // to 0 and add the pigeon's relative velocity to the other dodgeables so that it looks like the pigeon is
+            // moving upwards
+
+            Vector2 pigeonVel = pigeonBody.getLinearVelocity();
+            pigeonVel.y = 0f;
+
+            pigeonBody.setLinearVelocity(pigeonVel);
+            pigeonBody.setTransform(new Vector2(pigeonBody.getPosition().x, pigeon.STARTING_POSITION.y), pigeonBody.getAngle());
+
+
+        } else {
+            //PIGEON IS WITHIN BOUNDS OF SCREEN
+
         }
 
     }
@@ -284,14 +317,14 @@ public class GameScreen implements Screen {
                 //the enemy will explode at collision. Then, destroy the rocket and the enemy it collided with
                 //The spawned rocket and destroyed bodies must be run on a separate thread so the world isn't locked
                 if (rocketInvolvedInCollision) {
-                    if (!pigeonInvolvedInCollision){
+                    if (!pigeonInvolvedInCollision) {
                         final Body fixtureAExplosionBody = fixtureABody;
                         final Body fixtureBExplosionBody = fixtureBBody;
-                        if (fixtureA.getFilterData().categoryBits == game.CATEGORY_ROCKET){
+                        if (fixtureA.getFilterData().categoryBits == game.CATEGORY_ROCKET) {
                             Gdx.app.postRunnable(new Runnable() {
 
                                 @Override
-                                public void run () {
+                                public void run() {
                                     dodgeables.spawnRocketExplosion(fixtureBExplosionBody.getWorldCenter().x, fixtureBExplosionBody.getWorldCenter().y);
                                     destroyBody(fixtureA);
                                     destroyBody(fixtureB);
@@ -303,7 +336,7 @@ public class GameScreen implements Screen {
                             Gdx.app.postRunnable(new Runnable() {
 
                                 @Override
-                                public void run () {
+                                public void run() {
                                     dodgeables.spawnRocketExplosion(fixtureAExplosionBody.getWorldCenter().x, fixtureAExplosionBody.getWorldCenter().y);
                                     destroyBody(fixtureA);
                                     destroyBody(fixtureB);
@@ -357,7 +390,7 @@ public class GameScreen implements Screen {
 
     }
 
-    private void destroyBody(Fixture fixture){
+    private void destroyBody(Fixture fixture) {
         fixture.getBody().setUserData(new BodyData(true));
     }
 
@@ -375,21 +408,21 @@ public class GameScreen implements Screen {
         //Go through and remove all bodies flagged for deletion
 
         /**
-        Array bodies = new Array<Body>();
-        world.getBodies(bodies);
-        for (Iterator<Body> iter = bodies.iterator(); iter.hasNext(); ) {
-            Body body = iter.next();
-            if (body != null) {
-                BodyData data = (BodyData) body.getUserData();
-                if (data != null) {
-                    if (data.isFlaggedForDelete()) {
-                        world.destroyBody(body);
-                        //body.setUserData(null);
-                        body = null;
-                    }
-                }
-            }
-        }
+         Array bodies = new Array<Body>();
+         world.getBodies(bodies);
+         for (Iterator<Body> iter = bodies.iterator(); iter.hasNext(); ) {
+         Body body = iter.next();
+         if (body != null) {
+         BodyData data = (BodyData) body.getUserData();
+         if (data != null) {
+         if (data.isFlaggedForDelete()) {
+         world.destroyBody(body);
+         //body.setUserData(null);
+         body = null;
+         }
+         }
+         }
+         }
          */
     }
 

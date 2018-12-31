@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
@@ -17,12 +18,12 @@ import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 public class AlienMissile extends Dodgeable {
 
     public final float WIDTH = 10f;
-    public final float HEIGHT = 10f;
     private final float FORCE_X = -40.0f;
     private final float FORCE_Y = 40.0f;
 
-    public AlienMissile(World gameWorld, AlphaPigeon game, OrthographicCamera camera) {
-        super(gameWorld, game, camera);
+    public AlienMissile(World gameWorld, AlphaPigeon game, OrthographicCamera camera, Dodgeables dodgeables) {
+        super(gameWorld, game, camera, dodgeables);
+        this.HEIGHT = 10f;
 
         //spawn a new alien missile
         BodyDef alienMissileBodyDef = new BodyDef();
@@ -54,6 +55,8 @@ public class AlienMissile extends Dodgeable {
         missileData.setSpawnTime(TimeUtils.nanoTime() / GameVariables.MILLION_SCALE);
         dodgeableBody.setUserData(missileData);
 
+        applyScrollSpeed();
+
     }
 
     public void initRightward(){
@@ -67,6 +70,8 @@ public class AlienMissile extends Dodgeable {
         BodyData missileData = new BodyData(false);
         missileData.setSpawnTime(TimeUtils.nanoTime() / GameVariables.MILLION_SCALE);
         dodgeableBody.setUserData(missileData);
+
+        applyScrollSpeed();
 
     }
 
@@ -82,6 +87,8 @@ public class AlienMissile extends Dodgeable {
         missileData.setSpawnTime(TimeUtils.nanoTime() / GameVariables.MILLION_SCALE);
         dodgeableBody.setUserData(missileData);
 
+        applyScrollSpeed();
+
     }
 
     public void initDownward(){
@@ -95,6 +102,8 @@ public class AlienMissile extends Dodgeable {
         BodyData missileData = new BodyData(false);
         missileData.setSpawnTime(TimeUtils.nanoTime() / GameVariables.MILLION_SCALE);
         dodgeableBody.setUserData(missileData);
+
+        applyScrollSpeed();
 
     }
 

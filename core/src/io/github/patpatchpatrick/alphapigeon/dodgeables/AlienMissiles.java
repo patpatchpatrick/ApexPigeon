@@ -67,7 +67,7 @@ public class AlienMissiles {
     private Texture alienMissileCornerExplosionSheet;
     private long lastAlienMissileCornerExplosionSpawnTime;
 
-    public AlienMissiles(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables){
+    public AlienMissiles(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, final Dodgeables dodgeables){
         this.gameWorld = gameWorld;
         this.game = game;
         this.camera = camera;
@@ -80,28 +80,28 @@ public class AlienMissiles {
         alienMissilePool = new Pool<AlienMissile>() {
             @Override
             protected AlienMissile newObject() {
-                return new AlienMissile(gameWorld, game, camera);
+                return new AlienMissile(gameWorld, game, camera, dodgeables);
             }
         };
 
         alienMissileExplosionsPool = new Pool<AlienMissileExplosion>() {
             @Override
             protected AlienMissileExplosion newObject() {
-                return new AlienMissileExplosion(gameWorld, game, camera);
+                return new AlienMissileExplosion(gameWorld, game, camera, dodgeables);
             }
         };
 
         alienMissileCornersPool = new Pool<AlienMissileCorner>() {
             @Override
             protected AlienMissileCorner newObject() {
-                return new AlienMissileCorner(gameWorld, game, camera);
+                return new AlienMissileCorner(gameWorld, game, camera, dodgeables);
             }
         };
 
         alienMissileCornerExplosionsPool = new Pool<AlienMissileCornerExplosion>() {
             @Override
             protected AlienMissileCornerExplosion newObject() {
-                return new AlienMissileCornerExplosion(gameWorld, game, camera);
+                return new AlienMissileCornerExplosion(gameWorld, game,camera, dodgeables);
             }
         };
 

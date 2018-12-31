@@ -11,6 +11,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
@@ -18,10 +19,10 @@ import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 public class AlienMissileCornerExplosion extends Dodgeable {
 
     public final float WIDTH = 10f;
-    public final float HEIGHT = 10f;
 
-    public AlienMissileCornerExplosion(World gameWorld, AlphaPigeon game, OrthographicCamera camera) {
-        super(gameWorld, game, camera);
+    public AlienMissileCornerExplosion(World gameWorld, AlphaPigeon game, OrthographicCamera camera, Dodgeables dodgeables) {
+        super(gameWorld, game, camera, dodgeables);
+        this.HEIGHT = 10f;
 
         //spawn new alien missile explosions
         BodyDef alienExplosionBodyDef = new BodyDef();
@@ -55,6 +56,8 @@ public class AlienMissileCornerExplosion extends Dodgeable {
         BodyData alienMissileExplosionData = new BodyData(false);
         alienMissileExplosionData.setExplosionData(TimeUtils.nanoTime()/GameVariables.MILLION_SCALE);
         dodgeableBody.setUserData(alienMissileExplosionData);
+
+        applyScrollSpeed();
 
     }
 
