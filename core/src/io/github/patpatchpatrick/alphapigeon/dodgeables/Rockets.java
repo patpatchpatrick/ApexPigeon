@@ -1,6 +1,7 @@
 package io.github.patpatchpatrick.alphapigeon.dodgeables;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -43,6 +44,11 @@ public class Rockets {
     private Animation<TextureRegion> rocketExplosionAnimation;
     private Texture rocketExplosionSheet;
     private long lastRocketExplosionSpawnTime;
+
+    //Sounds
+    private Sound rocketSpawnSound = Gdx.audio.newSound(Gdx.files.internal("sounds/rocketSpawn.wav"));
+    private Sound rocketExplosionSound = Gdx.audio.newSound(Gdx.files.internal("sounds/rocketExplosion.wav"));
+
 
     public Rockets(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables) {
         this.gameWorld = gameWorld;
@@ -170,6 +176,9 @@ public class Rockets {
         //keep track of time the rocket was spawned
         lastRocketSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
 
+        //Play rocket spawn sounds
+        rocketSpawnSound.play();
+
     }
 
     public void spawnRocketExplosion(float explosionPositionX, float explosionPositionY) {
@@ -183,6 +192,9 @@ public class Rockets {
 
         //keep track of time the rocket explosion was spawned
         lastRocketExplosionSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+
+        //Play rocket explosion sound
+        rocketExplosionSound.play();
 
 
     }
@@ -277,6 +289,8 @@ public class Rockets {
     public void dispose() {
         rocketExplosionSheet.dispose();
         rocketSheet.dispose();
+        rocketSpawnSound.dispose();
+        rocketExplosionSound.dispose();
     }
 
 }

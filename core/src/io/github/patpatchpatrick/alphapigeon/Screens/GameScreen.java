@@ -36,8 +36,6 @@ public class GameScreen implements Screen {
     AlphaPigeon game;
 
     private OrthographicCamera camera;
-    public static Sound dropSound;
-    private Music rainMusic;
     private Pigeon pigeon;
     private Dodgeables dodgeables;
     public ScrollingBackground scrollingBackground;
@@ -75,14 +73,6 @@ public class GameScreen implements Screen {
 
         // initialize the gameplay class
         gameplay = new Gameplay(this.dodgeables);
-
-        // load the game sound effects and background music
-        dropSound = Gdx.audio.newSound(Gdx.files.internal("sounds/drop.wav"));
-        rainMusic = Gdx.audio.newMusic(Gdx.files.internal("sounds/rain.mp3"));
-
-        // start the playback of the background music immediately
-        //rainMusic.setLooping(true);
-        //rainMusic.play();
 
         // create contact listener to listen for if the Pigeon collides with another object
         // if the pigeon collides with another object, the game is over
@@ -152,8 +142,6 @@ public class GameScreen implements Screen {
     public void dispose() {
 
         // dispose of all the native resources... CALL THIS METHOD MANUALLY WHEN YOU EXIT A SCREEN
-        dropSound.dispose();
-        rainMusic.dispose();
         game.batch.dispose();
         pigeon.dispose();
         dodgeables.dispose();
@@ -347,6 +335,7 @@ public class GameScreen implements Screen {
 
     private void destroyNonPigeonBody(Fixture fixtureA, Fixture fixtureB) {
 
+        // Pigeon is charged and hits a dodgeable enemy
         // destroy the body that the pigeon touches
 
         if (fixtureA.getFilterData().categoryBits == game.CATEGORY_PIGEON) {
@@ -354,6 +343,9 @@ public class GameScreen implements Screen {
         } else if (fixtureB.getFilterData().categoryBits == game.CATEGORY_PIGEON) {
             fixtureA.getBody().setUserData(new BodyData(true));
         }
+
+        // zap the enemy that pigeon touches while charged... play zap sound effect
+        pigeon.zapEnemy();
 
     }
 
@@ -372,25 +364,6 @@ public class GameScreen implements Screen {
 
         this.dodgeables.sweepDeadBodies();
 
-        //Go through and remove all bodies flagged for deletion
-
-        /**
-        Array bodies = new Array<Body>();
-        world.getBodies(bodies);
-        for (Iterator<Body> iter = bodies.iterator(); iter.hasNext(); ) {
-            Body body = iter.next();
-            if (body != null) {
-                BodyData data = (BodyData) body.getUserData();
-                if (data != null) {
-                    if (data.isFlaggedForDelete()) {
-                        world.destroyBody(body);
-                        //body.setUserData(null);
-                        body = null;
-                    }
-                }
-            }
-        }
-         */
     }
 
 }

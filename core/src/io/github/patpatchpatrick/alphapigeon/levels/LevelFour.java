@@ -40,7 +40,7 @@ public class LevelFour extends Level {
         if (!randomWaveIsInitiated) {
             //If a random isn't currently in progress:
             //Generate a random number to determine which random wave to run
-            randomWave = MathUtils.random(3, TOTAL_NUMBER_OF_WAVES);
+            randomWave = MathUtils.random(1, TOTAL_NUMBER_OF_WAVES);
             //Save the time the last random wave was started
             lastRandomWaveStartTime = currentTimeInMillis;
             randomWaveIsInitiated = true;

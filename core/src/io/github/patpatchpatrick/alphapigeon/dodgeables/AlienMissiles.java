@@ -1,6 +1,7 @@
 package io.github.patpatchpatrick.alphapigeon.dodgeables;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -66,6 +67,9 @@ public class AlienMissiles {
     private Animation<TextureRegion> alienMissileCornerExplosionAnimation;
     private Texture alienMissileCornerExplosionSheet;
     private long lastAlienMissileCornerExplosionSpawnTime;
+
+    //Sounds
+    private Sound alienMissileExplosionSound = Gdx.audio.newSound(Gdx.files.internal("sounds/alienMissileExplosion.wav"));
 
     public AlienMissiles(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables){
         this.gameWorld = gameWorld;
@@ -266,6 +270,9 @@ public class AlienMissiles {
         //keep track of time the missile was spawned
         lastAlienMissileExplosionSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
 
+        //play explosion sound
+        alienMissileExplosionSound.play();
+
     }
 
     public void spawnAlienMissileCorners(float explosionPositionX, float explosionPositionY){
@@ -311,6 +318,9 @@ public class AlienMissiles {
 
         //keep track of time the missile was spawned
         lastAlienMissileCornerExplosionSpawnTime = TimeUtils.nanoTime();
+
+        //play explosion sound
+        alienMissileExplosionSound.play();
 
 
     }
@@ -444,6 +454,7 @@ public class AlienMissiles {
         alienMissileExplosionSheet.dispose();
         alienMissileCornerSheet.dispose();
         alienMissileCornerExplosionSheet.dispose();
+        alienMissileExplosionSound.dispose();
     }
 
 }

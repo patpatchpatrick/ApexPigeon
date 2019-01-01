@@ -60,7 +60,7 @@ public class LevelOneBird extends Dodgeable {
         //The force multiplier is the magnitude by which object's force/speed is increased
         //The force multiplier increases over time
 
-        this.forceMultiplier = 1f + totalGameTime * 0.00003f;
+        this.forceMultiplier = 1f + totalGameTime * 0.000015f;
         // The maximum force multiplier for this object is 10
         if (this.forceMultiplier >= 10f){
             this.forceMultiplier = 10f;

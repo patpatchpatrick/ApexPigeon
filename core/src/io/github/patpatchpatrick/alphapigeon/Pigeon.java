@@ -2,6 +2,7 @@ package io.github.patpatchpatrick.alphapigeon;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -37,6 +38,10 @@ public class Pigeon {
     private Texture powerUpShieldSheet;
     private Animation<TextureRegion> powerUpShieldAnimation;
 
+    //Sounds
+    private Sound powerUpShieldSound;
+    private Sound powerUpShieldZapSound;
+
 
     public Pigeon(World world, AlphaPigeon game) {
 
@@ -67,6 +72,10 @@ public class Pigeon {
 
         initializePowerUpShieldAnimation();
 
+        // load the powerUpShield sound effect
+        powerUpShieldSound = Gdx.audio.newSound(Gdx.files.internal("sounds/powerUpShield.wav"));
+        powerUpShieldZapSound = Gdx.audio.newSound(Gdx.files.internal("sounds/powerUpShieldZap.wav"));
+
 
     }
 
@@ -76,6 +85,25 @@ public class Pigeon {
         //Set the current power up type and the time that the power up was picked up by the pigeon
         currentPowerUp = powerUpType;
         this.currentPowerUpTime = this.stateTime;
+
+        //Play powerUp sounds
+        if (currentPowerUp == game.CATEGORY_POWERUP_SHIELD){
+            powerUpShieldSound.play();
+        }
+
+    }
+
+    private void removePowerUps(){
+        //Remove the powerUps from the pigeon
+        //Set the powerUp back to its default of PIGEON
+        this.currentPowerUp = game.CATEGORY_PIGEON;
+        //Stop the power up sounds
+        powerUpShieldSound.stop();
+
+    }
+
+    public void zapEnemy(){
+        powerUpShieldZapSound.play();
     }
 
     public short getPowerUpType() {
@@ -197,7 +225,7 @@ public class Pigeon {
         //Check if power up shield has expired
         //If so, set currentPowerUp back to CATEGORY_PIGEON, which is the default currentPowerUp setting
         if (this.stateTime - this.currentPowerUpTime > 8) {
-            this.currentPowerUp = game.CATEGORY_PIGEON;
+            removePowerUps();
         }
 
     }
@@ -210,5 +238,7 @@ public class Pigeon {
     public void dispose() {
         pigeonFlySheet.dispose();
         powerUpShieldSheet.dispose();
+        powerUpShieldSound.dispose();
+        powerUpShieldZapSound.dispose();
     }
 }

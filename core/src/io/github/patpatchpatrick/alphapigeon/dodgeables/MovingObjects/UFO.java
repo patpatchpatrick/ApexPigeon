@@ -1,6 +1,7 @@
 package io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -28,6 +29,8 @@ public class UFO extends Dodgeable {
     public boolean stopInBottomLeftCornerOfScreen = false;
     public long timeToHold = 0;
 
+    //Sound associated with UFO
+    private Sound flyingSound;
 
     public long spawnTime;
     //Energy balls associated with UFO
@@ -58,7 +61,7 @@ public class UFO extends Dodgeable {
 
     }
 
-    public void init(float direction) {
+    public void init(float direction, Sound flyingSound) {
 
         //Set the direction which the energy beams associated with the UFO should fire
         this.direction = direction;
@@ -71,10 +74,14 @@ public class UFO extends Dodgeable {
         //keep track of time the ufo was spawned
         spawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
 
+        //Play UFO Sound
+        this.flyingSound = flyingSound;
+        this.flyingSound.loop();
+
 
     }
 
-    public void initHorizontal(float direction) {
+    public void initHorizontal(float direction, Sound flyingSound) {
 
         //Set the direction which the energy beams associated with the UFO should fire
         this.direction = direction;
@@ -87,9 +94,13 @@ public class UFO extends Dodgeable {
         //keep track of time the ufo was spawned
         spawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
 
+        //Play UFO Sound
+        this.flyingSound = flyingSound;
+        this.flyingSound.loop();
+
     }
 
-    public void initVertical(float direction){
+    public void initVertical(float direction, Sound flyingSound){
         //Set the direction which the energy beams associated with the UFO should fire
         this.direction = direction;
 
@@ -101,9 +112,13 @@ public class UFO extends Dodgeable {
         //keep track of time the ufo was spawned
         spawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
 
+        //Play UFO Sound
+        this.flyingSound = flyingSound;
+        this.flyingSound.loop();
+
     }
 
-    public void initStopInCenter(float direction, long timeToHoldInCenter) {
+    public void initStopInCenter(float direction, long timeToHoldInCenter, Sound flyingSound) {
 
         //This version of the UFO will stop in the center of the screen for a specified period of time
 
@@ -121,9 +136,13 @@ public class UFO extends Dodgeable {
         this.stopInCenterOfScreen = true;
         this.timeToHold = timeToHoldInCenter;
 
+        //Play UFO Sound
+        this.flyingSound = flyingSound;
+        this.flyingSound.loop();
+
     }
 
-    public void initStopInTopRightCorner(float direction, long timeToHold){
+    public void initStopInTopRightCorner(float direction, long timeToHold, Sound flyingSound){
         //This version of the UFO will stop in the right corner of the screen for a specified period of time
 
         //Set the direction which the energy beams associated with the UFO should fire
@@ -139,9 +158,13 @@ public class UFO extends Dodgeable {
 
         this.stopInTopRightCornerOfScreen = true;
         this.timeToHold = timeToHold;
+
+        //Play UFO Sound
+        this.flyingSound = flyingSound;
+        this.flyingSound.loop();
     }
 
-    public void initStopInBottomLeftCorner(float direction, long timeToHold){
+    public void initStopInBottomLeftCorner(float direction, long timeToHold, Sound flyingSound){
         //This version of the UFO will stop in the bottom left corner of the screen for a specified period of time
 
         //Set the direction which the energy beams associated with the UFO should fire
@@ -157,6 +180,10 @@ public class UFO extends Dodgeable {
 
         this.stopInBottomLeftCornerOfScreen = true;
         this.timeToHold = timeToHold;
+
+        //Play UFO Sound
+        this.flyingSound = flyingSound;
+        this.flyingSound.loop();
     }
 
     @Override
@@ -188,6 +215,8 @@ public class UFO extends Dodgeable {
         this.stopInTopRightCornerOfScreen = false;
         this.stopInBottomLeftCornerOfScreen = false;
         this.timeToHold = 0;
+
+        this.flyingSound.stop();
 
     }
 }

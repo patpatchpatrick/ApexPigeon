@@ -1,6 +1,7 @@
 package io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.ufoEnergyBeam;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -14,7 +15,7 @@ import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.UFO;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 
-public class UfoEnergyBeamLeft extends Dodgeable {
+public class UfoEnergyBeamLeft extends UfoEnergyBeam {
 
     public final float WIDTH = 80f;
     public final float HEIGHT = 40f;
@@ -46,7 +47,7 @@ public class UfoEnergyBeamLeft extends Dodgeable {
 
     }
 
-    public void init(UFO ufo, float energyBeamDirection) {
+    public void init(UFO ufo, float energyBeamDirection, Sound energyBeamSound) {
 
         // Get ufo positions to determine where to spawn the energy beam
         float ufoXPosition = ufo.getPosition().x;
@@ -71,6 +72,10 @@ public class UfoEnergyBeamLeft extends Dodgeable {
         dodgeableBody.setUserData(energyBeamData);
 
         this.ufo =  ufo;
+
+        //Set and play the energy beam sound
+        this.energyBeamSound = energyBeamSound;
+        this.energyBeamSound.loop();
 
     }
 }
