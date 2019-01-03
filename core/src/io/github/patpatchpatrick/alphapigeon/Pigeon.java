@@ -41,6 +41,7 @@ public class Pigeon {
     //Sounds
     private Sound powerUpShieldSound;
     private Sound powerUpShieldZapSound;
+    private Sound teleportSound;
 
 
     public Pigeon(World world, AlphaPigeon game) {
@@ -75,6 +76,7 @@ public class Pigeon {
         // load the powerUpShield sound effect
         powerUpShieldSound = Gdx.audio.newSound(Gdx.files.internal("sounds/powerUpShield.wav"));
         powerUpShieldZapSound = Gdx.audio.newSound(Gdx.files.internal("sounds/powerUpShieldZap.wav"));
+        teleportSound = Gdx.audio.newSound(Gdx.files.internal("sounds/teleportSound.mp3"));
 
 
     }
@@ -125,6 +127,9 @@ public class Pigeon {
 
                 final BodyData deleteObjectOne = new BodyData(true);
                 final BodyData deleteObjectTwo = new BodyData(true);
+
+                //Play the teleport sound
+                teleportSound.play();
 
                 //Move the pigeon to the opposite teleport's location and then destroy both teleports
                 //This must be done using Runnable app.postRunnable so it occurs in the rendering thread which is currently locked

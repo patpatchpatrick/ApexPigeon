@@ -19,6 +19,8 @@ public abstract class Dodgeable implements Pool.Poolable {
     //This class implements poolable because objects used in this class can and should be pooled when not in use
 
     public boolean alive;
+    //Boolean to manually delete dodgeables
+    public boolean flagForDeletion = false;
     public Body dodgeableBody;
 
     protected float forceMultiplier = 1f;
@@ -62,6 +64,9 @@ public abstract class Dodgeable implements Pool.Poolable {
             if (data.isFlaggedForDelete()) {
                 return false;
             }
+        }
+        if (flagForDeletion){
+            return false;
         }
         return true;
     }
@@ -109,6 +114,7 @@ public abstract class Dodgeable implements Pool.Poolable {
         dodgeableBody.setLinearVelocity(vel);
         dodgeableBody.setAngularVelocity(0);
         this.alive = false;
+        this.flagForDeletion = false;
 
         //Reset hold variables
         this.isHeld = false;

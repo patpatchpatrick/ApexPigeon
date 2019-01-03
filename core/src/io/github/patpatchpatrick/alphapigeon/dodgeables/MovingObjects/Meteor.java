@@ -1,6 +1,7 @@
 package io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -17,6 +18,7 @@ public class Meteor extends Dodgeable {
     public final float HEIGHT = WIDTH / 2;
     private final float FORCE_X = -3000.0f;
     private final float FORCE_Y = -3000.0f;
+    private Sound meteorSound;
 
     public Meteor(World gameWorld, AlphaPigeon game, OrthographicCamera camera) {
         super(gameWorld, game, camera);
@@ -42,13 +44,24 @@ public class Meteor extends Dodgeable {
 
     }
 
-    public void init() {
+    public void init(Sound meteorSound) {
 
         dodgeableBody.setActive(true);
         dodgeableBody.setTransform(MathUtils.random(0 - WIDTH/2, camera.viewportWidth), camera.viewportHeight + HEIGHT/2, dodgeableBody.getAngle());
         dodgeableBody.applyForceToCenter(FORCE_X, FORCE_Y, true);
         this.alive = true;
 
+        //Play spawn sound
+        this.meteorSound =  meteorSound;
+        this.meteorSound.play();
+
     }
 
+    @Override
+    public void reset() {
+        super.reset();
+
+        //Stop playing sound
+        this.meteorSound.stop();
+    }
 }

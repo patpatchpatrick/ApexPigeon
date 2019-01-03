@@ -50,6 +50,7 @@ public class GameScreen implements Screen {
     //Variables
     final float PIGEON_WIDTH = 10.0f;
     final float PIGEON_HEIGHT = 5.0f;
+    final float PIGEON_INPUT_FORCE = 7.0f;
 
     public GameScreen(AlphaPigeon game) {
         this.game = game;
@@ -173,13 +174,13 @@ public class GameScreen implements Screen {
             pigeonBody.applyForceToCenter(0.3f * (touchPos.x - pigeonBody.getPosition().x), 0.3f * (touchPos.y - pigeonBody.getPosition().y), true);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
-            pigeonBody.applyForceToCenter(-9f, 0,  true);
+            pigeonBody.applyForceToCenter(-PIGEON_INPUT_FORCE, 0,  true);
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
-            pigeonBody.applyForceToCenter(9f, 0,  true);
+            pigeonBody.applyForceToCenter(PIGEON_INPUT_FORCE, 0,  true);
         if (Gdx.input.isKeyPressed(Input.Keys.UP))
-            pigeonBody.applyForceToCenter(0, 9f,  true);
+            pigeonBody.applyForceToCenter(0, PIGEON_INPUT_FORCE,  true);
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
-            pigeonBody.applyForceToCenter(0, -9f,  true);
+            pigeonBody.applyForceToCenter(0, -PIGEON_INPUT_FORCE,  true);
 
 
         // make sure the pigeon stays within the screen bounds

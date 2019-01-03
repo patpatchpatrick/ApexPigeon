@@ -84,7 +84,7 @@ public class UFOs {
     private Sound ufoEnergyBallSound = Gdx.audio.newSound(Gdx.files.internal("sounds/ufoEnergyBall.wav"));
     private Sound ufoEnergyBeamSound = Gdx.audio.newSound(Gdx.files.internal("sounds/ufoEnergyBeam.wav"));
 
-    public UFOs(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables) {
+    public UFOs(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, final Dodgeables dodgeables) {
 
         this.gameWorld = gameWorld;
         this.game = game;

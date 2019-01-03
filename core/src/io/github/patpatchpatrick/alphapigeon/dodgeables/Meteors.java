@@ -1,6 +1,7 @@
 package io.github.patpatchpatrick.alphapigeon.dodgeables;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -38,6 +39,9 @@ public class Meteors {
     private long lastMeteorSpawnTime;
     private final float METEOR_WIDTH = 80f;
     private final float METEOR_HEIGHT = METEOR_WIDTH / 2;
+
+    //Sounds
+    private Sound meteorSound = Gdx.audio.newSound(Gdx.files.internal("sounds/meteor.wav"));
 
     public Meteors(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables){
 
@@ -91,12 +95,13 @@ public class Meteors {
         // Spawn(obtain) a new meteor from the meteors pool and add to list of active meteors
 
         Meteor meteor = meteorsPool.obtain();
-        meteor.init();
+        meteor.init(meteorSound);
         activeMeteors.add(meteor);
         dodgeables.activeDodgeables.add(meteor);
 
         //keep track of time the meteor was spawned
         lastMeteorSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+
 
     }
 

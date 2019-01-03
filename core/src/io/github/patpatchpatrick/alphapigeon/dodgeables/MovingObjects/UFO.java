@@ -11,10 +11,13 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.ufoEnergyBeam.UfoEnergyBeam;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.UFOs;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
 public class UFO extends Dodgeable {
+    private UFOs ufos;
 
     public final float WIDTH = 15f;
     public final float HEIGHT = WIDTH;
@@ -36,10 +39,11 @@ public class UFO extends Dodgeable {
     //Energy balls associated with UFO
     public Array<EnergyBall> energyBalls = new Array<EnergyBall>();
     //Energy beams associated with UFO
-    public Array<Dodgeable> energyBeams = new Array<Dodgeable>();
+    public Array<UfoEnergyBeam> energyBeams = new Array<UfoEnergyBeam>();
 
     public UFO(World gameWorld, AlphaPigeon game, OrthographicCamera camera) {
         super(gameWorld, game, camera);
+        this.ufos = ufos;
 
         //spawn a new ufo
         BodyDef ufoBodyDef = new BodyDef();
@@ -196,8 +200,8 @@ public class UFO extends Dodgeable {
             this.stopInTopRightCornerOfScreen = false;
             this.stopInBottomLeftCornerOfScreen = false;
             //Kill all energy beams when UFO is unheld
-            for(Dodgeable energyBeam : this.energyBeams){
-                energyBeam.alive = false;
+            for(UfoEnergyBeam energyBeam : this.energyBeams){
+                energyBeam.flagForDeletion = true;
             }
         }
     }

@@ -67,6 +67,7 @@ public class UfoEnergyBeamUp extends UfoEnergyBeam {
         BodyData energyBeamData = new BodyData(false);
         energyBeamData.setUfo(ufo);
         energyBeamData.setEnergyBeamDirection(energyBeamDirection);
+        this.direction = energyBeamDirection;
         dodgeableBody.setUserData(energyBeamData);
 
         this.ufo = ufo;

@@ -12,6 +12,7 @@ import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Dodgeable;
 public abstract class UfoEnergyBeam extends Dodgeable {
 
     protected Sound energyBeamSound;
+    public float direction;
 
 
     public UfoEnergyBeam(World gameWorld, AlphaPigeon game, OrthographicCamera camera) {
@@ -23,6 +24,10 @@ public abstract class UfoEnergyBeam extends Dodgeable {
         super.reset();
 
         //Stop playing energy beam sound when it is no longer active
+        this.energyBeamSound.stop();
+    }
+
+    public void stopSound() {
         this.energyBeamSound.stop();
     }
 }

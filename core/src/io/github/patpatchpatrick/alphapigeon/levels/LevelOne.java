@@ -24,6 +24,7 @@ public class LevelOne extends Level {
 
             if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() > L1BIRD_SPAWN_DURATION_WAVE_0) {
                 birds.spawnLevelOneBird(totalGameTime);
+                meteors.spawnMeteor();
             }
             if (currentTimeInMillis - powerUps.getLastpowerUpShieldSpawnTime() > powerUpShieldInterval) {
                 powerUps.spawnPowerUpShield();

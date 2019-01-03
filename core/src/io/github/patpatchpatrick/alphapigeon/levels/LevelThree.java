@@ -15,19 +15,20 @@ public class LevelThree extends Level {
     // Level Three consists of "MEDIUM" difficulty waves of dodgeables that occur randomly
     private final int TOTAL_NUMBER_OF_WAVES = 5;
     private final float RANDOM_WAVE_UFO_HORIZONTAL = 1f;
-    private final float RANDOM_WAVE_UFO_HORIZ_SPAWN_DURATION = 30000f;
+    private boolean randomWaveHorizUfoSpawned = false;
     private final float RANDOM_WAVE_UFO_HORIZ_TOTAL_TIME = 30000f;
     private final float RANDOM_WAVE_UFO_VERTICAL = 2f;
-    private final float RANDOM_WAVE_UFO_VERT_SPAWN_DURATION = 30000f;
+    private boolean randomWaveVertUfoSpawned = false;
     private final float RANDOM_WAVE_UFO_VERT_TOTAL_TIME = 30000f;
     private final float RANDOM_WAVE_METEORS = 3f;
     private final float RANDOM_WAVE_METEORS_SPAWN_DURATION = 2000f;
-    private final float RANDOM_WAVE_METEORS_TOTAL_TIME = 20000f;
+    private final float RANDOM_WAVE_METEORS_TOTAL_TIME = 30000f;
     private final float RANDOM_WAVE_MISSILES = 4f;
     private final float RANDOM_WAVE_MISSILES_SPAWN_DURATION = 2000f;
-    private final float RANDOM_WAVE_MISSILES_TOTAL_TIME = 20000f;
+    private final float RANDOM_WAVE_MISSILES_TOTAL_TIME = 30000f;
     private final float RANDOM_WAVE_UFO_CENTER = 5f;
     private final float RANDOM_WAVE_UFO_CENTER_SPAWN_DURATION = 30000f;
+    private boolean randomWaveCenterUfoSpawned = false;
     private final float RANDOM_WAVE_UFO_CENTER_TOTAL_TIME = 30000f;
     private final float RANDOM_WAVE_L1BIRD_SPAWN_DURATION = 2000;
     private final float RANDOM_WAVE_L2BIRD_SPAWN_DURATION = 2000;
@@ -43,6 +44,7 @@ public class LevelThree extends Level {
         this.powerUpShieldInterval = powerUpShieldInterval;
 
         if (!randomWaveIsInitiated) {
+            resetWaveVariables();
             //If a random isn't currently in progress:
             //Generate a random number to determine which random wave to run
             randomWave = MathUtils.random(1, TOTAL_NUMBER_OF_WAVES);
@@ -63,17 +65,26 @@ public class LevelThree extends Level {
 
     }
 
+    private void resetWaveVariables() {
+        //Reset all variables that need to be reset before selecting a new wave
+        randomWaveHorizUfoSpawned = false;
+        randomWaveVertUfoSpawned = false;
+        randomWaveCenterUfoSpawned = false;
+
+    }
+
     private void runRandomWaveCenterUFO(){
 
         spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
 
-        if (currentTimeInMillis - ufos.getLastUfoSpawnTime() > RANDOM_WAVE_UFO_CENTER_SPAWN_DURATION) {
+        if (!randomWaveCenterUfoSpawned) {
 
             //Spawn a UFO that stops in center and shoots beams in all directions for a specified
             //amount of time
             ufos.spawnStopInCenterUfo(ufos.ENERGY_BEAM_ALL_DIRECTIONS, 5);
             //Spawn a teleport that can be used to dodge the center UFO
             teleports.spawnTeleports();
+            randomWaveCenterUfoSpawned = true;
         }
 
 
@@ -85,11 +96,12 @@ public class LevelThree extends Level {
 
         spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
 
-        if (currentTimeInMillis - ufos.getLastUfoSpawnTime() > RANDOM_WAVE_UFO_VERT_SPAWN_DURATION) {
+        if (!randomWaveVertUfoSpawned) {
 
             //Spawn a UFO that travels vertically from top to bottom and shoots a straight vertical
             //line of energy beams (i.e. a top and bottom beam)
             ufos.spawnVerticalUfo(ufos.ENERGY_BEAM_VERTICAL_DIRECTIONS);
+            randomWaveVertUfoSpawned = true;
         }
 
         checkIfRandomWaveIsComplete(RANDOM_WAVE_UFO_VERT_TOTAL_TIME);
@@ -131,11 +143,12 @@ public class LevelThree extends Level {
 
         spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
 
-        if (currentTimeInMillis - ufos.getLastUfoSpawnTime() > RANDOM_WAVE_UFO_HORIZ_SPAWN_DURATION) {
+        if (!randomWaveHorizUfoSpawned) {
 
             //Spawn a UFO that travels horizontally from right to left and shoots a straight horizontal
             //line of energy beams (i.e. a left and right beam)
             ufos.spawnHorizontalUfo(ufos.ENERGY_BEAM_HORIZONAL_DIRECTIONS);
+            randomWaveHorizUfoSpawned = true;
         }
 
 
