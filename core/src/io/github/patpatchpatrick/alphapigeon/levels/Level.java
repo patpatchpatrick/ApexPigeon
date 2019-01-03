@@ -38,14 +38,14 @@ public abstract class Level {
     //L1W1 is only level 1 birds,  L1W2 is level 1 and 2 birds
     //Start time should be 0f and end time should be 40000f
     protected final float LEVEL_ONE_WAVE_1 = 20000f;
-    protected final float LEVEL_ONE_END_TIME = 274000f;
+    protected final float LEVEL_ONE_END_TIME = 200000f;
     //L2 is "easy" difficulty
     //End time should be 120000f
     protected final float LEVEL_TWO_START_TIME = LEVEL_ONE_END_TIME;
-    protected final float LEVEL_TWO_END_TIME = 275000f;
+    protected final float LEVEL_TWO_END_TIME = 4f;
     //L3 is "medium" difficulty
     protected final float LEVEL_THREE_START_TIME = LEVEL_TWO_END_TIME;
-    protected final float LEVEL_THREE_END_TIME = 280000f;
+    protected final float LEVEL_THREE_END_TIME = 6f;
     //L4 is "hard" difficulty
     protected final float LEVEL_FOUR_START_TIME = LEVEL_THREE_END_TIME;
     protected final float LEVEL_FOUR_END_TIME = 290000f;
@@ -77,6 +77,18 @@ public abstract class Level {
             birds.spawnLevelTwoBird(totalGameTime);
         }
 
+    }
+
+    protected void spawnReverseBirds(float levelOneBirdSpawnDuration, float levelTwoBirdSpawnDuration){
+        //Method shared by all of the levels
+        //Spawns level one and level two birds based on inputted spawn durations
+        //Birds are spawned flying in reverse direction
+        if (currentTimeInMillis - birds.getLastLevelOneReverseBirdSpawnTime() > levelOneBirdSpawnDuration) {
+            birds.spawnLevelOneBirdReverse(totalGameTime);
+        }
+        if (currentTimeInMillis - birds.getLastLevelTwoReverseBirdSpawnTime() > levelTwoBirdSpawnDuration) {
+            birds.spawnLevelTwoBirdReverse(totalGameTime);
+        }
     }
 
     protected void checkIfRandomWaveIsComplete(float randomWaveDuration){

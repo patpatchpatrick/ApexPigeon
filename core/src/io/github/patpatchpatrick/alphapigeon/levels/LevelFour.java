@@ -13,7 +13,7 @@ public class LevelFour extends Level {
     // that are randomly selected
 
     //RANDOM WAVE VARIABLES
-    private final int TOTAL_NUMBER_OF_WAVES = 4;
+    private final int TOTAL_NUMBER_OF_WAVES = 5;
     private final float RANDOM_WAVE_TELEPORT_MADNESS = 1f;
     private final float RANDOM_WAVE_TELEPORT_MADNESS_L1BIRD_DURATION = 700f;
     private final float RANDOM_WAVE_TELEPORT_SPAWN_DURATION = 4000f;
@@ -29,6 +29,10 @@ public class LevelFour extends Level {
     private final float RANDOM_WAVE_ROCKET_MADNESS_L1BIRD_DURATION = 400f;
     private final float RANDOM_WAVE_ROCKET_MADNESS_SPAWN_DURATION = 400f;
     private final float RANDOM_WAVE_ROCKET_MADNESS_TOTAL_TIME = 15000f;
+    private final float RANDOM_WAVE_BIRD_MADNESS = 5f;
+    private final float RANDOM_WAVE_BIRD_MADNESS_L1BIRD_DURATION = 1600f;
+    private final float RANDOM_WAVE_BIRD_MADNESS_L2BIRD_DURATION = 3200f;
+    private final float RANDOM_WAVE_BIRD_MADNESS_TOTAL_TIME = 15000f;
 
 
     public LevelFour(Dodgeables dodgeables){
@@ -45,7 +49,7 @@ public class LevelFour extends Level {
             resetWaveVariables();
             //If a random isn't currently in progress:
             //Generate a random number to determine which random wave to run
-            randomWave = MathUtils.random(4, 4);
+            randomWave = MathUtils.random(1, TOTAL_NUMBER_OF_WAVES);
             //Save the time the last random wave was started
             lastRandomWaveStartTime = currentTimeInMillis;
             randomWaveIsInitiated = true;
@@ -57,7 +61,19 @@ public class LevelFour extends Level {
             runRandomWaveUFOsInCorners();
         } else if (randomWave == RANDOM_WAVE_ROCKET_MADNESS){
             runRandomWaveRocketMadness();
+        } else if (randomWave == RANDOM_WAVE_BIRD_MADNESS){
+            runRandomWaveBirdMadness();
         }
+
+    }
+
+    private void runRandomWaveBirdMadness() {
+        // Spawn loads of L1birds and L2birds flying in regular and reverse directions
+        spawnBirds(RANDOM_WAVE_BIRD_MADNESS_L1BIRD_DURATION, RANDOM_WAVE_BIRD_MADNESS_L2BIRD_DURATION);
+
+        spawnReverseBirds(RANDOM_WAVE_BIRD_MADNESS_L1BIRD_DURATION, RANDOM_WAVE_BIRD_MADNESS_L2BIRD_DURATION);
+
+        checkIfRandomWaveIsComplete(RANDOM_WAVE_BIRD_MADNESS_TOTAL_TIME);
 
     }
 

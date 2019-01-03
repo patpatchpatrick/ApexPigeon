@@ -31,7 +31,7 @@ public class Dodgeables {
     private PowerUps powerUps;
     private Meteors meteors;
     private UFOs ufos;
-
+    public Notifications notifications;
 
     public Dodgeables(Pigeon pigeon, World world, AlphaPigeon game, OrthographicCamera camera) {
 
@@ -46,6 +46,7 @@ public class Dodgeables {
         powerUps = new PowerUps(gameWorld, game, camera, this);
         meteors = new Meteors(gameWorld, game, camera, this);
         ufos = new UFOs(gameWorld, game, camera, this);
+        notifications = new Notifications(gameWorld, game, camera, this);
 
     }
 
@@ -86,6 +87,7 @@ public class Dodgeables {
     public void render(float stateTime, SpriteBatch batch) {
 
         //Render all dodgeable classes
+
         birds.render(stateTime, batch);
         rockets.render(stateTime, batch);
         alienMissiles.render(stateTime, batch);
@@ -93,6 +95,8 @@ public class Dodgeables {
         powerUps.render(stateTime, batch);
         meteors.render(stateTime, batch);
         ufos.render(stateTime, batch);
+        notifications.render(stateTime, batch);
+
 
     }
 
@@ -106,6 +110,7 @@ public class Dodgeables {
         powerUps.update();
         meteors.update();
         ufos.update(stateTime);
+        notifications.update();
 
     }
 
@@ -123,6 +128,7 @@ public class Dodgeables {
     public void dispose() {
 
         //Dispose all dodgeable classes' textures
+        notifications.dispose();
         birds.dispose();
         rockets.dispose();
         alienMissiles.dispose();

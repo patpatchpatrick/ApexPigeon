@@ -19,6 +19,7 @@ import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBird;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBirdReverse;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelTwoBird;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelTwoBirdReverse;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
@@ -48,7 +49,13 @@ public class Birds {
     private Texture levelTwoBirdFlySheet;
     private long lastLevelTwoBirdSpawnTime;
 
-    public Birds(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables){
+    //Level Two Bird (Reverse) variables
+    private final Array<LevelTwoBirdReverse> activeLevelTwoBirdReverses = new Array<LevelTwoBirdReverse>();
+    private final Pool<LevelTwoBirdReverse> levelTwoBirdReversePool;
+    private long lastLevelTwoBirdReverseSpawnTime;
+
+
+    public Birds(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables) {
 
         this.gameWorld = gameWorld;
         this.game = game;
@@ -78,12 +85,18 @@ public class Birds {
                 return new LevelTwoBird(gameWorld, game, camera);
             }
         };
-        
-        
+
+        levelTwoBirdReversePool = new Pool<LevelTwoBirdReverse>() {
+            @Override
+            protected LevelTwoBirdReverse newObject() {
+                return new LevelTwoBirdReverse(gameWorld, game, camera);
+            }
+        };
+
 
     }
 
-    public void render(float stateTime, SpriteBatch batch){
+    public void render(float stateTime, SpriteBatch batch) {
 
         // Get the animation frames for the level one and level two birds
         TextureRegion levelOneCurrentFrame = levelOneBirdAnimation.getKeyFrame(stateTime, true);
@@ -102,6 +115,7 @@ public class Birds {
         // Render all active level one birds(reversed)
         for (LevelOneBirdReverse levelOneBirdReverse : activeLevelOneBirdReverses) {
             if (levelOneBirdReverse.alive) {
+                //X scale is -1 because bird is reversed
                 batch.draw(levelOneCurrentFrame, levelOneBirdReverse.getPosition().x + levelOneBirdReverse.WIDTH, levelOneBirdReverse.getPosition().y, 0, 0, levelOneBirdReverse.WIDTH, levelOneBirdReverse.HEIGHT, -1, 1, levelOneBirdReverse.getAngle());
             } else {
                 activeLevelOneBirdReverses.removeValue(levelOneBirdReverse, false);
@@ -119,41 +133,60 @@ public class Birds {
             }
         }
 
+        // Render all active level two birds (reversed)
+        for (LevelTwoBirdReverse levelTwoBirdReverse : activeLevelTwoBirdReverses) {
+            if (levelTwoBirdReverse.alive) {
+                //X scale is -1 because bird if reversed
+                batch.draw(levelTwoCurrentFrame, levelTwoBirdReverse.getPosition().x + levelTwoBirdReverse.WIDTH, levelTwoBirdReverse.getPosition().y - 2f, 0, 2, levelTwoBirdReverse.WIDTH, levelTwoBirdReverse.HEIGHT, -1, 1, levelTwoBirdReverse.getAngle());
+            } else {
+                activeLevelTwoBirdReverses.removeValue(levelTwoBirdReverse, false);
+                dodgeables.activeDodgeables.removeValue(levelTwoBirdReverse, false);
+            }
+        }
+
     }
 
-    public void update(){
-        
-    // For all level one and level two birds that are off the game screen, free the birds in the pool
+    public void update() {
+
+        // For all level one and level two birds that are off the game screen, free the birds in the pool
         // so that they can be reused 
-        
-        for (LevelOneBird levelOneBird : activeLevelOneBirds){
-            if (levelOneBird.getPosition().x < 0 - levelOneBird.WIDTH || levelOneBird.getPosition().x > camera.viewportWidth + levelOneBird.WIDTH){
+
+        for (LevelOneBird levelOneBird : activeLevelOneBirds) {
+            if (levelOneBird.getPosition().x < 0 - levelOneBird.WIDTH || levelOneBird.getPosition().x > camera.viewportWidth + levelOneBird.WIDTH) {
                 activeLevelOneBirds.removeValue(levelOneBird, false);
                 dodgeables.activeDodgeables.removeValue(levelOneBird, false);
                 levelOneBirdPool.free(levelOneBird);
             }
         }
 
-        for (LevelOneBirdReverse levelOneBirdReverse : activeLevelOneBirdReverses){
-            if (levelOneBirdReverse.getPosition().x < 0 - levelOneBirdReverse.WIDTH || levelOneBirdReverse.getPosition().x > camera.viewportWidth + levelOneBirdReverse.WIDTH){
+        for (LevelOneBirdReverse levelOneBirdReverse : activeLevelOneBirdReverses) {
+            if (levelOneBirdReverse.getPosition().x < 0 - levelOneBirdReverse.WIDTH || levelOneBirdReverse.getPosition().x > camera.viewportWidth + levelOneBirdReverse.WIDTH) {
                 activeLevelOneBirdReverses.removeValue(levelOneBirdReverse, false);
                 dodgeables.activeDodgeables.removeValue(levelOneBirdReverse, false);
                 levelOneBirdReversePool.free(levelOneBirdReverse);
             }
         }
 
-        for (LevelTwoBird levelTwoBird : activeLevelTwoBirds){
-            if (levelTwoBird.getPosition().x < 0 - levelTwoBird.WIDTH || levelTwoBird.getPosition().x > camera.viewportWidth + levelTwoBird.WIDTH){
+        for (LevelTwoBird levelTwoBird : activeLevelTwoBirds) {
+            if (levelTwoBird.getPosition().x < 0 - levelTwoBird.WIDTH || levelTwoBird.getPosition().x > camera.viewportWidth + levelTwoBird.WIDTH) {
                 activeLevelTwoBirds.removeValue(levelTwoBird, false);
                 dodgeables.activeDodgeables.removeValue(levelTwoBird, false);
                 levelTwoBirdPool.free(levelTwoBird);
             }
         }
-        
+
+        for (LevelTwoBirdReverse levelTwoBirdReverse : activeLevelTwoBirdReverses) {
+            if (levelTwoBirdReverse.getPosition().x < 0 - levelTwoBirdReverse.WIDTH || levelTwoBirdReverse.getPosition().x > camera.viewportWidth + levelTwoBirdReverse.WIDTH) {
+                activeLevelTwoBirdReverses.removeValue(levelTwoBirdReverse, false);
+                dodgeables.activeDodgeables.removeValue(levelTwoBirdReverse, false);
+                levelTwoBirdReversePool.free(levelTwoBirdReverse);
+            }
+        }
+
 
     }
 
-    public void spawnLevelOneBird(float totalGameTime){
+    public void spawnLevelOneBird(float totalGameTime) {
 
         // Spawn(obtain) a new bird from the level one bird pool and add to list of active birds
 
@@ -167,7 +200,7 @@ public class Birds {
 
     }
 
-    public void spawnLevelOneBirdReverse(float totalGameTime){
+    public void spawnLevelOneBirdReverse(float totalGameTime) {
 
         // Spawn(obtain) a new bird from the level one bird pool and add to list of active birds
 
@@ -179,9 +212,13 @@ public class Birds {
         //keep track of time the bird was spawned
         lastLevelOneBirdReverseSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
 
+        //Notify user that bird is coming from the left
+        dodgeables.notifications.spawnExclamationMarkNotification(Notifications.DIRECTION_LEFT);
+
+
     }
 
-    public void spawnLevelTwoBird(float totalGameTime){
+    public void spawnLevelTwoBird(float totalGameTime) {
 
         // Spawn(obtain) a new bird from the level two bird pool and add to list of active birds
 
@@ -192,6 +229,23 @@ public class Birds {
 
         //keep track of time the bird was spawned
         lastLevelTwoBirdSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+    }
+
+    public void spawnLevelTwoBirdReverse(float totalGameTime) {
+
+        // Spawn(obtain) a new bird from the level two reverse bird pool and add to list of active birds
+
+        LevelTwoBirdReverse levelTwoBirdReverse = levelTwoBirdReversePool.obtain();
+        levelTwoBirdReverse.init(totalGameTime);
+        activeLevelTwoBirdReverses.add(levelTwoBirdReverse);
+        dodgeables.activeDodgeables.add(levelTwoBirdReverse);
+
+        //keep track of time the bird was spawned
+        lastLevelTwoBirdReverseSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+
+        //Notify user that bird is coming from the left
+        dodgeables.notifications.spawnExclamationMarkNotification(Notifications.DIRECTION_BOTTOM);
+
     }
 
     private void initializeLevelOneBirdAnimation() {
@@ -249,48 +303,63 @@ public class Birds {
 
     }
 
-    public float getLastLevelOneBirdSpawnTime(){
+    public float getLastLevelOneBirdSpawnTime() {
         return lastLevelOneBirdSpawnTime;
     }
 
-    public float getLastLevelTwoBirdSpawnTime(){
+    public float getLastLevelTwoBirdSpawnTime() {
         return lastLevelTwoBirdSpawnTime;
     }
 
-    public void sweepDeadBodies(){
+    public float getLastLevelOneReverseBirdSpawnTime() {
+        return lastLevelOneBirdReverseSpawnTime;
+    }
+
+    public float getLastLevelTwoReverseBirdSpawnTime() {
+        return lastLevelTwoBirdReverseSpawnTime;
+    }
+
+    public void sweepDeadBodies() {
 
         // If the bird is flagged for deletion due to a collision, free the bird from the pool
         // so that it moves off the screen and can be reused
 
-        for (LevelOneBird levelOneBird : activeLevelOneBirds){
-            if (!levelOneBird.isActive()){
+        for (LevelOneBird levelOneBird : activeLevelOneBirds) {
+            if (!levelOneBird.isActive()) {
                 activeLevelOneBirds.removeValue(levelOneBird, false);
                 dodgeables.activeDodgeables.removeValue(levelOneBird, false);
                 levelOneBirdPool.free(levelOneBird);
             }
         }
 
-        for (LevelOneBirdReverse levelOneBirdReverse : activeLevelOneBirdReverses){
-            if (!levelOneBirdReverse.isActive()){
+        for (LevelOneBirdReverse levelOneBirdReverse : activeLevelOneBirdReverses) {
+            if (!levelOneBirdReverse.isActive()) {
                 activeLevelOneBirdReverses.removeValue(levelOneBirdReverse, false);
                 dodgeables.activeDodgeables.removeValue(levelOneBirdReverse, false);
                 levelOneBirdReversePool.free(levelOneBirdReverse);
             }
         }
 
-        for (LevelTwoBird levelTwoBird : activeLevelTwoBirds){
-            if (!levelTwoBird.isActive()){
+        for (LevelTwoBird levelTwoBird : activeLevelTwoBirds) {
+            if (!levelTwoBird.isActive()) {
                 activeLevelTwoBirds.removeValue(levelTwoBird, false);
                 dodgeables.activeDodgeables.removeValue(levelTwoBird, false);
                 levelTwoBirdPool.free(levelTwoBird);
             }
         }
-        
-        
-        
+
+        for (LevelTwoBirdReverse levelTwoBirdReverse : activeLevelTwoBirdReverses) {
+            if (!levelTwoBirdReverse.isActive()) {
+                activeLevelTwoBirdReverses.removeValue(levelTwoBirdReverse, false);
+                dodgeables.activeDodgeables.removeValue(levelTwoBirdReverse, false);
+                levelTwoBirdReversePool.free(levelTwoBirdReverse);
+            }
+        }
+
+
     }
 
-    public void dispose(){
+    public void dispose() {
         levelOneBirdFlySheet.dispose();
         levelTwoBirdFlySheet.dispose();
     }
