@@ -3,6 +3,8 @@ package io.github.patpatchpatrick.alphapigeon.levels;
 import com.badlogic.gdx.math.MathUtils;
 
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.Notifications;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.Notifications.ExclamationMark;
 
 public class LevelThree extends Level {
 
@@ -70,6 +72,7 @@ public class LevelThree extends Level {
         randomWaveHorizUfoSpawned = false;
         randomWaveVertUfoSpawned = false;
         randomWaveCenterUfoSpawned = false;
+        ExclamationMark.notificationSpawned = false;
 
     }
 

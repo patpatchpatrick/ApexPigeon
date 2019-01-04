@@ -111,7 +111,7 @@ public class Notifications {
         exclamationMarkSheet.dispose();
     }
 
-    static class ExclamationMark {
+    public static class ExclamationMark {
         //Class to define exclamation mark notifications
 
         public ExclamationMark(OrthographicCamera camera) {
@@ -126,17 +126,19 @@ public class Notifications {
 
         private OrthographicCamera camera;
 
-        private float timeBetweenSpawns = 5000f;
-        private float notificationDisplayDuration = 5000f;
+        public static final float DURATION = 2500f;
 
-        public boolean exclamationMarkLeftSpawned = false;
-        private long lastExclamationMarkLeftSpawnTime;
+        private static long lastNotificationSpawnTime;
+        public static boolean notificationSpawned = false;
 
-        public boolean exclamationMarkTopSpawned = false;
-        private long lastExclamationMarkTopSpawnTime;
+        public static boolean exclamationMarkLeftSpawned = false;
+        private static long lastExclamationMarkLeftSpawnTime;
 
-        public boolean exclamationMarkBottomSpawned = false;
-        private long lastExclamationMarkBottomSpawnTime;
+        public static boolean exclamationMarkTopSpawned = false;
+        private static long lastExclamationMarkTopSpawnTime;
+
+        public static boolean exclamationMarkBottomSpawned = false;
+        private static long lastExclamationMarkBottomSpawnTime;
 
         //Render variables
         protected final float HEIGHT = 5f;
@@ -156,13 +158,13 @@ public class Notifications {
             // (i.e. set the spawned boolean to false)
             Boolean anExclamationMarkIsSpawned = exclamationMarkLeftSpawned || exclamationMarkBottomSpawned || exclamationMarkTopSpawned;
             if (anExclamationMarkIsSpawned) {
-                if (currentTime - lastExclamationMarkLeftSpawnTime > notificationDisplayDuration) {
+                if (currentTime - lastExclamationMarkLeftSpawnTime > DURATION) {
                     exclamationMarkLeftSpawned = false;
                 }
-                if (currentTime - lastExclamationMarkBottomSpawnTime > notificationDisplayDuration) {
+                if (currentTime - lastExclamationMarkBottomSpawnTime > DURATION) {
                     exclamationMarkBottomSpawned = false;
                 }
-                if (currentTime - lastExclamationMarkTopSpawnTime > notificationDisplayDuration) {
+                if (currentTime - lastExclamationMarkTopSpawnTime > DURATION) {
                     exclamationMarkTopSpawned = false;
                 }
 
@@ -171,50 +173,48 @@ public class Notifications {
 
         }
 
-        public void spawnExclamationMark(float direction) {
+        public static void spawnExclamationMark(float direction) {
 
             if (direction == Notifications.DIRECTION_LEFT) {
 
                 exclamationMarkLeftSpawned = true;
                 //keep track of time the exclamation mark was spawned
                 long currentTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
-                if (currentTime - lastExclamationMarkLeftSpawnTime > timeBetweenSpawns) {
-                    // If it has been 5 seconds since the last exclamation mark spawn time, register a new spawn time
-                    // Otherwise, don't
-                    // This will prevent the exclamation mark notification from continuously appearing when many objects
-                    // are spawned
-                    lastExclamationMarkLeftSpawnTime = currentTime;
-                }
+                lastExclamationMarkLeftSpawnTime = currentTime;
+                lastNotificationSpawnTime = currentTime;
+                notificationSpawned = true;
+
 
             } else if (direction == Notifications.DIRECTION_BOTTOM) {
 
                 exclamationMarkBottomSpawned = true;
                 //keep track of time the exclamation mark was spawned
                 long currentTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
-                if (currentTime - lastExclamationMarkBottomSpawnTime > timeBetweenSpawns) {
-                    // If it has been 5 seconds since the last exclamation mark spawn time, register a new spawn time
-                    // Otherwise, don't
-                    // This will prevent the exclamation mark notification from continuously appearing when many objects
-                    // are spawned
-                    lastExclamationMarkBottomSpawnTime = currentTime;
-                }
+                lastExclamationMarkBottomSpawnTime = currentTime;
+                lastNotificationSpawnTime = currentTime;
+                notificationSpawned = true;
+
 
             } else if (direction == Notifications.DIRECTION_TOP) {
 
                 exclamationMarkTopSpawned = true;
                 //keep track of time the exclamation mark was spawned
                 long currentTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
-                if (currentTime - lastExclamationMarkTopSpawnTime > timeBetweenSpawns) {
-                    // If it has been 5 seconds since the last exclamation mark spawn time, register a new spawn time
-                    // Otherwise, don't
-                    // This will prevent the exclamation mark notification from continuously appearing when many objects
-                    // are spawned
-                    lastExclamationMarkTopSpawnTime = currentTime;
-                }
+                lastExclamationMarkTopSpawnTime = currentTime;
+                lastNotificationSpawnTime = currentTime;
+                notificationSpawned = true;
 
             }
 
+        }
 
+        public static boolean notificationIsComplete() {
+            //If Exclamation Mark notification duration has passed, return true.
+            long currentTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+            if (currentTime - lastNotificationSpawnTime > ExclamationMark.DURATION) {
+                return true;
+            }
+            return false;
         }
 
 

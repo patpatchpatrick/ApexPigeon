@@ -1,13 +1,18 @@
 package io.github.patpatchpatrick.alphapigeon.levels;
 
+import com.badlogic.gdx.utils.TimeUtils;
+
 import io.github.patpatchpatrick.alphapigeon.dodgeables.AlienMissiles;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Birds;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Meteors;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.Notifications;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.Notifications.ExclamationMark;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.PowerUps;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Rockets;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Teleports;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.UFOs;
+import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
 public abstract class Level {
 
@@ -38,7 +43,7 @@ public abstract class Level {
     //L1W1 is only level 1 birds,  L1W2 is level 1 and 2 birds
     //Start time should be 0f and end time should be 40000f
     protected final float LEVEL_ONE_WAVE_1 = 20000f;
-    protected final float LEVEL_ONE_END_TIME = 200000f;
+    protected final float LEVEL_ONE_END_TIME = 2f;
     //L2 is "easy" difficulty
     //End time should be 120000f
     protected final float LEVEL_TWO_START_TIME = LEVEL_ONE_END_TIME;
@@ -50,13 +55,13 @@ public abstract class Level {
     protected final float LEVEL_FOUR_START_TIME = LEVEL_THREE_END_TIME;
     protected final float LEVEL_FOUR_END_TIME = 290000f;
 
-    public Level(Dodgeables dodgeables){
+    public Level(Dodgeables dodgeables) {
 
-        this.dodgeables =  dodgeables;
-        this.birds =  dodgeables.getBirds();
+        this.dodgeables = dodgeables;
+        this.birds = dodgeables.getBirds();
         this.rockets = dodgeables.getRockets();
         this.alienMissiles = dodgeables.getAlienMissiles();
-        this.teleports =  dodgeables.getTeleports();
+        this.teleports = dodgeables.getTeleports();
         this.powerUps = dodgeables.getPowerUps();
         this.meteors = dodgeables.getMeteors();
         this.ufos = dodgeables.getUfos();
@@ -66,7 +71,7 @@ public abstract class Level {
 
     // METHODS USED BY ALL LEVELS:
 
-    protected void spawnBirds(float levelOneBirdSpawnDuration, float levelTwoBirdSpawnDuration){
+    protected void spawnBirds(float levelOneBirdSpawnDuration, float levelTwoBirdSpawnDuration) {
         //Method shared by all of the levels
         //Spawns level one and level two birds based on inputted spawn durations
 
@@ -79,7 +84,7 @@ public abstract class Level {
 
     }
 
-    protected void spawnReverseBirds(float levelOneBirdSpawnDuration, float levelTwoBirdSpawnDuration){
+    protected void spawnReverseBirds(float levelOneBirdSpawnDuration, float levelTwoBirdSpawnDuration) {
         //Method shared by all of the levels
         //Spawns level one and level two birds based on inputted spawn durations
         //Birds are spawned flying in reverse direction
@@ -91,12 +96,13 @@ public abstract class Level {
         }
     }
 
-    protected void checkIfRandomWaveIsComplete(float randomWaveDuration){
+    protected void checkIfRandomWaveIsComplete(float randomWaveDuration) {
         //Check if a wave is complete, if so, mark randomWaveInitiated as false so that a new random
         // wave will be run
         if (currentTimeInMillis - lastRandomWaveStartTime > randomWaveDuration) {
             randomWaveIsInitiated = false;
         }
     }
+
 
 }

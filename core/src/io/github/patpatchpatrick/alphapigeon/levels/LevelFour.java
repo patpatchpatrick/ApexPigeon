@@ -4,6 +4,8 @@ import com.badlogic.gdx.math.MathUtils;
 
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Dodgeable;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.Notifications;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.Notifications.ExclamationMark;
 
 public class LevelFour extends Level {
 
@@ -35,7 +37,7 @@ public class LevelFour extends Level {
     private final float RANDOM_WAVE_BIRD_MADNESS_TOTAL_TIME = 15000f;
 
 
-    public LevelFour(Dodgeables dodgeables){
+    public LevelFour(Dodgeables dodgeables) {
         super(dodgeables);
     }
 
@@ -49,29 +51,38 @@ public class LevelFour extends Level {
             resetWaveVariables();
             //If a random isn't currently in progress:
             //Generate a random number to determine which random wave to run
-            randomWave = MathUtils.random(1, TOTAL_NUMBER_OF_WAVES);
+            randomWave = MathUtils.random(5, 5);
             //Save the time the last random wave was started
             lastRandomWaveStartTime = currentTimeInMillis;
             randomWaveIsInitiated = true;
         } else if (randomWave == RANDOM_WAVE_TELEPORT_MADNESS) {
             runRandomWaveTeleportMadness();
-        } else if (randomWave == RANDOM_WAVE_ALIEN_MISSILE_MADNESS){
+        } else if (randomWave == RANDOM_WAVE_ALIEN_MISSILE_MADNESS) {
             runRandomWaveAlienMissileMadness();
-        } else if (randomWave == RANDOM_WAVE_UFOS_IN_CORNERS){
+        } else if (randomWave == RANDOM_WAVE_UFOS_IN_CORNERS) {
             runRandomWaveUFOsInCorners();
-        } else if (randomWave == RANDOM_WAVE_ROCKET_MADNESS){
+        } else if (randomWave == RANDOM_WAVE_ROCKET_MADNESS) {
             runRandomWaveRocketMadness();
-        } else if (randomWave == RANDOM_WAVE_BIRD_MADNESS){
+        } else if (randomWave == RANDOM_WAVE_BIRD_MADNESS) {
             runRandomWaveBirdMadness();
         }
 
     }
 
     private void runRandomWaveBirdMadness() {
-        // Spawn loads of L1birds and L2birds flying in regular and reverse directions
-        spawnBirds(RANDOM_WAVE_BIRD_MADNESS_L1BIRD_DURATION, RANDOM_WAVE_BIRD_MADNESS_L2BIRD_DURATION);
 
-        spawnReverseBirds(RANDOM_WAVE_BIRD_MADNESS_L1BIRD_DURATION, RANDOM_WAVE_BIRD_MADNESS_L2BIRD_DURATION);
+        if (!ExclamationMark.notificationSpawned) {
+            //Spawn a warning notification if it is not yet spawned ( for bird coming from left side)
+            ExclamationMark.spawnExclamationMark(Notifications.DIRECTION_LEFT);
+        }
+
+        if (ExclamationMark.notificationIsComplete()){
+            //If notification has finished displaying,
+            // Spawn loads of L1birds and L2birds flying in regular and reverse directions
+            spawnBirds(RANDOM_WAVE_BIRD_MADNESS_L1BIRD_DURATION, RANDOM_WAVE_BIRD_MADNESS_L2BIRD_DURATION);
+
+            spawnReverseBirds(RANDOM_WAVE_BIRD_MADNESS_L1BIRD_DURATION, RANDOM_WAVE_BIRD_MADNESS_L2BIRD_DURATION);
+        }
 
         checkIfRandomWaveIsComplete(RANDOM_WAVE_BIRD_MADNESS_TOTAL_TIME);
 
@@ -90,7 +101,7 @@ public class LevelFour extends Level {
 
     }
 
-    private void runRandomWaveAlienMissileMadness(){
+    private void runRandomWaveAlienMissileMadness() {
 
         // Spawn loads of alien missiles
         if (currentTimeInMillis - alienMissiles.getLastAlienMissileSpawnTime() > RANDOM_WAVE_ALIEN_MISSILE_SPAWN_DURATION) {
@@ -105,7 +116,7 @@ public class LevelFour extends Level {
 
     }
 
-    private void runRandomWaveUFOsInCorners(){
+    private void runRandomWaveUFOsInCorners() {
         // Spawn two ufos in the top-right and bottom-left corners of the screen
         // The ufos shoot energy beams in all directions, causing the entire border of screen to be blocked off by beams
 
@@ -123,7 +134,7 @@ public class LevelFour extends Level {
 
     }
 
-    private void runRandomWaveRocketMadness(){
+    private void runRandomWaveRocketMadness() {
 
         // Spawn level one birds and also lots of rockets to explode the birds
 
@@ -140,6 +151,7 @@ public class LevelFour extends Level {
 
     private void resetWaveVariables() {
         randomWaveCornerUfosAreSpawned = false;
+        ExclamationMark.notificationSpawned = false;
     }
 
 

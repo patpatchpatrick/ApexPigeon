@@ -212,10 +212,6 @@ public class Birds {
         //keep track of time the bird was spawned
         lastLevelOneBirdReverseSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
 
-        //Notify user that bird is coming from the left
-        dodgeables.notifications.spawnExclamationMarkNotification(Notifications.DIRECTION_LEFT);
-
-
     }
 
     public void spawnLevelTwoBird(float totalGameTime) {
@@ -243,8 +239,6 @@ public class Birds {
         //keep track of time the bird was spawned
         lastLevelTwoBirdReverseSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
 
-        //Notify user that bird is coming from the left
-        dodgeables.notifications.spawnExclamationMarkNotification(Notifications.DIRECTION_BOTTOM);
 
     }
 
