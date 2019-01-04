@@ -38,8 +38,9 @@ public class LevelFour extends Level {
     private final float RANDOM_WAVE_UFO_MAZE = 6f;
     private final float RANDOM_WAVE_UFO_MAZE_SPAWN_DURATION = 7500f;
     private final float RANDOM_WAVE_UFO_MAZE_L1BIRD_DURATION = 2000f;
+    private final float RANDOM_WAVE_UFO_MAZE_L2BIRD_DURATION = 2000f;
     private float randomWaveUfoMazeBeamDirection = ufos.ENERGY_BEAM_DOWN;
-    private final float RANDOM_WAVE_UFO_MAZE_TOTAL_TIME = 30000f;
+    private final float RANDOM_WAVE_UFO_MAZE_TOTAL_TIME = 50000f;
 
 
     public LevelFour(Dodgeables dodgeables) {
@@ -186,7 +187,7 @@ public class LevelFour extends Level {
         // The player must navigate through the maze of beams
         // Every other beam should shoot downwards, then upwards, and so forth...
 
-        spawnBirds(RANDOM_WAVE_UFO_MAZE_L1BIRD_DURATION, 500000);
+        spawnBirds(RANDOM_WAVE_UFO_MAZE_L1BIRD_DURATION, RANDOM_WAVE_UFO_MAZE_L2BIRD_DURATION);
 
         if (currentTimeInMillis - ufos.getLastUfoSpawnTime() > RANDOM_WAVE_UFO_MAZE_SPAWN_DURATION) {
             if (randomWaveUfoMazeBeamDirection == ufos.ENERGY_BEAM_DOWN) {

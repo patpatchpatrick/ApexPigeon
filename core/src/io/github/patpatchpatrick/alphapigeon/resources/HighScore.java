@@ -1,9 +1,15 @@
 package io.github.patpatchpatrick.alphapigeon.resources;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+
+import java.text.DecimalFormat;
+
+import static java.lang.Math.floor;
+
 
 public class HighScore {
 
@@ -22,7 +28,9 @@ public class HighScore {
         scoreBitmapFont = new BitmapFont();
         generator = new FreeTypeFontGenerator(Gdx.files.internal("arcadeclassic.TTF"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 12;
+        parameter.size = 18;
+        parameter.minFilter = Texture.TextureFilter.Linear;
+        parameter.magFilter = Texture.TextureFilter.Linear;
         font12 = generator.generateFont(parameter);
         font12.setColor(1.0f, 1.0f, 1.0f, 1.0f);
         font12.getData().setScale(0.1f);
@@ -30,12 +38,13 @@ public class HighScore {
 
     public void update(float deltaTime) {
         // increase score
-        // the 9 is the default speed that the pigeon initially flies
+        // the score is equal to the distance (meters) that the bird has traveled
         // if the pigeon has not crashed, keep increasing the score
         // after the pigeon crashes, stop increasing score
+        DecimalFormat df = new DecimalFormat("#.");
         if (pigeonHasNotCrashed) {
-            score = score + 9 * deltaTime;
-            scoreString = "S co r e        " + score;
+            score = score + GameVariables.BIRD_SPEED * deltaTime;
+            scoreString = "Distance        " + df.format(score) + "  m";
         }
 
     }
