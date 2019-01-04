@@ -15,7 +15,7 @@ public class LevelFour extends Level {
     // that are randomly selected
 
     //RANDOM WAVE VARIABLES
-    private final int TOTAL_NUMBER_OF_WAVES = 5;
+    private final int TOTAL_NUMBER_OF_WAVES = 6;
     private final float RANDOM_WAVE_TELEPORT_MADNESS = 1f;
     private final float RANDOM_WAVE_TELEPORT_MADNESS_L1BIRD_DURATION = 700f;
     private final float RANDOM_WAVE_TELEPORT_SPAWN_DURATION = 4000f;
@@ -35,6 +35,11 @@ public class LevelFour extends Level {
     private final float RANDOM_WAVE_BIRD_MADNESS_L1BIRD_DURATION = 1600f;
     private final float RANDOM_WAVE_BIRD_MADNESS_L2BIRD_DURATION = 3200f;
     private final float RANDOM_WAVE_BIRD_MADNESS_TOTAL_TIME = 15000f;
+    private final float RANDOM_WAVE_UFO_MAZE = 6f;
+    private final float RANDOM_WAVE_UFO_MAZE_SPAWN_DURATION = 7500f;
+    private final float RANDOM_WAVE_UFO_MAZE_L1BIRD_DURATION = 2000f;
+    private float randomWaveUfoMazeBeamDirection = ufos.ENERGY_BEAM_DOWN;
+    private final float RANDOM_WAVE_UFO_MAZE_TOTAL_TIME = 30000f;
 
 
     public LevelFour(Dodgeables dodgeables) {
@@ -51,7 +56,7 @@ public class LevelFour extends Level {
             resetWaveVariables();
             //If a random isn't currently in progress:
             //Generate a random number to determine which random wave to run
-            randomWave = MathUtils.random(4, 4);
+            randomWave = MathUtils.random(1, TOTAL_NUMBER_OF_WAVES);
             //Save the time the last random wave was started
             lastRandomWaveStartTime = currentTimeInMillis;
             randomWaveIsInitiated = true;
@@ -65,6 +70,8 @@ public class LevelFour extends Level {
             runRandomWaveRocketMadness();
         } else if (randomWave == RANDOM_WAVE_BIRD_MADNESS) {
             runRandomWaveBirdMadness();
+        } else if (randomWave == RANDOM_WAVE_UFO_MAZE) {
+            runRandomWaveUfoMaze();
         }
 
     }
@@ -76,7 +83,7 @@ public class LevelFour extends Level {
             ExclamationMark.spawnExclamationMark(Notifications.DIRECTION_LEFT);
         }
 
-        if (ExclamationMark.notificationIsComplete()){
+        if (ExclamationMark.notificationIsComplete()) {
             //If notification has finished displaying,
             // Spawn loads of L1birds and L2birds flying in regular and reverse directions
             spawnBirds(RANDOM_WAVE_BIRD_MADNESS_L1BIRD_DURATION, RANDOM_WAVE_BIRD_MADNESS_L2BIRD_DURATION);
@@ -111,7 +118,7 @@ public class LevelFour extends Level {
             ExclamationMark.spawnExclamationMark(Notifications.DIRECTION_TOP);
         }
 
-        if (ExclamationMark.notificationIsComplete()){
+        if (ExclamationMark.notificationIsComplete()) {
             //If notification has finished displaying,
             // Spawn loads of alien missiles
             if (currentTimeInMillis - alienMissiles.getLastAlienMissileSpawnTime() > RANDOM_WAVE_ALIEN_MISSILE_SPAWN_DURATION) {
@@ -140,7 +147,7 @@ public class LevelFour extends Level {
             ExclamationMark.spawnExclamationMark(Notifications.DIRECTION_TOP);
         }
 
-        if (ExclamationMark.notificationIsComplete()){
+        if (ExclamationMark.notificationIsComplete()) {
             //If notification has finished displaying,
             //Spawn corner UFOs and hold them in the corner for 30 seconds
             if (!randomWaveCornerUfosAreSpawned) {
@@ -170,6 +177,29 @@ public class LevelFour extends Level {
 
         checkIfRandomWaveIsComplete(RANDOM_WAVE_ROCKET_MADNESS_TOTAL_TIME);
 
+
+    }
+
+    private void runRandomWaveUfoMaze() {
+
+        // Spawn ufos (some of them shoot beams upwards and some downwards
+        // The player must navigate through the maze of beams
+        // Every other beam should shoot downwards, then upwards, and so forth...
+
+        spawnBirds(RANDOM_WAVE_UFO_MAZE_L1BIRD_DURATION, 500000);
+
+        if (currentTimeInMillis - ufos.getLastUfoSpawnTime() > RANDOM_WAVE_UFO_MAZE_SPAWN_DURATION) {
+            if (randomWaveUfoMazeBeamDirection == ufos.ENERGY_BEAM_DOWN) {
+                ufos.spawnStopInRightCenterUfo(randomWaveUfoMazeBeamDirection,  6);
+                randomWaveUfoMazeBeamDirection = ufos.ENERGY_BEAM_UP;
+            } else {
+                ufos.spawnStopInRightCenterUfo(randomWaveUfoMazeBeamDirection,  6);
+                randomWaveUfoMazeBeamDirection = ufos.ENERGY_BEAM_DOWN;
+            }
+        }
+
+
+        checkIfRandomWaveIsComplete(RANDOM_WAVE_UFO_MAZE_TOTAL_TIME);
 
     }
 

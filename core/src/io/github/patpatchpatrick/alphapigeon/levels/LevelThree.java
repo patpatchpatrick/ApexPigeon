@@ -56,7 +56,7 @@ public class LevelThree extends Level {
             resetWaveVariables();
             //If a random isn't currently in progress:
             //Generate a random number to determine which random wave to run
-            randomWave = MathUtils.random(6, 6);
+            randomWave = MathUtils.random(1, TOTAL_NUMBER_OF_WAVES);
             //Save the time the last random wave was started
             lastRandomWaveStartTime = currentTimeInMillis;
             randomWaveIsInitiated = true;
