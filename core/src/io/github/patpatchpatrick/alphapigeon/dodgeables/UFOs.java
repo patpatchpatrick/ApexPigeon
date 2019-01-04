@@ -347,6 +347,11 @@ public class UFOs {
                 //hold the UFO
                 ufo.holdPosition(ufo.timeToHold, ufo.FORCE_X, 0);
             }
+            if (ufo.stopInRightCenterOfScreen && !ufo.isHeld && ufo.getPosition().x < camera.viewportWidth - ufo.WIDTH) {
+                //If ufo is set to stop in center of the screen and the x position is equal to center of screen,
+                //hold the UFO
+                ufo.holdPosition(ufo.timeToHold, ufo.FORCE_X, 0);
+            }
             if (ufo.stopInTopRightCornerOfScreen && !ufo.isHeld && ufo.getPosition().x < camera.viewportWidth - ufo.WIDTH) {
                 //If ufo is set to stop in top right corner of the screen and the x position is one UFO's width from the corner,
                 //hold the UFO
@@ -528,6 +533,24 @@ public class UFOs {
 
         UFO ufo = ufoPool.obtain();
         ufo.initStopInCenter(direction, timeToHoldInCenter, ufoFlyingSound);
+        activeUFOs.add(ufo);
+        dodgeables.activeDodgeables.add(ufo);
+
+
+        //keep track of time the ufo was spawned
+        lastUfoSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+
+    }
+
+    public void spawnStopInRightCenterUfo(float direction, long timeToHoldInRightCenter) {
+
+
+        // Spawn(obtain) a new UFO from the UFO pool and add to list of active UFOs
+        // StopInRightCenter Ufos stop in the center of the screen on the far right (near the edge)
+        // for a certain amount of time
+
+        UFO ufo = ufoPool.obtain();
+        ufo.initStopInRightCenter(direction, timeToHoldInRightCenter, ufoFlyingSound);
         activeUFOs.add(ufo);
         dodgeables.activeDodgeables.add(ufo);
 

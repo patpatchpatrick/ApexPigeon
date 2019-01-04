@@ -22,7 +22,7 @@ public class LevelFour extends Level {
     private final float RANDOM_WAVE_TELEPORT_MADNESS_TOTAL_TIME = 15000f;
     private final float RANDOM_WAVE_ALIEN_MISSILE_MADNESS = 2f;
     private final float RANDOM_WAVE_ALIEN_MISSILE_SPAWN_DURATION = 5000f;
-    private final float RANDOM_WAVE_ALIEN_MISSILE_MADNESS_TOTAL_TIME = 15000f;
+    private final float RANDOM_WAVE_ALIEN_MISSILE_MADNESS_TOTAL_TIME = 25000f;
     private final float RANDOM_WAVE_UFOS_IN_CORNERS = 3f;
     private final float RANDOM_WAVE_UFOS_IN_CORNERS_BIRD_DURATION = 2000f;
     private boolean randomWaveCornerUfosAreSpawned = false;
@@ -51,7 +51,7 @@ public class LevelFour extends Level {
             resetWaveVariables();
             //If a random isn't currently in progress:
             //Generate a random number to determine which random wave to run
-            randomWave = MathUtils.random(5, 5);
+            randomWave = MathUtils.random(4, 4);
             //Save the time the last random wave was started
             lastRandomWaveStartTime = currentTimeInMillis;
             randomWaveIsInitiated = true;
@@ -103,13 +103,25 @@ public class LevelFour extends Level {
 
     private void runRandomWaveAlienMissileMadness() {
 
-        // Spawn loads of alien missiles
-        if (currentTimeInMillis - alienMissiles.getLastAlienMissileSpawnTime() > RANDOM_WAVE_ALIEN_MISSILE_SPAWN_DURATION) {
-            alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_LEFTWARD);
-            alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_UPWARD);
-            alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_RIGHTWARD);
-            alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_DOWNWARD);
+        if (!ExclamationMark.notificationSpawned) {
+            //Spawn a warning notification if it is not yet spawned ( for alien missiles coming from all directions)
+            // Don't need a warning for the right since dodgeables typically come from that direction
+            ExclamationMark.spawnExclamationMark(Notifications.DIRECTION_LEFT);
+            ExclamationMark.spawnExclamationMark(Notifications.DIRECTION_BOTTOM);
+            ExclamationMark.spawnExclamationMark(Notifications.DIRECTION_TOP);
         }
+
+        if (ExclamationMark.notificationIsComplete()){
+            //If notification has finished displaying,
+            // Spawn loads of alien missiles
+            if (currentTimeInMillis - alienMissiles.getLastAlienMissileSpawnTime() > RANDOM_WAVE_ALIEN_MISSILE_SPAWN_DURATION) {
+                alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_LEFTWARD);
+                alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_UPWARD);
+                alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_RIGHTWARD);
+                alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_DOWNWARD);
+            }
+        }
+
 
         checkIfRandomWaveIsComplete(RANDOM_WAVE_ALIEN_MISSILE_MADNESS_TOTAL_TIME);
 
@@ -120,14 +132,26 @@ public class LevelFour extends Level {
         // Spawn two ufos in the top-right and bottom-left corners of the screen
         // The ufos shoot energy beams in all directions, causing the entire border of screen to be blocked off by beams
 
+        if (!ExclamationMark.notificationSpawned) {
+            //Spawn a warning notification if it is not yet spawned ( for UFOs coming from all directions)
+            // Don't need a warning for the right since dodgeables typically come from that direction
+            ExclamationMark.spawnExclamationMark(Notifications.DIRECTION_LEFT);
+            ExclamationMark.spawnExclamationMark(Notifications.DIRECTION_BOTTOM);
+            ExclamationMark.spawnExclamationMark(Notifications.DIRECTION_TOP);
+        }
+
+        if (ExclamationMark.notificationIsComplete()){
+            //If notification has finished displaying,
+            //Spawn corner UFOs and hold them in the corner for 30 seconds
+            if (!randomWaveCornerUfosAreSpawned) {
+                ufos.spawnTopRightCornerUfo(ufos.ENERGY_BEAM_ALL_DIRECTIONS, 20);
+                ufos.spawnBottomLeftCornerUfo(ufos.ENERGY_BEAM_ALL_DIRECTIONS, 20);
+                randomWaveCornerUfosAreSpawned = true;
+            }
+        }
+
         spawnBirds(RANDOM_WAVE_UFOS_IN_CORNERS_BIRD_DURATION, RANDOM_WAVE_UFOS_IN_CORNERS_BIRD_DURATION);
 
-        if (!randomWaveCornerUfosAreSpawned) {
-            //Spawn corner UFOs and hold them in the corner for 30 seconds
-            ufos.spawnTopRightCornerUfo(ufos.ENERGY_BEAM_ALL_DIRECTIONS, 20);
-            ufos.spawnBottomLeftCornerUfo(ufos.ENERGY_BEAM_ALL_DIRECTIONS, 20);
-            randomWaveCornerUfosAreSpawned = true;
-        }
 
         checkIfRandomWaveIsComplete(RANDOM_WAVE_UFOS_IN_CORNERS_TOTAL_TIME);
 
@@ -148,6 +172,7 @@ public class LevelFour extends Level {
 
 
     }
+
 
     private void resetWaveVariables() {
         randomWaveCornerUfosAreSpawned = false;

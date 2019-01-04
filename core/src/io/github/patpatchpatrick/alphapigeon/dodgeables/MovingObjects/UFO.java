@@ -28,6 +28,7 @@ public class UFO extends Dodgeable {
 
     // Variables controlling how long ufo should stop in center of screen
     public boolean stopInCenterOfScreen = false;
+    public boolean stopInRightCenterOfScreen = false;
     public boolean stopInTopRightCornerOfScreen = false;
     public boolean stopInBottomLeftCornerOfScreen = false;
     public long timeToHold = 0;
@@ -146,6 +147,30 @@ public class UFO extends Dodgeable {
 
     }
 
+    public void initStopInRightCenter(float direction, long timeToHoldInCenter, Sound flyingSound) {
+
+        //This version of the UFO will stop in the center of the screen for a specified period of time
+
+        //Set the direction which the energy beams associated with the UFO should fire
+        this.direction = direction;
+
+        dodgeableBody.setActive(true);
+        dodgeableBody.setTransform(camera.viewportWidth, (camera.viewportHeight - HEIGHT) / 2, dodgeableBody.getAngle());
+        dodgeableBody.applyForceToCenter(FORCE_X, 0, true);
+        this.alive = true;
+
+        //keep track of time the ufo was spawned
+        spawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+
+        this.stopInRightCenterOfScreen = true;
+        this.timeToHold = timeToHoldInCenter;
+
+        //Play UFO Sound
+        this.flyingSound = flyingSound;
+        this.flyingSound.loop();
+
+    }
+
     public void initStopInTopRightCorner(float direction, long timeToHold, Sound flyingSound){
         //This version of the UFO will stop in the right corner of the screen for a specified period of time
 
@@ -197,6 +222,7 @@ public class UFO extends Dodgeable {
         long currentTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
         if (this.timeHoldWillBeReleased <= currentTime){
             this.stopInCenterOfScreen = false;
+            this.stopInRightCenterOfScreen = false;
             this.stopInTopRightCornerOfScreen = false;
             this.stopInBottomLeftCornerOfScreen = false;
             //Kill all energy beams when UFO is unheld
@@ -216,6 +242,7 @@ public class UFO extends Dodgeable {
         this.energyBeams.clear();
         this.spawnTime = 0;
         this.stopInCenterOfScreen = false;
+        this.stopInRightCenterOfScreen = false;
         this.stopInTopRightCornerOfScreen = false;
         this.stopInBottomLeftCornerOfScreen = false;
         this.timeToHold = 0;
