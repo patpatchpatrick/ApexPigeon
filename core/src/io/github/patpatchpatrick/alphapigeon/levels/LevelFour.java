@@ -15,7 +15,7 @@ public class LevelFour extends Level {
     // that are randomly selected
 
     //RANDOM WAVE VARIABLES
-    private final int TOTAL_NUMBER_OF_WAVES = 6;
+    public final static int TOTAL_NUMBER_OF_WAVES = 6;
     private final float RANDOM_WAVE_TELEPORT_MADNESS = 1f;
     private final float RANDOM_WAVE_TELEPORT_MADNESS_L1BIRD_DURATION = 700f;
     private final float RANDOM_WAVE_TELEPORT_SPAWN_DURATION = 4000f;
@@ -77,7 +77,38 @@ public class LevelFour extends Level {
 
     }
 
-    private void runRandomWaveBirdMadness() {
+    public boolean runManualWave(float waveNumber, float totalGameTime, long currentTimeInMillis, float powerUpShieldInterval) {
+
+        this.totalGameTime = totalGameTime;
+        this.currentTimeInMillis = currentTimeInMillis;
+        this.powerUpShieldInterval = powerUpShieldInterval;
+
+        //Manually run a wave
+        // Return true if wave is complete
+        if (!randomWaveIsInitiated) {
+            resetWaveVariables();
+            //Save the time the last random wave was started
+            lastRandomWaveStartTime = currentTimeInMillis;
+            randomWaveIsInitiated = true;
+            return false;
+        } else if (waveNumber == RANDOM_WAVE_TELEPORT_MADNESS) {
+            return runRandomWaveTeleportMadness();
+        } else if (waveNumber == RANDOM_WAVE_ALIEN_MISSILE_MADNESS) {
+            return runRandomWaveAlienMissileMadness();
+        } else if (waveNumber == RANDOM_WAVE_UFOS_IN_CORNERS) {
+            return runRandomWaveUFOsInCorners();
+        } else if (waveNumber == RANDOM_WAVE_ROCKET_MADNESS) {
+            return runRandomWaveRocketMadness();
+        } else if (waveNumber == RANDOM_WAVE_BIRD_MADNESS) {
+            return runRandomWaveBirdMadness();
+        } else if (waveNumber == RANDOM_WAVE_UFO_MAZE) {
+            return runRandomWaveUfoMaze();
+        } else {
+            return false;
+        }
+    }
+
+    private boolean runRandomWaveBirdMadness() {
 
         if (!ExclamationMark.notificationSpawned) {
             //Spawn a warning notification if it is not yet spawned ( for bird coming from left side)
@@ -92,11 +123,11 @@ public class LevelFour extends Level {
             spawnReverseBirds(RANDOM_WAVE_BIRD_MADNESS_L1BIRD_DURATION, RANDOM_WAVE_BIRD_MADNESS_L2BIRD_DURATION);
         }
 
-        checkIfRandomWaveIsComplete(RANDOM_WAVE_BIRD_MADNESS_TOTAL_TIME);
+        return checkIfRandomWaveIsComplete(RANDOM_WAVE_BIRD_MADNESS_TOTAL_TIME);
 
     }
 
-    private void runRandomWaveTeleportMadness() {
+    private boolean runRandomWaveTeleportMadness() {
 
         // Spawn loads of teleports and level one birds
         spawnBirds(RANDOM_WAVE_TELEPORT_MADNESS_L1BIRD_DURATION, 100000);
@@ -105,11 +136,11 @@ public class LevelFour extends Level {
             teleports.spawnTeleports();
         }
 
-        checkIfRandomWaveIsComplete(RANDOM_WAVE_TELEPORT_MADNESS_TOTAL_TIME);
+        return checkIfRandomWaveIsComplete(RANDOM_WAVE_TELEPORT_MADNESS_TOTAL_TIME);
 
     }
 
-    private void runRandomWaveAlienMissileMadness() {
+    private boolean runRandomWaveAlienMissileMadness() {
 
         if (!ExclamationMark.notificationSpawned) {
             //Spawn a warning notification if it is not yet spawned ( for alien missiles coming from all directions)
@@ -131,12 +162,12 @@ public class LevelFour extends Level {
         }
 
 
-        checkIfRandomWaveIsComplete(RANDOM_WAVE_ALIEN_MISSILE_MADNESS_TOTAL_TIME);
+        return checkIfRandomWaveIsComplete(RANDOM_WAVE_ALIEN_MISSILE_MADNESS_TOTAL_TIME);
 
 
     }
 
-    private void runRandomWaveUFOsInCorners() {
+    private boolean runRandomWaveUFOsInCorners() {
         // Spawn two ufos in the top-right and bottom-left corners of the screen
         // The ufos shoot energy beams in all directions, causing the entire border of screen to be blocked off by beams
 
@@ -161,12 +192,12 @@ public class LevelFour extends Level {
         spawnBirds(RANDOM_WAVE_UFOS_IN_CORNERS_BIRD_DURATION, RANDOM_WAVE_UFOS_IN_CORNERS_BIRD_DURATION);
 
 
-        checkIfRandomWaveIsComplete(RANDOM_WAVE_UFOS_IN_CORNERS_TOTAL_TIME);
+        return checkIfRandomWaveIsComplete(RANDOM_WAVE_UFOS_IN_CORNERS_TOTAL_TIME);
 
 
     }
 
-    private void runRandomWaveRocketMadness() {
+    private boolean runRandomWaveRocketMadness() {
 
         // Spawn level one birds and also lots of rockets to explode the birds
 
@@ -176,12 +207,12 @@ public class LevelFour extends Level {
             rockets.spawnRocket();
         }
 
-        checkIfRandomWaveIsComplete(RANDOM_WAVE_ROCKET_MADNESS_TOTAL_TIME);
+        return checkIfRandomWaveIsComplete(RANDOM_WAVE_ROCKET_MADNESS_TOTAL_TIME);
 
 
     }
 
-    private void runRandomWaveUfoMaze() {
+    private boolean runRandomWaveUfoMaze() {
 
         // Spawn ufos (some of them shoot beams upwards and some downwards
         // The player must navigate through the maze of beams
@@ -200,7 +231,7 @@ public class LevelFour extends Level {
         }
 
 
-        checkIfRandomWaveIsComplete(RANDOM_WAVE_UFO_MAZE_TOTAL_TIME);
+        return checkIfRandomWaveIsComplete(RANDOM_WAVE_UFO_MAZE_TOTAL_TIME);
 
     }
 

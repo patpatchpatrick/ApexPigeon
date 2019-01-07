@@ -4,6 +4,8 @@ public class GameVariables {
 
     public static final long MILLION_SCALE = 1000000;
 
-    public static float BIRD_SPEED = 9;
+    // The pigeon's speed in m/s
+    // This speed slowly accelerated as the game progresses
+    public static float pigeonSpeed = 9;
 
 }

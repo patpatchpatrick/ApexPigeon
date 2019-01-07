@@ -43,17 +43,20 @@ public abstract class Level {
     //L1W1 is only level 1 birds,  L1W2 is level 1 and 2 birds
     //Start time should be 0f and end time should be 40000f
     protected final float LEVEL_ONE_WAVE_1 = 20000f;
-    protected final float LEVEL_ONE_END_TIME = 2f;
+    protected final float LEVEL_ONE_END_TIME = 1f;
     //L2 is "easy" difficulty
     //End time should be 120000f
     protected final float LEVEL_TWO_START_TIME = LEVEL_ONE_END_TIME;
-    protected final float LEVEL_TWO_END_TIME = 4f;
+    protected final float LEVEL_TWO_END_TIME = 2f;
     //L3 is "medium" difficulty
     protected final float LEVEL_THREE_START_TIME = LEVEL_TWO_END_TIME;
-    protected final float LEVEL_THREE_END_TIME = 6f;
+    protected final float LEVEL_THREE_END_TIME = 3f;
     //L4 is "hard" difficulty
     protected final float LEVEL_FOUR_START_TIME = LEVEL_THREE_END_TIME;
-    protected final float LEVEL_FOUR_END_TIME = 290000f;
+    protected final float LEVEL_FOUR_END_TIME = 4f;
+    //Level Final is "insane" difficulty.  It is a continuous level and the last level of the game
+    protected final float LEVEL_FINAL_START_TIME = LEVEL_FOUR_END_TIME;
+
 
     public Level(Dodgeables dodgeables) {
 
@@ -96,12 +99,15 @@ public abstract class Level {
         }
     }
 
-    protected void checkIfRandomWaveIsComplete(float randomWaveDuration) {
+    protected boolean checkIfRandomWaveIsComplete(float randomWaveDuration) {
         //Check if a wave is complete, if so, mark randomWaveInitiated as false so that a new random
         // wave will be run
+        // Return true if random wave is complete
         if (currentTimeInMillis - lastRandomWaveStartTime > randomWaveDuration) {
             randomWaveIsInitiated = false;
+            return true;
         }
+        return false;
     }
 
 

@@ -43,7 +43,7 @@ public class HighScore {
         // after the pigeon crashes, stop increasing score
         DecimalFormat df = new DecimalFormat("#.");
         if (pigeonHasNotCrashed) {
-            score = score + GameVariables.BIRD_SPEED * deltaTime;
+            score = score + GameVariables.pigeonSpeed * deltaTime;
             scoreString = "Distance        " + df.format(score) + "  m";
         }
 

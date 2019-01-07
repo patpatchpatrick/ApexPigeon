@@ -15,7 +15,7 @@ public class LevelThree extends Level {
 
     //RANDOM WAVE VARIABLES
     // Level Three consists of "MEDIUM" difficulty waves of dodgeables that occur randomly
-    private final int TOTAL_NUMBER_OF_WAVES = 6;
+    public final static int TOTAL_NUMBER_OF_WAVES = 6;
     private final float RANDOM_WAVE_UFO_HORIZONTAL = 1f;
     private boolean randomWaveHorizUfoSpawned = false;
     private final float RANDOM_WAVE_UFO_HORIZ_TOTAL_TIME = 30000f;
@@ -76,6 +76,39 @@ public class LevelThree extends Level {
 
     }
 
+    public boolean runManualWave(float waveNumber, float totalGameTime, long currentTimeInMillis, float powerUpShieldInterval) {
+
+        this.totalGameTime = totalGameTime;
+        this.currentTimeInMillis = currentTimeInMillis;
+        this.powerUpShieldInterval = powerUpShieldInterval;
+
+
+        //Manually run a wave
+        // Return true if wave is complete
+        if (!randomWaveIsInitiated) {
+            resetWaveVariables();
+            //Save the time the last random wave was started
+            lastRandomWaveStartTime = currentTimeInMillis;
+            randomWaveIsInitiated = true;
+            return false;
+        } else if (waveNumber == RANDOM_WAVE_UFO_HORIZONTAL) {
+            return runRandomWaveHorizontalUFO();
+        } else if (waveNumber == RANDOM_WAVE_UFO_VERTICAL) {
+            return runRandomWaveVerticalUFO();
+        } else if (waveNumber == RANDOM_WAVE_METEORS) {
+            return runRandomWaveMeteors();
+        } else if (waveNumber == RANDOM_WAVE_MISSILES) {
+            return runRandomWaveMissiles();
+        } else if (waveNumber == RANDOM_WAVE_UFO_CENTER) {
+            return runRandomWaveCenterUFO();
+        } else if (waveNumber == RANDOM_WAVE_VERT_UFO_TELEPORT) {
+            return runRandomWaveVerticalUFOAndTeleport();
+        } else {
+            return false;
+        }
+    }
+
+
     private void resetWaveVariables() {
         //Reset all variables that need to be reset before selecting a new wave
         randomWaveHorizUfoSpawned = false;
@@ -88,7 +121,7 @@ public class LevelThree extends Level {
 
     }
 
-    private void runRandomWaveCenterUFO() {
+    private boolean runRandomWaveCenterUFO() {
 
         spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
 
@@ -103,11 +136,11 @@ public class LevelThree extends Level {
         }
 
 
-        checkIfRandomWaveIsComplete(RANDOM_WAVE_UFO_CENTER_TOTAL_TIME);
+        return checkIfRandomWaveIsComplete(RANDOM_WAVE_UFO_CENTER_TOTAL_TIME);
 
     }
 
-    private void runRandomWaveVerticalUFO() {
+    private boolean runRandomWaveVerticalUFO() {
 
         if (!ExclamationMark.notificationSpawned) {
             //Spawn a warning notification if it is not yet spawned ( for UFO coming from the top)
@@ -129,12 +162,12 @@ public class LevelThree extends Level {
         spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
 
 
-        checkIfRandomWaveIsComplete(RANDOM_WAVE_UFO_VERT_TOTAL_TIME);
+        return checkIfRandomWaveIsComplete(RANDOM_WAVE_UFO_VERT_TOTAL_TIME);
 
 
     }
 
-    private void runRandomWaveMissiles() {
+    private boolean runRandomWaveMissiles() {
         //Spawn both regular rockets and alien missiles
 
         spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
@@ -146,11 +179,11 @@ public class LevelThree extends Level {
             alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_LEFTWARD);
         }
 
-        checkIfRandomWaveIsComplete(RANDOM_WAVE_MISSILES_TOTAL_TIME);
+        return checkIfRandomWaveIsComplete(RANDOM_WAVE_MISSILES_TOTAL_TIME);
 
     }
 
-    private void runRandomWaveMeteors() {
+    private boolean runRandomWaveMeteors() {
 
         if (!ExclamationMark.notificationSpawned) {
             //Spawn a warning notification if it is not yet spawned ( for meteors coming from the top)
@@ -168,11 +201,11 @@ public class LevelThree extends Level {
 
         spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
 
-        checkIfRandomWaveIsComplete(RANDOM_WAVE_METEORS_TOTAL_TIME);
+        return checkIfRandomWaveIsComplete(RANDOM_WAVE_METEORS_TOTAL_TIME);
 
     }
 
-    private void runRandomWaveHorizontalUFO() {
+    private boolean runRandomWaveHorizontalUFO() {
 
         spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
 
@@ -185,11 +218,11 @@ public class LevelThree extends Level {
         }
 
 
-        checkIfRandomWaveIsComplete(RANDOM_WAVE_UFO_HORIZ_TOTAL_TIME);
+        return checkIfRandomWaveIsComplete(RANDOM_WAVE_UFO_HORIZ_TOTAL_TIME);
 
     }
 
-    private void runRandomWaveVerticalUFOAndTeleport() {
+    private boolean runRandomWaveVerticalUFOAndTeleport() {
 
         spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
 
@@ -214,7 +247,7 @@ public class LevelThree extends Level {
         }
 
 
-        checkIfRandomWaveIsComplete(RANDOM_WAVE_VERT_UFO_TELEPORT_TOTAL_TIME);
+        return checkIfRandomWaveIsComplete(RANDOM_WAVE_VERT_UFO_TELEPORT_TOTAL_TIME);
 
 
     }
