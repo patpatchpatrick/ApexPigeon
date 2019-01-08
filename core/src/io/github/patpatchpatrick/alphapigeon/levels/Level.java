@@ -31,6 +31,9 @@ public abstract class Level {
     protected boolean randomWaveIsInitiated = false;
     protected long lastRandomWaveStartTime = 0;
     protected float randomWave = 0f;
+    protected final float RANDOM_WAVE_STANDARD_DURATION = 30000f;
+    protected final float RANDOM_WAVE_SHORT_DURATION = 10000f;
+    protected final float RANDOM_WAVE_LONG_DURATION = 60000f;
 
     // GAME TIMES
     protected float startTime = 0f;

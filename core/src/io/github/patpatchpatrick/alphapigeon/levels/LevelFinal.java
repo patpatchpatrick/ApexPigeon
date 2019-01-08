@@ -1,5 +1,6 @@
 package io.github.patpatchpatrick.alphapigeon.levels;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
@@ -44,7 +45,9 @@ public class LevelFinal extends Level {
             //Determine which levels to run random waves from
             //Do not run random waves from the same levels
             randomWaveOneLevel = MathUtils.random(2, TOTAL_NUMBER_OF_LEVELS);
-            while (randomWaveTwoLevel != randomWaveOneLevel) {
+            //Ensure the 2nd level does not equal the first level
+            randomWaveTwoLevel = randomWaveOneLevel;
+            while (randomWaveTwoLevel == randomWaveOneLevel) {
                 randomWaveTwoLevel = MathUtils.random(2, TOTAL_NUMBER_OF_LEVELS);
             }
             //Determine which specific waves from the randomly selected levels to run
@@ -86,6 +89,10 @@ public class LevelFinal extends Level {
 
         //Run a random wave from 2 random levels
         // If both waves are complete, reset the randomWaveIsInitiated variable so a new wave will be initiated
+
+        Gdx.app.log("Level1", randomWaveOneLevel + " " + randomWaveOne);
+        Gdx.app.log("Level2", randomWaveTwoLevel + " " + randomWaveTwo);
+
         if (!waveOneComplete){
             waveOneComplete = runWaveFromLevel(randomWaveOneLevel, randomWaveOne);
         }
@@ -107,11 +114,13 @@ public class LevelFinal extends Level {
         //Run a wave from a specified level
 
         if (level == 2){
-            return levelTwo.runManualWave(wave, this.totalGameTime, this.currentTimeInMillis, this.powerUpShieldInterval);
+            //Level 2 waves need to be specified to use the standard duration because the duration for level 2 waves change to be longer on the final level
+            return levelTwo.runManualWave(wave, this.totalGameTime, this.currentTimeInMillis, this.powerUpShieldInterval, true);
         } else if (level == 3){
             return levelThree.runManualWave(wave, this.totalGameTime, this.currentTimeInMillis, this.powerUpShieldInterval);
         } else {
-            return levelFour.runManualWave(wave, this.totalGameTime, this.currentTimeInMillis, this.powerUpShieldInterval);
+            //Level 4 waves need to be specified to use the standard duration because the duration for some level 3 waves change on the final level
+            return levelFour.runManualWave(wave, this.totalGameTime, this.currentTimeInMillis, this.powerUpShieldInterval, true);
         }
 
     }

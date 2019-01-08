@@ -18,26 +18,19 @@ public class LevelThree extends Level {
     public final static int TOTAL_NUMBER_OF_WAVES = 6;
     private final float RANDOM_WAVE_UFO_HORIZONTAL = 1f;
     private boolean randomWaveHorizUfoSpawned = false;
-    private final float RANDOM_WAVE_UFO_HORIZ_TOTAL_TIME = 30000f;
     private final float RANDOM_WAVE_UFO_VERTICAL = 2f;
     private boolean randomWaveVertUfoSpawned = false;
-    private final float RANDOM_WAVE_UFO_VERT_TOTAL_TIME = 30000f;
     private final float RANDOM_WAVE_METEORS = 3f;
     private final float RANDOM_WAVE_METEORS_SPAWN_DURATION = 2000f;
-    private final float RANDOM_WAVE_METEORS_TOTAL_TIME = 30000f;
     private final float RANDOM_WAVE_MISSILES = 4f;
     private final float RANDOM_WAVE_MISSILES_SPAWN_DURATION = 2000f;
-    private final float RANDOM_WAVE_MISSILES_TOTAL_TIME = 30000f;
     private final float RANDOM_WAVE_UFO_CENTER = 5f;
-    private final float RANDOM_WAVE_UFO_CENTER_SPAWN_DURATION = 30000f;
     private boolean randomWaveCenterUfoSpawned = false;
-    private final float RANDOM_WAVE_UFO_CENTER_TOTAL_TIME = 30000f;
     private final float RANDOM_WAVE_VERT_UFO_TELEPORT = 6f;
     private boolean randomWaveVertTeleUfoSpawned = false;
     private boolean randomWaveVertTeleUfoTeleportsSpawned = false;
     private long randomWaveVerTeleUfoTimeUfoSpawned = 999999999;
     private final float RANDOM_WAVE_VERT_UFO_TELEPORT_TIME_BEFORE_TELE_SPAWN = 12000f;
-    private final float RANDOM_WAVE_VERT_UFO_TELEPORT_TOTAL_TIME = 30000f;
     private final float RANDOM_WAVE_L1BIRD_SPAWN_DURATION = 2000;
     private final float RANDOM_WAVE_L2BIRD_SPAWN_DURATION = 2000;
 
@@ -136,7 +129,7 @@ public class LevelThree extends Level {
         }
 
 
-        return checkIfRandomWaveIsComplete(RANDOM_WAVE_UFO_CENTER_TOTAL_TIME);
+        return checkIfRandomWaveIsComplete(RANDOM_WAVE_STANDARD_DURATION);
 
     }
 
@@ -162,7 +155,7 @@ public class LevelThree extends Level {
         spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
 
 
-        return checkIfRandomWaveIsComplete(RANDOM_WAVE_UFO_VERT_TOTAL_TIME);
+        return checkIfRandomWaveIsComplete(RANDOM_WAVE_STANDARD_DURATION);
 
 
     }
@@ -179,7 +172,7 @@ public class LevelThree extends Level {
             alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_LEFTWARD);
         }
 
-        return checkIfRandomWaveIsComplete(RANDOM_WAVE_MISSILES_TOTAL_TIME);
+        return checkIfRandomWaveIsComplete(RANDOM_WAVE_STANDARD_DURATION);
 
     }
 
@@ -201,7 +194,7 @@ public class LevelThree extends Level {
 
         spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
 
-        return checkIfRandomWaveIsComplete(RANDOM_WAVE_METEORS_TOTAL_TIME);
+        return checkIfRandomWaveIsComplete(RANDOM_WAVE_STANDARD_DURATION);
 
     }
 
@@ -218,7 +211,7 @@ public class LevelThree extends Level {
         }
 
 
-        return checkIfRandomWaveIsComplete(RANDOM_WAVE_UFO_HORIZ_TOTAL_TIME);
+        return checkIfRandomWaveIsComplete(RANDOM_WAVE_STANDARD_DURATION);
 
     }
 
@@ -247,7 +240,7 @@ public class LevelThree extends Level {
         }
 
 
-        return checkIfRandomWaveIsComplete(RANDOM_WAVE_VERT_UFO_TELEPORT_TOTAL_TIME);
+        return checkIfRandomWaveIsComplete(RANDOM_WAVE_STANDARD_DURATION);
 
 
     }

@@ -22,25 +22,20 @@ public class LevelFour extends Level {
     private final float RANDOM_WAVE_TELEPORT_MADNESS_TOTAL_TIME = 15000f;
     private final float RANDOM_WAVE_ALIEN_MISSILE_MADNESS = 2f;
     private final float RANDOM_WAVE_ALIEN_MISSILE_SPAWN_DURATION = 5000f;
-    private final float RANDOM_WAVE_ALIEN_MISSILE_MADNESS_TOTAL_TIME = 25000f;
     private final float RANDOM_WAVE_UFOS_IN_CORNERS = 3f;
     private final float RANDOM_WAVE_UFOS_IN_CORNERS_BIRD_DURATION = 2000f;
     private boolean randomWaveCornerUfosAreSpawned = false;
-    private final float RANDOM_WAVE_UFOS_IN_CORNERS_TOTAL_TIME = 30000f;
     private final float RANDOM_WAVE_ROCKET_MADNESS = 4f;
     private final float RANDOM_WAVE_ROCKET_MADNESS_L1BIRD_DURATION = 400f;
     private final float RANDOM_WAVE_ROCKET_MADNESS_SPAWN_DURATION = 400f;
-    private final float RANDOM_WAVE_ROCKET_MADNESS_TOTAL_TIME = 15000f;
     private final float RANDOM_WAVE_BIRD_MADNESS = 5f;
     private final float RANDOM_WAVE_BIRD_MADNESS_L1BIRD_DURATION = 1600f;
     private final float RANDOM_WAVE_BIRD_MADNESS_L2BIRD_DURATION = 3200f;
-    private final float RANDOM_WAVE_BIRD_MADNESS_TOTAL_TIME = 15000f;
     private final float RANDOM_WAVE_UFO_MAZE = 6f;
     private final float RANDOM_WAVE_UFO_MAZE_SPAWN_DURATION = 7500f;
     private final float RANDOM_WAVE_UFO_MAZE_L1BIRD_DURATION = 2000f;
     private final float RANDOM_WAVE_UFO_MAZE_L2BIRD_DURATION = 2000f;
     private float randomWaveUfoMazeBeamDirection = ufos.ENERGY_BEAM_DOWN;
-    private final float RANDOM_WAVE_UFO_MAZE_TOTAL_TIME = 50000f;
 
 
     public LevelFour(Dodgeables dodgeables) {
@@ -72,12 +67,12 @@ public class LevelFour extends Level {
         } else if (randomWave == RANDOM_WAVE_BIRD_MADNESS) {
             runRandomWaveBirdMadness();
         } else if (randomWave == RANDOM_WAVE_UFO_MAZE) {
-            runRandomWaveUfoMaze();
+            runRandomWaveUfoMaze(false);
         }
 
     }
 
-    public boolean runManualWave(float waveNumber, float totalGameTime, long currentTimeInMillis, float powerUpShieldInterval) {
+    public boolean runManualWave(float waveNumber, float totalGameTime, long currentTimeInMillis, float powerUpShieldInterval, boolean useStandardDuration) {
 
         this.totalGameTime = totalGameTime;
         this.currentTimeInMillis = currentTimeInMillis;
@@ -102,7 +97,7 @@ public class LevelFour extends Level {
         } else if (waveNumber == RANDOM_WAVE_BIRD_MADNESS) {
             return runRandomWaveBirdMadness();
         } else if (waveNumber == RANDOM_WAVE_UFO_MAZE) {
-            return runRandomWaveUfoMaze();
+            return runRandomWaveUfoMaze(useStandardDuration);
         } else {
             return false;
         }
@@ -123,7 +118,7 @@ public class LevelFour extends Level {
             spawnReverseBirds(RANDOM_WAVE_BIRD_MADNESS_L1BIRD_DURATION, RANDOM_WAVE_BIRD_MADNESS_L2BIRD_DURATION);
         }
 
-        return checkIfRandomWaveIsComplete(RANDOM_WAVE_BIRD_MADNESS_TOTAL_TIME);
+        return checkIfRandomWaveIsComplete(RANDOM_WAVE_STANDARD_DURATION);
 
     }
 
@@ -162,7 +157,7 @@ public class LevelFour extends Level {
         }
 
 
-        return checkIfRandomWaveIsComplete(RANDOM_WAVE_ALIEN_MISSILE_MADNESS_TOTAL_TIME);
+        return checkIfRandomWaveIsComplete(RANDOM_WAVE_STANDARD_DURATION);
 
 
     }
@@ -192,7 +187,7 @@ public class LevelFour extends Level {
         spawnBirds(RANDOM_WAVE_UFOS_IN_CORNERS_BIRD_DURATION, RANDOM_WAVE_UFOS_IN_CORNERS_BIRD_DURATION);
 
 
-        return checkIfRandomWaveIsComplete(RANDOM_WAVE_UFOS_IN_CORNERS_TOTAL_TIME);
+        return checkIfRandomWaveIsComplete(RANDOM_WAVE_STANDARD_DURATION);
 
 
     }
@@ -207,16 +202,18 @@ public class LevelFour extends Level {
             rockets.spawnRocket();
         }
 
-        return checkIfRandomWaveIsComplete(RANDOM_WAVE_ROCKET_MADNESS_TOTAL_TIME);
+        return checkIfRandomWaveIsComplete(RANDOM_WAVE_STANDARD_DURATION);
 
 
     }
 
-    private boolean runRandomWaveUfoMaze() {
+    private boolean runRandomWaveUfoMaze(boolean useStandardDuration) {
 
         // Spawn ufos (some of them shoot beams upwards and some downwards
         // The player must navigate through the maze of beams
         // Every other beam should shoot downwards, then upwards, and so forth...
+
+        //This wave uses the long duration by default unless it is run on the final level, then it uses the standard duration
 
         spawnBirds(RANDOM_WAVE_UFO_MAZE_L1BIRD_DURATION, RANDOM_WAVE_UFO_MAZE_L2BIRD_DURATION);
 
@@ -231,7 +228,11 @@ public class LevelFour extends Level {
         }
 
 
-        return checkIfRandomWaveIsComplete(RANDOM_WAVE_UFO_MAZE_TOTAL_TIME);
+        if (useStandardDuration){
+            return checkIfRandomWaveIsComplete(RANDOM_WAVE_STANDARD_DURATION);
+        } else {
+            return checkIfRandomWaveIsComplete(RANDOM_WAVE_LONG_DURATION);
+        }
 
     }
 
