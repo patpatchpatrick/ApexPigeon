@@ -122,7 +122,7 @@ public class LevelThree extends Level {
 
             //Spawn a UFO that stops in center and shoots beams in all directions for a specified
             //amount of time
-            ufos.spawnStopInCenterUfo(ufos.ENERGY_BEAM_ALL_DIRECTIONS, 5);
+            ufos.spawnStopInCenterUfo(ufos.ENERGY_BEAM_ALL_DIRECTIONS, 5, 3);
             //Spawn a teleport that can be used to dodge the center UFO
             teleports.spawnTeleports();
             randomWaveCenterUfoSpawned = true;
@@ -147,7 +147,7 @@ public class LevelThree extends Level {
 
                 //Spawn a UFO that travels vertically from top to bottom and shoots a straight vertical
                 //line of energy beams (i.e. a top and bottom beam)
-                ufos.spawnVerticalUfo(ufos.ENERGY_BEAM_VERTICAL_DIRECTIONS);
+                ufos.spawnVerticalUfo(ufos.ENERGY_BEAM_VERTICAL_DIRECTIONS, 3);
                 randomWaveVertUfoSpawned = true;
             }
         }
@@ -165,11 +165,11 @@ public class LevelThree extends Level {
 
         spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
 
-        if (currentTimeInMillis - rockets.getLastRocketSpawnTime() > RANDOM_WAVE_MISSILES_SPAWN_DURATION) {
-            rockets.spawnRocket();
+        if (currentTimeInMillis - rockets.getLastRocketSpawnTime(3) > RANDOM_WAVE_MISSILES_SPAWN_DURATION) {
+            rockets.spawnRocket(3);
         }
-        if (currentTimeInMillis - alienMissiles.getLastAlienMissileSpawnTime() > RANDOM_WAVE_MISSILES_SPAWN_DURATION) {
-            alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_LEFTWARD);
+        if (currentTimeInMillis - alienMissiles.getLastAlienMissileSpawnTime(3) > RANDOM_WAVE_MISSILES_SPAWN_DURATION) {
+            alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_LEFTWARD, 3);
         }
 
         return checkIfRandomWaveIsComplete(RANDOM_WAVE_STANDARD_DURATION);
@@ -206,7 +206,7 @@ public class LevelThree extends Level {
 
             //Spawn a UFO that travels horizontally from right to left and shoots a straight horizontal
             //line of energy beams (i.e. a left and right beam)
-            ufos.spawnHorizontalUfo(ufos.ENERGY_BEAM_HORIZONAL_DIRECTIONS);
+            ufos.spawnHorizontalUfo(ufos.ENERGY_BEAM_HORIZONAL_DIRECTIONS, 3);
             randomWaveHorizUfoSpawned = true;
         }
 
@@ -224,7 +224,7 @@ public class LevelThree extends Level {
             //Spawn a UFO that travels horizontally from right to left and shoots a straight vertical
             //line of energy beams (i.e. a top and bottom beam) that must be jumped over using a teleport
             // The ufo stops at the right of the screen for 6 seconds to let the power beam generate before moving
-            ufos.spawnStopInRightCenterUfo(ufos.ENERGY_BEAM_VERTICAL_DIRECTIONS, 6);
+            ufos.spawnStopInRightCenterUfo(ufos.ENERGY_BEAM_VERTICAL_DIRECTIONS, 6, 3);
             randomWaveVerTeleUfoTimeUfoSpawned = currentTimeInMillis;
             randomWaveVertTeleUfoSpawned = true;
 

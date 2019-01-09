@@ -26,7 +26,7 @@ public class LevelFour extends Level {
     private final float RANDOM_WAVE_UFOS_IN_CORNERS_BIRD_DURATION = 2000f;
     private boolean randomWaveCornerUfosAreSpawned = false;
     private final float RANDOM_WAVE_ROCKET_MADNESS = 4f;
-    private final float RANDOM_WAVE_ROCKET_MADNESS_L1BIRD_DURATION = 400f;
+    private final float RANDOM_WAVE_ROCKET_MADNESS_L1BIRD_DURATION = 800f;
     private final float RANDOM_WAVE_ROCKET_MADNESS_SPAWN_DURATION = 400f;
     private final float RANDOM_WAVE_BIRD_MADNESS = 5f;
     private final float RANDOM_WAVE_BIRD_MADNESS_L1BIRD_DURATION = 1600f;
@@ -148,11 +148,11 @@ public class LevelFour extends Level {
         if (ExclamationMark.notificationIsComplete()) {
             //If notification has finished displaying,
             // Spawn loads of alien missiles
-            if (currentTimeInMillis - alienMissiles.getLastAlienMissileSpawnTime() > RANDOM_WAVE_ALIEN_MISSILE_SPAWN_DURATION) {
-                alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_LEFTWARD);
-                alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_UPWARD);
-                alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_RIGHTWARD);
-                alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_DOWNWARD);
+            if (currentTimeInMillis - alienMissiles.getLastAlienMissileSpawnTime(4) > RANDOM_WAVE_ALIEN_MISSILE_SPAWN_DURATION) {
+                alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_LEFTWARD, 4);
+                alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_UPWARD, 4);
+                alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_RIGHTWARD, 4);
+                alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_DOWNWARD, 4);
             }
         }
 
@@ -178,8 +178,8 @@ public class LevelFour extends Level {
             //If notification has finished displaying,
             //Spawn corner UFOs and hold them in the corner for 30 seconds
             if (!randomWaveCornerUfosAreSpawned) {
-                ufos.spawnTopRightCornerUfo(ufos.ENERGY_BEAM_ALL_DIRECTIONS, 20);
-                ufos.spawnBottomLeftCornerUfo(ufos.ENERGY_BEAM_ALL_DIRECTIONS, 20);
+                ufos.spawnTopRightCornerUfo(ufos.ENERGY_BEAM_ALL_DIRECTIONS, 20, 4);
+                ufos.spawnBottomLeftCornerUfo(ufos.ENERGY_BEAM_ALL_DIRECTIONS, 20, 4);
                 randomWaveCornerUfosAreSpawned = true;
             }
         }
@@ -198,8 +198,8 @@ public class LevelFour extends Level {
 
         spawnBirds(RANDOM_WAVE_ROCKET_MADNESS_L1BIRD_DURATION, 100000);
 
-        if (currentTimeInMillis - rockets.getLastRocketSpawnTime() > RANDOM_WAVE_ROCKET_MADNESS_SPAWN_DURATION) {
-            rockets.spawnRocket();
+        if (currentTimeInMillis - rockets.getLastRocketSpawnTime(4) > RANDOM_WAVE_ROCKET_MADNESS_SPAWN_DURATION) {
+            rockets.spawnRocket(4);
         }
 
         return checkIfRandomWaveIsComplete(RANDOM_WAVE_STANDARD_DURATION);
@@ -217,12 +217,12 @@ public class LevelFour extends Level {
 
         spawnBirds(RANDOM_WAVE_UFO_MAZE_L1BIRD_DURATION, RANDOM_WAVE_UFO_MAZE_L2BIRD_DURATION);
 
-        if (currentTimeInMillis - ufos.getLastUfoSpawnTime() > RANDOM_WAVE_UFO_MAZE_SPAWN_DURATION) {
+        if (currentTimeInMillis - ufos.getLastUfoSpawnTime(4) > RANDOM_WAVE_UFO_MAZE_SPAWN_DURATION) {
             if (randomWaveUfoMazeBeamDirection == ufos.ENERGY_BEAM_DOWN) {
-                ufos.spawnStopInRightCenterUfo(randomWaveUfoMazeBeamDirection,  6);
+                ufos.spawnStopInRightCenterUfo(randomWaveUfoMazeBeamDirection,  6, 4);
                 randomWaveUfoMazeBeamDirection = ufos.ENERGY_BEAM_UP;
             } else {
-                ufos.spawnStopInRightCenterUfo(randomWaveUfoMazeBeamDirection,  6);
+                ufos.spawnStopInRightCenterUfo(randomWaveUfoMazeBeamDirection,  6, 4);
                 randomWaveUfoMazeBeamDirection = ufos.ENERGY_BEAM_DOWN;
             }
         }

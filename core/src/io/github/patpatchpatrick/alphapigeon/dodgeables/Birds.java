@@ -15,6 +15,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
 
+import java.util.HashMap;
+
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBird;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBirdReverse;
@@ -37,10 +39,12 @@ public class Birds {
     private Texture levelOneBirdFlySheet;
     private long lastLevelOneBirdSpawnTime;
 
+
     //Level One Bird (Reverse) variables
     private final Array<LevelOneBirdReverse> activeLevelOneBirdReverses = new Array<LevelOneBirdReverse>();
     private final Pool<LevelOneBirdReverse> levelOneBirdReversePool;
     private long lastLevelOneBirdReverseSpawnTime;
+
 
     //Level Two Bird variables
     private Array<LevelTwoBird> activeLevelTwoBirds = new Array<LevelTwoBird>();
@@ -49,10 +53,12 @@ public class Birds {
     private Texture levelTwoBirdFlySheet;
     private long lastLevelTwoBirdSpawnTime;
 
+
     //Level Two Bird (Reverse) variables
     private final Array<LevelTwoBirdReverse> activeLevelTwoBirdReverses = new Array<LevelTwoBirdReverse>();
     private final Pool<LevelTwoBirdReverse> levelTwoBirdReversePool;
     private long lastLevelTwoBirdReverseSpawnTime;
+
 
 
     public Birds(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables) {
@@ -92,6 +98,7 @@ public class Birds {
                 return new LevelTwoBirdReverse(gameWorld, game, camera);
             }
         };
+
 
 
     }
@@ -298,18 +305,22 @@ public class Birds {
     }
 
     public float getLastLevelOneBirdSpawnTime() {
+
         return lastLevelOneBirdSpawnTime;
     }
 
     public float getLastLevelTwoBirdSpawnTime() {
+
         return lastLevelTwoBirdSpawnTime;
     }
 
     public float getLastLevelOneReverseBirdSpawnTime() {
+
         return lastLevelOneBirdReverseSpawnTime;
     }
 
     public float getLastLevelTwoReverseBirdSpawnTime() {
+
         return lastLevelTwoBirdReverseSpawnTime;
     }
 

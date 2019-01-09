@@ -84,9 +84,9 @@ public class LevelTwo extends Level {
 
         spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
 
-        if (currentTimeInMillis - ufos.getLastUfoSpawnTime() > RANDOM_WAVE_UFO_SPAWN_DURATION) {
+        if (currentTimeInMillis - ufos.getLastUfoSpawnTime(2) > RANDOM_WAVE_UFO_SPAWN_DURATION) {
             //Spawn a ufo that shoots an energy beam in a random direction
-            ufos.spawnUfo(ufos.ENERGY_BEAM_RANDOM);
+            ufos.spawnUfo(ufos.ENERGY_BEAM_RANDOM, 2);
         }
 
         if (useStandardDuration){
@@ -100,8 +100,8 @@ public class LevelTwo extends Level {
 
         spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
 
-        if (currentTimeInMillis - alienMissiles.getLastAlienMissileSpawnTime() > RANDOM_WAVE_ALIEN_MISSILE_SPAWN_DURATION) {
-            alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_LEFTWARD);
+        if (currentTimeInMillis - alienMissiles.getLastAlienMissileSpawnTime(2) > RANDOM_WAVE_ALIEN_MISSILE_SPAWN_DURATION) {
+            alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_LEFTWARD, 2);
         }
 
         if (useStandardDuration){
@@ -119,8 +119,8 @@ public class LevelTwo extends Level {
         if (currentTimeInMillis - powerUps.getLastpowerUpShieldSpawnTime() > powerUpShieldInterval) {
             powerUps.spawnPowerUpShield();
         }
-        if (currentTimeInMillis - rockets.getLastRocketSpawnTime() > RANDOM_WAVE_ROCKETS_SPAWN_DURATION) {
-            rockets.spawnRocket();
+        if (currentTimeInMillis - rockets.getLastRocketSpawnTime(2) > RANDOM_WAVE_ROCKETS_SPAWN_DURATION) {
+            rockets.spawnRocket(2);
         }
 
         if (useStandardDuration){

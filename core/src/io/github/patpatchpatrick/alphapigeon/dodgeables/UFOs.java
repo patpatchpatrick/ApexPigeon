@@ -14,6 +14,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
 
+import java.util.HashMap;
+
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Dodgeable;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.EnergyBall;
@@ -40,6 +42,7 @@ public class UFOs {
     private final float UFO_WIDTH = 15f;
     private final float UFO_HEIGHT = UFO_WIDTH;
     private long lastUfoSpawnTime;
+    private HashMap<Float, Long> lastSpawnTimeByLevel = new HashMap<Float, Long>();
 
     //UFO tracking variables
 
@@ -478,7 +481,7 @@ public class UFOs {
 
     }
 
-    public void spawnUfo(float direction) {
+    public void spawnUfo(float direction, float level) {
 
         // Spawn(obtain) a new UFO from the UFO pool and add to list of active UFOs
 
@@ -490,10 +493,11 @@ public class UFOs {
 
         //keep track of time the ufo was spawned
         lastUfoSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        lastSpawnTimeByLevel.put(level, lastUfoSpawnTime);
 
     }
 
-    public void spawnHorizontalUfo(float direction) {
+    public void spawnHorizontalUfo(float direction, float level) {
 
         // Spawn(obtain) a new UFO from the UFO pool and add to list of active UFOs
         // Horizontal Ufos start in the vertical middle of the right of the screen and move slowly
@@ -507,10 +511,11 @@ public class UFOs {
 
         //keep track of time the ufo was spawned
         lastUfoSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        lastSpawnTimeByLevel.put(level, lastUfoSpawnTime);
 
     }
 
-    public void spawnVerticalUfo(float direction) {
+    public void spawnVerticalUfo(float direction, float level) {
         // Spawn(obtain) a new UFO from the UFO pool and add to list of active UFOs
         // Vertical Ufos start in the top of the screen in the horizontal middle and move slowly
         // towards the bottom of the screen vertically
@@ -523,9 +528,10 @@ public class UFOs {
 
         //keep track of time the ufo was spawned
         lastUfoSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        lastSpawnTimeByLevel.put(level, lastUfoSpawnTime);
     }
 
-    public void spawnStopInCenterUfo(float direction, long timeToHoldInCenter) {
+    public void spawnStopInCenterUfo(float direction, long timeToHoldInCenter, float level) {
 
 
         // Spawn(obtain) a new UFO from the UFO pool and add to list of active UFOs
@@ -539,10 +545,11 @@ public class UFOs {
 
         //keep track of time the ufo was spawned
         lastUfoSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        lastSpawnTimeByLevel.put(level, lastUfoSpawnTime);
 
     }
 
-    public void spawnStopInRightCenterUfo(float direction, long timeToHoldInRightCenter) {
+    public void spawnStopInRightCenterUfo(float direction, long timeToHoldInRightCenter, float level) {
 
 
         // Spawn(obtain) a new UFO from the UFO pool and add to list of active UFOs
@@ -557,10 +564,11 @@ public class UFOs {
 
         //keep track of time the ufo was spawned
         lastUfoSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        lastSpawnTimeByLevel.put(level, lastUfoSpawnTime);
 
     }
 
-    public void spawnTopRightCornerUfo(float direction, long timeToHold){
+    public void spawnTopRightCornerUfo(float direction, long timeToHold, float level){
 
         // Spawn(obtain) a new UFO from the UFO pool and add to list of active UFOs
         // StopInCorner Ufos stop in the corner of the screen for a certain amount of time
@@ -573,10 +581,11 @@ public class UFOs {
 
         //keep track of time the ufo was spawned
         lastUfoSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        lastSpawnTimeByLevel.put(level, lastUfoSpawnTime);
 
     }
 
-    public void spawnBottomLeftCornerUfo(float direction, long timeToHold){
+    public void spawnBottomLeftCornerUfo(float direction, long timeToHold, float level){
 
         // Spawn(obtain) a new UFO from the UFO pool and add to list of active UFOs
         // StopInCorner Ufos stop in the corner of the screen for a certain amount of time
@@ -589,6 +598,7 @@ public class UFOs {
 
         //keep track of time the ufo was spawned
         lastUfoSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        lastSpawnTimeByLevel.put(level, lastUfoSpawnTime);
 
     }
 
@@ -809,8 +819,14 @@ public class UFOs {
 
     }
 
-    public float getLastUfoSpawnTime() {
-        return lastUfoSpawnTime;
+    public float getLastUfoSpawnTime(float level) {
+
+        if (lastSpawnTimeByLevel.get(level) == null){
+            return 0;
+        } else {
+            return lastUfoSpawnTime;
+        }
+
     }
 
     public void sweepDeadBodies() {

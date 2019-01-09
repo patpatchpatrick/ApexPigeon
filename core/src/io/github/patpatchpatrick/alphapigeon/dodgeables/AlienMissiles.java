@@ -16,6 +16,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
 
+import java.util.HashMap;
+
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.AlienMissile;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.AlienMissileCorner;
@@ -40,6 +42,7 @@ public class AlienMissiles {
     private Animation<TextureRegion> alienMissileAnimation;
     private Texture alienMissileSheet;
     private long lastAlienMissileSpawnTime;
+    private HashMap<Float, Long> lastSpawnTimeByLevel = new HashMap<Float, Long>();
     public final float SPAWN_DIRECTION_LEFTWARD = 0f;
     public final float SPAWN_DIRECTION_UPWARD = 1f;
     public final float SPAWN_DIRECTION_RIGHTWARD = 2f;
@@ -235,10 +238,11 @@ public class AlienMissiles {
 
     }
 
-    public void spawnAlienMissile(float direction) {
+    public void spawnAlienMissile(float direction, float level) {
 
         // Spawn(obtain) a new alien missile from the alien missile pool and add to list of active alien missiles
         // Spawn the the missile in the inputted direction
+        // Associate the level in which the alien missile was spawned with a spawn time
 
         AlienMissile alienMissile = alienMissilePool.obtain();
         if (direction == SPAWN_DIRECTION_UPWARD){
@@ -255,6 +259,7 @@ public class AlienMissiles {
 
         //keep track of time the bird was spawned
         lastAlienMissileSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        lastSpawnTimeByLevel.put(level, lastAlienMissileSpawnTime);
 
     }
 
@@ -405,8 +410,12 @@ public class AlienMissiles {
         alienMissileCornerAnimation = new Animation<TextureRegion>(1f, alienFrames);
     }
 
-    public float getLastAlienMissileSpawnTime(){
-        return lastAlienMissileSpawnTime;
+    public float getLastAlienMissileSpawnTime(float level){
+        //Return the last spawn time for the given level
+        if (lastSpawnTimeByLevel.get(level) == null){
+            return 0;
+        } else {
+        return lastSpawnTimeByLevel.get(level);}
     }
 
     public void sweepDeadBodies(){

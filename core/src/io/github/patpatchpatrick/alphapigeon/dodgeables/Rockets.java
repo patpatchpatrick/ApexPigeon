@@ -16,6 +16,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
 
+import java.util.HashMap;
+
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBird;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Rocket;
@@ -37,6 +39,7 @@ public class Rockets {
     private Animation<TextureRegion> rocketAnimation;
     private Texture rocketSheet;
     private long lastRocketSpawnTime;
+    private HashMap<Float, Long> lastSpawnTimeByLevel = new HashMap<Float, Long>();
 
     //Rocket explosion variables
     private final Array<RocketExplosion> activeRocketExplosions = new Array<RocketExplosion>();
@@ -131,7 +134,7 @@ public class Rockets {
             BodyData rocketExplosionData = (BodyData) rocketExplosion.dodgeableBody.getUserData();
             if (rocketExplosionData != null) {
                 long rocketExplosionTime = rocketExplosionData.getExplosionTime();
-                if (currentTimeInMillis - rocketExplosionTime> 500) {
+                if (currentTimeInMillis - rocketExplosionTime > 500) {
                     rocketExplosionData.setFlaggedForDelete(true);
                 }
             } else {
@@ -164,7 +167,7 @@ public class Rockets {
 
     }
 
-    public void spawnRocket() {
+    public void spawnRocket(float level) {
 
         // Spawn(obtain) a new rocket from the rocket pool and add to list of active rockets
 
@@ -175,6 +178,7 @@ public class Rockets {
 
         //keep track of time the rocket was spawned
         lastRocketSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        lastSpawnTimeByLevel.put(level, lastRocketSpawnTime);
 
         //Play rocket spawn sounds
         rocketSpawnSound.play();
@@ -260,8 +264,16 @@ public class Rockets {
 
     }
 
-    public long getLastRocketSpawnTime() {
-        return lastRocketSpawnTime;
+    public long getLastRocketSpawnTime(float level) {
+
+        //Return the last spawn time for a given level
+
+        if (lastSpawnTimeByLevel.get(level) == null){
+            return 0;
+        } else {
+            return lastRocketSpawnTime;
+        }
+
     }
 
     public void sweepDeadBodies() {
