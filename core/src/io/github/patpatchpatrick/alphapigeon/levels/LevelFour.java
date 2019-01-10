@@ -27,7 +27,7 @@ public class LevelFour extends Level {
     private boolean randomWaveCornerUfosAreSpawned = false;
     private final float RANDOM_WAVE_ROCKET_MADNESS = 4f;
     private final float RANDOM_WAVE_ROCKET_MADNESS_L1BIRD_DURATION = 800f;
-    private final float RANDOM_WAVE_ROCKET_MADNESS_SPAWN_DURATION = 400f;
+    private final float RANDOM_WAVE_ROCKET_MADNESS_SPAWN_DURATION = 800f;
     private final float RANDOM_WAVE_BIRD_MADNESS = 5f;
     private final float RANDOM_WAVE_BIRD_MADNESS_L1BIRD_DURATION = 1600f;
     private final float RANDOM_WAVE_BIRD_MADNESS_L2BIRD_DURATION = 3200f;

@@ -8,12 +8,16 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
 public class MainMenuScreen implements Screen {
     private AlphaPigeon game;
     private OrthographicCamera camera;
+    private Viewport viewport;
     private Texture mainMenuBackground;
     private Texture startButtonSelected;
     private Texture startButtonNotSelected;
@@ -26,13 +30,17 @@ public class MainMenuScreen implements Screen {
     private final float START_BUTTON_Y = 12;
 
     public MainMenuScreen(AlphaPigeon game){
+
         this.game = game;
 
         //Initialize World
 
         // create the camera
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 80, 48);
+        camera.setToOrtho(false, GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT);
+        //the viewport object will handle camera's attributes
+        //the aspect provided (worldWidth/worldHeight) will be kept
+        viewport = new FitViewport(GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT, camera);
 
         mainMenuBackground = new Texture(Gdx.files.internal("textures/MainMenuScreen.png"));
         startButtonSelected = new Texture(Gdx.files.internal("textures/StartYellowSelected.png"));
@@ -74,7 +82,7 @@ public class MainMenuScreen implements Screen {
             game.batch.draw(startButtonSelected, START_BUTTON_X, START_BUTTON_Y, START_BUTTON_WIDTH, START_BUTTON_HEIGHT);
             if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
                 dispose();
-                game.setScreen(new GameScreen(game));
+                game.setScreen(new GameScreen(game, camera, viewport));
             }
         } else {
             game.batch.draw(startButtonNotSelected, START_BUTTON_X, START_BUTTON_Y, START_BUTTON_WIDTH, START_BUTTON_HEIGHT);
@@ -90,6 +98,9 @@ public class MainMenuScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
+
+        //Update viewport to match screen size
+        viewport.update(width, height, true);
 
     }
 

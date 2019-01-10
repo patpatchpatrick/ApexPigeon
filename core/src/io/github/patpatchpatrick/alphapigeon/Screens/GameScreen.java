@@ -20,6 +20,8 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.util.Iterator;
 
@@ -29,6 +31,7 @@ import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
 import io.github.patpatchpatrick.alphapigeon.levels.Gameplay;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
+import io.github.patpatchpatrick.alphapigeon.resources.Controller;
 import io.github.patpatchpatrick.alphapigeon.resources.HighScore;
 import io.github.patpatchpatrick.alphapigeon.resources.ScrollingBackground;
 
@@ -36,6 +39,8 @@ public class GameScreen implements Screen {
     AlphaPigeon game;
 
     private OrthographicCamera camera;
+    private Viewport viewport;
+    private Controller controller;
     private Pigeon pigeon;
     private Dodgeables dodgeables;
     public ScrollingBackground scrollingBackground;
@@ -52,7 +57,7 @@ public class GameScreen implements Screen {
     final float PIGEON_HEIGHT = 5.0f;
     final float PIGEON_INPUT_FORCE = 7.0f;
 
-    public GameScreen(AlphaPigeon game) {
+    public GameScreen(AlphaPigeon game, OrthographicCamera camera, Viewport viewport) {
         this.game = game;
 
         world = new World(new Vector2(0, 0), true);
@@ -61,9 +66,8 @@ public class GameScreen implements Screen {
         // set initial time to 0
         stateTime = 0f;
 
-        // create the camera
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, 80, 48);
+        this.camera = camera;
+        this.viewport = viewport;
 
         // initialize game resources
         this.scrollingBackground = new ScrollingBackground();
@@ -71,6 +75,9 @@ public class GameScreen implements Screen {
         this.pigeon = new Pigeon(world, game);
         this.dodgeables = new Dodgeables(this.pigeon, world, game, camera);
         pigeonBody = this.pigeon.getBody();
+
+        // Create the controller class to read user input
+        controller = new Controller(this.pigeon, this.camera);
 
         // initialize the gameplay class
         gameplay = new Gameplay(this.dodgeables);
@@ -120,7 +127,9 @@ public class GameScreen implements Screen {
     @Override
     public void resize(int width, int height) {
 
+        viewport.update(width, height, true);
         this.scrollingBackground.resize(width, height);
+
 
     }
 
@@ -165,22 +174,9 @@ public class GameScreen implements Screen {
         pigeon.update(stateTime);
 
         // process user input
-        if (Gdx.input.isTouched()) {
-            Vector3 touchPos = new Vector3();
-            touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-            // the camera unproject method converts touchPos coordinates to the
-            // camera coordinate system
-            camera.unproject(touchPos);
-            pigeonBody.applyForceToCenter(0.3f * (touchPos.x - pigeonBody.getPosition().x), 0.3f * (touchPos.y - pigeonBody.getPosition().y), true);
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
-            pigeonBody.applyForceToCenter(-PIGEON_INPUT_FORCE, 0,  true);
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
-            pigeonBody.applyForceToCenter(PIGEON_INPUT_FORCE, 0,  true);
-        if (Gdx.input.isKeyPressed(Input.Keys.UP))
-            pigeonBody.applyForceToCenter(0, PIGEON_INPUT_FORCE,  true);
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
-            pigeonBody.applyForceToCenter(0, -PIGEON_INPUT_FORCE,  true);
+        controller.processTouchInput();
+        controller.processKeyInput();
+        controller.processAccelerometerInput();
 
 
         // make sure the pigeon stays within the screen bounds
