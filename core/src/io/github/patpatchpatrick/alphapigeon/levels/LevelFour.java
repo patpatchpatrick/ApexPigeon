@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.MathUtils;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Notifications;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Notifications.ExclamationMark;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.Teleports;
 
 public class LevelFour extends Level {
 
@@ -99,11 +100,11 @@ public class LevelFour extends Level {
 
     private boolean runRandomWaveTeleportMadness() {
 
-        // Spawn loads of teleports and level one birds
+        // Spawn loads of teleports at random heights and level one birds
         spawnBirds(RANDOM_WAVE_TELEPORT_MADNESS_L1BIRD_DURATION, 100000);
 
         if (currentTimeInMillis - teleports.getLastTeleportSpawnTime() > RANDOM_WAVE_TELEPORT_SPAWN_DURATION) {
-            teleports.spawnTeleports();
+            teleports.spawnTeleports(Teleports.VERT_POSITION_RANDOM);
         }
 
         return checkIfRandomWaveIsComplete(RANDOM_WAVE_TELEPORT_MADNESS_TOTAL_TIME);

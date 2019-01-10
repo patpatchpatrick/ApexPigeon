@@ -28,7 +28,7 @@ public abstract class Level {
     protected float waveToRun;
     protected long lastWaveStartTime = 0;
     protected final float RANDOM_WAVE_STANDARD_DURATION = 30000f;
-    protected final float RANDOM_WAVE_SHORT_DURATION = 10000f;
+    protected final float RANDOM_WAVE_SHORT_DURATION = 15000f;
     protected final float RANDOM_WAVE_LONG_DURATION = 60000f;
 
     // GAME TIMES
@@ -46,7 +46,7 @@ public abstract class Level {
     //L2 is "easy" difficulty
     //End time should be 120000f
     protected final float LEVEL_TWO_START_TIME = LEVEL_ONE_END_TIME;
-    protected final float LEVEL_TWO_END_TIME = 5f;
+    protected final float LEVEL_TWO_END_TIME = 100000f;
     //L3 is "medium" difficulty
     //End time shoudl be 180000f
     protected final float LEVEL_THREE_START_TIME = LEVEL_TWO_END_TIME;

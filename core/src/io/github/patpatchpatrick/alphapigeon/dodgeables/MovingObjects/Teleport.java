@@ -9,6 +9,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.Teleports;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 
@@ -41,15 +42,34 @@ public class Teleport extends Dodgeable {
 
     }
 
-    public void initTeleportOne() {
+    public void initTeleportOne(float spawnHeight) {
 
-        // Initialize first teleport (moves in different direction from second teleport)
-        yPosition = MathUtils.random(0, camera.viewportHeight - HEIGHT);
+        // Initialize teleport one
+        // If a spawn height was specified, use that height, otherwise spawn at a random height
 
-        dodgeableBody.setActive(true);
-        dodgeableBody.setTransform(camera.viewportWidth, yPosition, dodgeableBody.getAngle());
-        dodgeableBody.applyForceToCenter(FORCE_ONE, 0, true);
-        this.alive = true;
+        if (spawnHeight == Teleports.VERT_POSITION_RANDOM){
+
+            // Initialize first teleport (moves in different direction from second teleport)
+            yPosition = MathUtils.random(0, camera.viewportHeight - HEIGHT);
+
+            dodgeableBody.setActive(true);
+            dodgeableBody.setTransform(camera.viewportWidth, yPosition, dodgeableBody.getAngle());
+            dodgeableBody.applyForceToCenter(FORCE_ONE, 0, true);
+            this.alive = true;
+
+        } else {
+
+            // Initialize first teleport (moves in different direction from second teleport)
+            yPosition = spawnHeight;
+
+            dodgeableBody.setActive(true);
+            dodgeableBody.setTransform(camera.viewportWidth, yPosition, dodgeableBody.getAngle());
+            dodgeableBody.applyForceToCenter(FORCE_ONE, 0, true);
+            this.alive = true;
+
+
+        }
+
 
     }
 

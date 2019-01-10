@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.MathUtils;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Notifications;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Notifications.ExclamationMark;
+import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
 public class LevelThree extends Level {
 
@@ -100,7 +101,7 @@ public class LevelThree extends Level {
             //amount of time
             ufos.spawnStopInCenterUfo(ufos.ENERGY_BEAM_ALL_DIRECTIONS, 5, 3);
             //Spawn a teleport that can be used to dodge the center UFO
-            teleports.spawnTeleports();
+            teleports.spawnTeleports(10);
             randomWaveCenterUfoSpawned = true;
         }
 
@@ -209,8 +210,8 @@ public class LevelThree extends Level {
         if (!randomWaveVertTeleUfoTeleportsSpawned && currentTimeInMillis - randomWaveVerTeleUfoTimeUfoSpawned > RANDOM_WAVE_VERT_UFO_TELEPORT_TIME_BEFORE_TELE_SPAWN) {
             //If time before when the teleport should spawn has passed and teleports haven't spawned yet
             // , spawn teleports that can be used by the player to dodge the energy beam
-            teleports.spawnTeleports();
-            teleports.spawnTeleports();
+            teleports.spawnTeleports(30);
+            teleports.spawnTeleports(10);
             randomWaveVertTeleUfoTeleportsSpawned = true;
 
         }

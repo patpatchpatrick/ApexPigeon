@@ -3,6 +3,8 @@ package io.github.patpatchpatrick.alphapigeon.levels;
 import com.badlogic.gdx.math.MathUtils;
 
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.Notifications;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.Notifications.ExclamationMark;
 
 public class LevelTwo extends Level {
 
@@ -126,12 +128,23 @@ public class LevelTwo extends Level {
 
         // Spawn a vertical line of birds that must be jumped over via teleports
 
-        if (!randomWaveVertBirdLineSpawned){
-            birds.spawnVerticalLineOfBirds(totalGameTime);
-            teleports.spawnTeleports();
-            teleports.spawnTeleports();
-            randomWaveVertBirdLineSpawned = true;
+        if (!ExclamationMark.notificationSpawned) {
+            //Spawn a warning notification if it is not yet spawned ( for teleports coming from the left)
+            ExclamationMark.spawnExclamationMark(Notifications.DIRECTION_LEFT);
         }
+
+        if (ExclamationMark.notificationIsComplete()) {
+            //If notification has finished displaying,
+            // Spawn birds and teleports
+            if (!randomWaveVertBirdLineSpawned){
+                birds.spawnVerticalLineOfBirds(totalGameTime);
+                teleports.spawnTeleports(10);
+                teleports.spawnTeleports(30);
+                randomWaveVertBirdLineSpawned = true;
+            }
+        }
+
+
 
         return checkIfWaveIsComplete(useStandardDuration);
 

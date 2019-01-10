@@ -31,6 +31,9 @@ public class Teleports {
     private OrthographicCamera camera;
     private Dodgeables dodgeables;
 
+    //Spawn variables
+    public final static float VERT_POSITION_RANDOM = -1;
+
     //Teleport variables
     private final Array<Teleport> activeTeleports = new Array<Teleport>();
     private final Pool<Teleport> teleportsPool;
@@ -87,7 +90,7 @@ public class Teleports {
 
     }
 
-    public void spawnTeleports() {
+    public void spawnTeleports(float spawnHeight) {
 
         //spawn two new teleports that start at opposite ends of the screen (x direction) and
         //travel in opposite directions
@@ -96,7 +99,7 @@ public class Teleports {
         // Spawn(obtain) a new teleport from the teleports pool and add to list of active teleports
 
         Teleport teleportOne = teleportsPool.obtain();
-        teleportOne.initTeleportOne();
+        teleportOne.initTeleportOne(spawnHeight);
         activeTeleports.add(teleportOne);
         dodgeables.activeDodgeables.add(teleportOne);
 
