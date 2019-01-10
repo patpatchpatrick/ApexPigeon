@@ -13,7 +13,7 @@ public class LevelTwo extends Level {
 
     //RANDOM WAVE VARIABLES
     // Level Two consists of "EASY" waves of dodgeables that occur randomly
-    public final static int TOTAL_NUMBER_OF_WAVES = 3;
+    public final static int TOTAL_NUMBER_OF_WAVES = 4;
     private final float RANDOM_WAVE_UFO = 1f;
     private final float RANDOM_WAVE_UFO_SPAWN_DURATION = 10000;
     private final float RANDOM_WAVE_ALIEN_MISSILE = 2f;
@@ -22,37 +22,14 @@ public class LevelTwo extends Level {
     private final float RANDOM_WAVE_ROCKETS_SPAWN_DURATION = 4000;
     private final float RANDOM_WAVE_L1BIRD_SPAWN_DURATION = 2000;
     private final float RANDOM_WAVE_L2BIRD_SPAWN_DURATION = 2000;
+    private final float RANDOM_WAVE_VERT_BIRD_LINE = 4f;
+    private boolean randomWaveVertBirdLineSpawned = false;
 
     public LevelTwo(Dodgeables dodgeables) {
         super(dodgeables);
     }
 
-    public void run(float totalGameTime, long currentTimeInMillis, float powerUpShieldInterval) {
-
-        this.totalGameTime = totalGameTime;
-        this.currentTimeInMillis = currentTimeInMillis;
-        this.powerUpShieldInterval = powerUpShieldInterval;
-
-        if (!randomWaveIsInitiated) {
-            //If a random isn't currently in progress:
-            //Generate a random number to determine which random wave to run
-            randomWave = MathUtils.random(1, TOTAL_NUMBER_OF_WAVES);
-            //Save the time the last random wave was started
-            lastRandomWaveStartTime = currentTimeInMillis;
-            randomWaveIsInitiated = true;
-            //Level 2 waves do not use standard durations by default
-            //They use short durations
-        } else if (randomWave == RANDOM_WAVE_UFO) {
-            runRandomWaveUFO(false);
-        } else if (randomWave == RANDOM_WAVE_ALIEN_MISSILE) {
-            runRandomWaveAlienMissile(false);
-        } else if (randomWave == RANDOM_WAVE_ROCKETS) {
-            runRandomWaveRockets(false);
-        }
-
-    }
-
-    public boolean runManualWave(float waveNumber, float totalGameTime, long currentTimeInMillis, float powerUpShieldInterval, boolean useStandardDuration) {
+    public boolean run(boolean runRandomWave, float waveNumber, float totalGameTime, long currentTimeInMillis, float powerUpShieldInterval, boolean useStandardDuration) {
 
         this.totalGameTime = totalGameTime;
         this.currentTimeInMillis = currentTimeInMillis;
@@ -60,24 +37,44 @@ public class LevelTwo extends Level {
 
         //Manually run a wave
         // Return true if wave is complete
-        if (!randomWaveIsInitiated) {
+        if (!waveIsInitiated) {
+            resetWaveVariables();
+            if (runRandomWave){
+                // If you are running a random wave, override the manually inputted wave number with a random number
+                waveToRun = MathUtils.random(1, TOTAL_NUMBER_OF_WAVES);
+            } else {
+                waveToRun = waveNumber;
+            }
             //Save the time the last random wave was started
-            lastRandomWaveStartTime = currentTimeInMillis;
-            randomWaveIsInitiated = true;
+            lastWaveStartTime = currentTimeInMillis;
+            waveIsInitiated = true;
             return false;
-        } else if (waveNumber == RANDOM_WAVE_UFO) {
+        } else if (waveToRun == RANDOM_WAVE_UFO) {
             return runRandomWaveUFO(useStandardDuration);
-        } else if (waveNumber == RANDOM_WAVE_ALIEN_MISSILE) {
+        } else if (waveToRun == RANDOM_WAVE_ALIEN_MISSILE) {
             return runRandomWaveAlienMissile(useStandardDuration);
-        } else if (waveNumber == RANDOM_WAVE_ROCKETS) {
+        } else if (waveToRun == RANDOM_WAVE_ROCKETS) {
             return runRandomWaveRockets(useStandardDuration);
+        } else if (waveToRun == RANDOM_WAVE_VERT_BIRD_LINE){
+            return runRandomWaveVerticalBirdLine(useStandardDuration);
         } else {
             return false;
         }
     }
 
+    private void resetWaveVariables(){
+
+        //Reset all variables that need to be reset before starting a new wave
+        randomWaveVertBirdLineSpawned = false;
+
+
+    }
+
 
     private boolean runRandomWaveUFO(boolean useStandardDuration) {
+
+        //Spawn a ufo that shoots an energy beam in a random direction
+        //Also spawn birds
 
         //Return true if wave is complete
         //useStandardDuration boolean determines if wave should be run with a standard or short duration
@@ -85,18 +82,17 @@ public class LevelTwo extends Level {
         spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
 
         if (currentTimeInMillis - ufos.getLastUfoSpawnTime(2) > RANDOM_WAVE_UFO_SPAWN_DURATION) {
-            //Spawn a ufo that shoots an energy beam in a random direction
             ufos.spawnUfo(ufos.ENERGY_BEAM_RANDOM, 2);
         }
 
-        if (useStandardDuration){
-            return checkIfRandomWaveIsComplete(RANDOM_WAVE_STANDARD_DURATION);
-        } else {
-            return checkIfRandomWaveIsComplete(RANDOM_WAVE_SHORT_DURATION);
-        }
+
+        return checkIfWaveIsComplete(useStandardDuration);
     }
 
     private boolean runRandomWaveAlienMissile(boolean useStandardDuration) {
+
+        //Spawn alien missiles in regular intervals
+        //Also spawn birds
 
         spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
 
@@ -104,15 +100,14 @@ public class LevelTwo extends Level {
             alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_LEFTWARD, 2);
         }
 
-        if (useStandardDuration){
-            return checkIfRandomWaveIsComplete(RANDOM_WAVE_STANDARD_DURATION);
-        } else {
-            return checkIfRandomWaveIsComplete(RANDOM_WAVE_SHORT_DURATION);
-        }
+        return checkIfWaveIsComplete(useStandardDuration);
 
     }
 
     private boolean runRandomWaveRockets(boolean useStandardDuration) {
+
+        //Spawn rockets that launch at regular intervals
+        //Also spawn birds
 
         spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
 
@@ -123,13 +118,38 @@ public class LevelTwo extends Level {
             rockets.spawnRocket(2);
         }
 
+        return checkIfWaveIsComplete(useStandardDuration);
+
+    }
+
+    private boolean runRandomWaveVerticalBirdLine(boolean useStandardDuration){
+
+        // Spawn a vertical line of birds that must be jumped over via teleports
+
+        if (!randomWaveVertBirdLineSpawned){
+            birds.spawnVerticalLineOfBirds(totalGameTime);
+            teleports.spawnTeleports();
+            teleports.spawnTeleports();
+            randomWaveVertBirdLineSpawned = true;
+        }
+
+        return checkIfWaveIsComplete(useStandardDuration);
+
+    }
+
+    private boolean checkIfWaveIsComplete(boolean useStandardDuration){
+
+        //Determine if a wave is complete
+        //If the wave is using standard duration, check if the standard wave time duration has passed
+        //If the wave is using short duration, check if the short wave time duration has passed
+
         if (useStandardDuration){
             return checkIfRandomWaveIsComplete(RANDOM_WAVE_STANDARD_DURATION);
         } else {
             return checkIfRandomWaveIsComplete(RANDOM_WAVE_SHORT_DURATION);
         }
-
     }
+
 
 
 }

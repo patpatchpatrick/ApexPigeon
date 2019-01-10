@@ -1,18 +1,13 @@
 package io.github.patpatchpatrick.alphapigeon.levels;
 
-import com.badlogic.gdx.utils.TimeUtils;
-
 import io.github.patpatchpatrick.alphapigeon.dodgeables.AlienMissiles;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Birds;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Meteors;
-import io.github.patpatchpatrick.alphapigeon.dodgeables.Notifications;
-import io.github.patpatchpatrick.alphapigeon.dodgeables.Notifications.ExclamationMark;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.PowerUps;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Rockets;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Teleports;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.UFOs;
-import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
 public abstract class Level {
 
@@ -26,11 +21,12 @@ public abstract class Level {
     protected Meteors meteors;
     protected UFOs ufos;
 
-    // RANDOM WAVE VARIABLES
+    // WAVE VARIABLES
     // Used to keep track of whether or not a random wave has started, and when
-    protected boolean randomWaveIsInitiated = false;
-    protected long lastRandomWaveStartTime = 0;
-    protected float randomWave = 0f;
+    protected boolean waveIsInitiated = false;
+    protected final float NO_WAVE = 0f;
+    protected float waveToRun;
+    protected long lastWaveStartTime = 0;
     protected final float RANDOM_WAVE_STANDARD_DURATION = 30000f;
     protected final float RANDOM_WAVE_SHORT_DURATION = 10000f;
     protected final float RANDOM_WAVE_LONG_DURATION = 60000f;
@@ -46,17 +42,19 @@ public abstract class Level {
     //L1W1 is only level 1 birds,  L1W2 is level 1 and 2 birds
     //Start time should be 0f and end time should be 40000f
     protected final float LEVEL_ONE_WAVE_1 = 20000f;
-    protected final float LEVEL_ONE_END_TIME = 40000f;
+    protected final float LEVEL_ONE_END_TIME = 4f;
     //L2 is "easy" difficulty
     //End time should be 120000f
     protected final float LEVEL_TWO_START_TIME = LEVEL_ONE_END_TIME;
-    protected final float LEVEL_TWO_END_TIME = 120000f;
+    protected final float LEVEL_TWO_END_TIME = 5f;
     //L3 is "medium" difficulty
+    //End time shoudl be 180000f
     protected final float LEVEL_THREE_START_TIME = LEVEL_TWO_END_TIME;
-    protected final float LEVEL_THREE_END_TIME = 180000f;
+    protected final float LEVEL_THREE_END_TIME = 6f;
     //L4 is "hard" difficulty
+    //End time should be 260000f
     protected final float LEVEL_FOUR_START_TIME = LEVEL_THREE_END_TIME;
-    protected final float LEVEL_FOUR_END_TIME = 260000f;
+    protected final float LEVEL_FOUR_END_TIME = 7f;
     //Level Final is "insane" difficulty.  It is a continuous level and the last level of the game
     protected final float LEVEL_FINAL_START_TIME = LEVEL_FOUR_END_TIME;
 
@@ -106,8 +104,8 @@ public abstract class Level {
         //Check if a wave is complete, if so, mark randomWaveInitiated as false so that a new random
         // wave will be run
         // Return true if random wave is complete
-        if (currentTimeInMillis - lastRandomWaveStartTime > randomWaveDuration) {
-            randomWaveIsInitiated = false;
+        if (currentTimeInMillis - lastWaveStartTime > randomWaveDuration) {
+            waveIsInitiated = false;
             return true;
         }
         return false;

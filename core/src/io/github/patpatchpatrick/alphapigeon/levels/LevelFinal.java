@@ -40,7 +40,7 @@ public class LevelFinal extends Level {
         this.currentTimeInMillis = currentTimeInMillis;
         this.powerUpShieldInterval = powerUpShieldInterval;
 
-        if (!randomWaveIsInitiated) {
+        if (!waveIsInitiated) {
             resetWaveVariables();
             //Determine which levels to run random waves from
             //Do not run random waves from the same levels
@@ -54,8 +54,8 @@ public class LevelFinal extends Level {
             randomWaveOne = determineRandomWavesToRun(randomWaveOneLevel);
             randomWaveTwo = determineRandomWavesToRun(randomWaveTwoLevel);
             //Save the time the last random wave was started
-            lastRandomWaveStartTime = currentTimeInMillis;
-            randomWaveIsInitiated = true;
+            lastWaveStartTime = currentTimeInMillis;
+            waveIsInitiated = true;
         } else {
             runWave();
         }
@@ -103,7 +103,7 @@ public class LevelFinal extends Level {
 
 
         if (waveOneComplete && waveTwoComplete){
-            randomWaveIsInitiated = false;
+            waveIsInitiated = false;
         }
 
 
@@ -115,12 +115,12 @@ public class LevelFinal extends Level {
 
         if (level == 2){
             //Level 2 waves need to be specified to use the standard duration because the duration for level 2 waves change to be longer on the final level
-            return levelTwo.runManualWave(wave, this.totalGameTime, this.currentTimeInMillis, this.powerUpShieldInterval, true);
+            return levelTwo.run(false, wave, this.totalGameTime, this.currentTimeInMillis, this.powerUpShieldInterval, true);
         } else if (level == 3){
-            return levelThree.runManualWave(wave, this.totalGameTime, this.currentTimeInMillis, this.powerUpShieldInterval);
+            return levelThree.run(false, wave, this.totalGameTime, this.currentTimeInMillis, this.powerUpShieldInterval, true);
         } else {
             //Level 4 waves need to be specified to use the standard duration because the duration for some level 3 waves change on the final level
-            return levelFour.runManualWave(wave, this.totalGameTime, this.currentTimeInMillis, this.powerUpShieldInterval, true);
+            return levelFour.run(false, wave, this.totalGameTime, this.currentTimeInMillis, this.powerUpShieldInterval, true);
         }
 
     }

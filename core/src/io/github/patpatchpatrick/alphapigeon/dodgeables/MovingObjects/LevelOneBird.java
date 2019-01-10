@@ -8,6 +8,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.Birds;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 
 public class LevelOneBird extends Dodgeable {
@@ -41,16 +42,31 @@ public class LevelOneBird extends Dodgeable {
 
     }
 
-    public void init(float totalGameTime) {
+    public void init(float totalGameTime, float verticalPosition) {
+
+        //initialize a bird
+        //can specify the vertical position, otherwise if position = VERT_POSITION_RANDOM use random position
 
         //Set the force multiplier for object
+        //the force multiplier increases over time so bird goes faster over time
         setForceMultiplier(totalGameTime);
 
-        //Initiate the object
-        dodgeableBody.setActive(true);
-        dodgeableBody.setTransform(camera.viewportWidth, MathUtils.random(0, camera.viewportHeight - HEIGHT), dodgeableBody.getAngle());
-        dodgeableBody.applyForceToCenter(this.forceMultiplier * FORCE_X, 0, true);
-        this.alive = true;
+        if (verticalPosition == Birds.VERT_POSITION_RANDOM){
+            //Initiate the object
+            dodgeableBody.setActive(true);
+            dodgeableBody.setTransform(camera.viewportWidth, MathUtils.random(0, camera.viewportHeight - HEIGHT), dodgeableBody.getAngle());
+            dodgeableBody.applyForceToCenter(this.forceMultiplier * FORCE_X, 0, true);
+            this.alive = true;
+        } else {
+
+            //Initiate the object
+            dodgeableBody.setActive(true);
+            dodgeableBody.setTransform(camera.viewportWidth, verticalPosition, dodgeableBody.getAngle());
+            dodgeableBody.applyForceToCenter(this.forceMultiplier * FORCE_X, 0, true);
+            this.alive = true;
+        }
+
+
 
     }
 

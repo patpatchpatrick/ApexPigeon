@@ -55,7 +55,6 @@ public class GameScreen implements Screen {
     //Variables
     final float PIGEON_WIDTH = 10.0f;
     final float PIGEON_HEIGHT = 5.0f;
-    final float PIGEON_INPUT_FORCE = 7.0f;
 
     public GameScreen(AlphaPigeon game, OrthographicCamera camera, Viewport viewport) {
         this.game = game;

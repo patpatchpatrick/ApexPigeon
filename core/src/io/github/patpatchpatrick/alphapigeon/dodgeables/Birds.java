@@ -32,6 +32,9 @@ public class Birds {
     private OrthographicCamera camera;
     private Dodgeables dodgeables;
 
+    //Spawn variables
+    public final static float VERT_POSITION_RANDOM = -1;
+
     //Level One Bird variables
     private final Array<LevelOneBird> activeLevelOneBirds = new Array<LevelOneBird>();
     private final Pool<LevelOneBird> levelOneBirdPool;
@@ -198,7 +201,7 @@ public class Birds {
         // Spawn(obtain) a new bird from the level one bird pool and add to list of active birds
 
         LevelOneBird levelOneBird = levelOneBirdPool.obtain();
-        levelOneBird.init(totalGameTime);
+        levelOneBird.init(totalGameTime, VERT_POSITION_RANDOM);
         activeLevelOneBirds.add(levelOneBird);
         dodgeables.activeDodgeables.add(levelOneBird);
 
@@ -245,6 +248,30 @@ public class Birds {
 
         //keep track of time the bird was spawned
         lastLevelTwoBirdReverseSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+
+
+    }
+
+    public void spawnVerticalLineOfBirds(float totalGameTime){
+
+        // Spawn(obtain) a vertical line of birds that move horizontally across the screen (leftwards)
+
+        float spawnHeight = camera.viewportHeight;
+
+        while (spawnHeight >= 0){
+
+            LevelOneBird levelOneBird = levelOneBirdPool.obtain();
+            levelOneBird.init(totalGameTime, spawnHeight);
+            activeLevelOneBirds.add(levelOneBird);
+            dodgeables.activeDodgeables.add(levelOneBird);
+
+            spawnHeight -= levelOneBird.HEIGHT;
+
+        }
+
+
+        //keep track of time the bird was spawned
+        lastLevelOneBirdSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
 
 
     }

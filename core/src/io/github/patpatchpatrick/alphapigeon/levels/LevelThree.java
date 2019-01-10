@@ -39,50 +39,26 @@ public class LevelThree extends Level {
         super(dodgeables);
     }
 
-    public void run(float totalGameTime, long currentTimeInMillis, float powerUpShieldInterval) {
+
+    public boolean run(boolean runRandomWave, float waveNumber, float totalGameTime, long currentTimeInMillis, float powerUpShieldInterval, boolean useStandardDuration) {
 
         this.totalGameTime = totalGameTime;
         this.currentTimeInMillis = currentTimeInMillis;
         this.powerUpShieldInterval = powerUpShieldInterval;
 
-        if (!randomWaveIsInitiated) {
-            resetWaveVariables();
-            //If a random isn't currently in progress:
-            //Generate a random number to determine which random wave to run
-            randomWave = MathUtils.random(1, TOTAL_NUMBER_OF_WAVES);
-            //Save the time the last random wave was started
-            lastRandomWaveStartTime = currentTimeInMillis;
-            randomWaveIsInitiated = true;
-        } else if (randomWave == RANDOM_WAVE_UFO_HORIZONTAL) {
-            runRandomWaveHorizontalUFO();
-        } else if (randomWave == RANDOM_WAVE_UFO_VERTICAL) {
-            runRandomWaveVerticalUFO();
-        } else if (randomWave == RANDOM_WAVE_METEORS) {
-            runRandomWaveMeteors();
-        } else if (randomWave == RANDOM_WAVE_MISSILES) {
-            runRandomWaveMissiles();
-        } else if (randomWave == RANDOM_WAVE_UFO_CENTER) {
-            runRandomWaveCenterUFO();
-        } else if (randomWave == RANDOM_WAVE_VERT_UFO_TELEPORT) {
-            runRandomWaveVerticalUFOAndTeleport();
-        }
-
-    }
-
-    public boolean runManualWave(float waveNumber, float totalGameTime, long currentTimeInMillis, float powerUpShieldInterval) {
-
-        this.totalGameTime = totalGameTime;
-        this.currentTimeInMillis = currentTimeInMillis;
-        this.powerUpShieldInterval = powerUpShieldInterval;
-
+        float waveToRun = waveNumber;
 
         //Manually run a wave
         // Return true if wave is complete
-        if (!randomWaveIsInitiated) {
+        if (!waveIsInitiated) {
             resetWaveVariables();
+            if (runRandomWave){
+                // If you are running a random wave, override the manually inputted wave number with a random number
+                waveToRun = MathUtils.random(1, TOTAL_NUMBER_OF_WAVES);
+            }
             //Save the time the last random wave was started
-            lastRandomWaveStartTime = currentTimeInMillis;
-            randomWaveIsInitiated = true;
+            lastWaveStartTime = currentTimeInMillis;
+            waveIsInitiated = true;
             return false;
         } else if (waveNumber == RANDOM_WAVE_UFO_HORIZONTAL) {
             return runRandomWaveHorizontalUFO();

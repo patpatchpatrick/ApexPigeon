@@ -3,7 +3,6 @@ package io.github.patpatchpatrick.alphapigeon.levels;
 import com.badlogic.gdx.math.MathUtils;
 
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
-import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Dodgeable;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Notifications;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Notifications.ExclamationMark;
 
@@ -42,49 +41,25 @@ public class LevelFour extends Level {
         super(dodgeables);
     }
 
-    public void run(float totalGameTime, long currentTimeInMillis, float powerUpShieldInterval) {
+    public boolean run(boolean runRandomWave, float waveNumber, float totalGameTime, long currentTimeInMillis, float powerUpShieldInterval, boolean useStandardDuration) {
 
         this.totalGameTime = totalGameTime;
         this.currentTimeInMillis = currentTimeInMillis;
         this.powerUpShieldInterval = powerUpShieldInterval;
 
-        if (!randomWaveIsInitiated) {
-            resetWaveVariables();
-            //If a random isn't currently in progress:
-            //Generate a random number to determine which random wave to run
-            randomWave = MathUtils.random(1, TOTAL_NUMBER_OF_WAVES);
-            //Save the time the last random wave was started
-            lastRandomWaveStartTime = currentTimeInMillis;
-            randomWaveIsInitiated = true;
-        } else if (randomWave == RANDOM_WAVE_TELEPORT_MADNESS) {
-            runRandomWaveTeleportMadness();
-        } else if (randomWave == RANDOM_WAVE_ALIEN_MISSILE_MADNESS) {
-            runRandomWaveAlienMissileMadness();
-        } else if (randomWave == RANDOM_WAVE_UFOS_IN_CORNERS) {
-            runRandomWaveUFOsInCorners();
-        } else if (randomWave == RANDOM_WAVE_ROCKET_MADNESS) {
-            runRandomWaveRocketMadness();
-        } else if (randomWave == RANDOM_WAVE_BIRD_MADNESS) {
-            runRandomWaveBirdMadness();
-        } else if (randomWave == RANDOM_WAVE_UFO_MAZE) {
-            runRandomWaveUfoMaze(false);
-        }
-
-    }
-
-    public boolean runManualWave(float waveNumber, float totalGameTime, long currentTimeInMillis, float powerUpShieldInterval, boolean useStandardDuration) {
-
-        this.totalGameTime = totalGameTime;
-        this.currentTimeInMillis = currentTimeInMillis;
-        this.powerUpShieldInterval = powerUpShieldInterval;
+        float waveToRun = waveNumber;
 
         //Manually run a wave
         // Return true if wave is complete
-        if (!randomWaveIsInitiated) {
+        if (!waveIsInitiated) {
             resetWaveVariables();
+            if (runRandomWave){
+                // If you are running a random wave, override the manually inputted wave number with a random number
+                waveToRun = MathUtils.random(1, TOTAL_NUMBER_OF_WAVES);
+            }
             //Save the time the last random wave was started
-            lastRandomWaveStartTime = currentTimeInMillis;
-            randomWaveIsInitiated = true;
+            lastWaveStartTime = currentTimeInMillis;
+            waveIsInitiated = true;
             return false;
         } else if (waveNumber == RANDOM_WAVE_TELEPORT_MADNESS) {
             return runRandomWaveTeleportMadness();

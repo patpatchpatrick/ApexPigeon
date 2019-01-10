@@ -76,15 +76,15 @@ public class Gameplay extends Level {
 
         } else if (totalGameTime > LEVEL_TWO_START_TIME && totalGameTime <= LEVEL_TWO_END_TIME){
 
-            levelTwo.run(totalGameTime, currentTimeInMillis, powerUpShieldInterval);
+            levelTwo.run(true, NO_WAVE, totalGameTime, currentTimeInMillis, powerUpShieldInterval, false);
 
         } else if (totalGameTime > LEVEL_THREE_START_TIME & totalGameTime <= LEVEL_THREE_END_TIME){
 
-            levelThree.run(totalGameTime,  currentTimeInMillis, powerUpShieldInterval);
+            levelThree.run(true, NO_WAVE, totalGameTime,  currentTimeInMillis, powerUpShieldInterval, false);
 
         } else if (totalGameTime > LEVEL_FOUR_START_TIME & totalGameTime <= LEVEL_FOUR_END_TIME){
 
-            levelFour.run(totalGameTime, currentTimeInMillis, powerUpShieldInterval);
+            levelFour.run(true, NO_WAVE, totalGameTime, currentTimeInMillis, powerUpShieldInterval, false);
 
         } else if (totalGameTime > LEVEL_FINAL_START_TIME){
 
