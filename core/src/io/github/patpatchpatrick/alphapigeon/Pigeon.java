@@ -1,21 +1,23 @@
 package io.github.patpatchpatrick.alphapigeon;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Teleport;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.PowerUps;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 
@@ -33,6 +35,7 @@ public class Pigeon {
     private short currentPowerUp;
     private float currentPowerUpTime = 0;
     private final long MILLION_SCALE = 1000000;
+    private String powerUpShieldTimeRemaining = "";
 
     //Power Up Shield Animation Variables
     private Texture powerUpShieldSheet;
@@ -42,6 +45,10 @@ public class Pigeon {
     private Sound powerUpShieldSound;
     private Sound powerUpShieldZapSound;
     private Sound teleportSound;
+
+    //Fonts and text to display on pigeon
+    private BitmapFont pigeonFonts;
+    FreeTypeFontGenerator pigeonFontGenerator;
 
 
     public Pigeon(World world, AlphaPigeon game) {
@@ -77,6 +84,16 @@ public class Pigeon {
         powerUpShieldSound = Gdx.audio.newSound(Gdx.files.internal("sounds/powerUpShield.wav"));
         powerUpShieldZapSound = Gdx.audio.newSound(Gdx.files.internal("sounds/powerUpShieldZap.wav"));
         teleportSound = Gdx.audio.newSound(Gdx.files.internal("sounds/teleportSound.mp3"));
+
+        //Initialize font pigeonFontGenerator for powerups
+        pigeonFontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("arcadeclassic.TTF"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = 18;
+        parameter.minFilter = Texture.TextureFilter.Linear;
+        parameter.magFilter = Texture.TextureFilter.Linear;
+        pigeonFonts = pigeonFontGenerator.generateFont(parameter);
+        pigeonFonts.setColor(Color.RED);
+        pigeonFonts.getData().setScale(0.1f);
 
 
     }
@@ -217,9 +234,12 @@ public class Pigeon {
         batch.draw(pigeonCurrentFrame, pigeonBody.getPosition().x, pigeonBody.getPosition().y, 0, 0, 10, 5f, 1, 1, MathUtils.radiansToDegrees * pigeonBody.getAngle());
 
         if (this.currentPowerUp == game.CATEGORY_POWERUP_SHIELD) {
+            // If the pigeon is powered up with a shield, draw the shield around it and also draw the shield time remaning
             // Get current frame of animation for the current stateTime and render it
             TextureRegion powUpShieldCurrentFrame = powerUpShieldAnimation.getKeyFrame(stateTime, true);
             batch.draw(powUpShieldCurrentFrame, pigeonBody.getPosition().x - 2.5f, pigeonBody.getPosition().y - 2.5f, 0, 0, 15f, 10f, 1, 1, MathUtils.radiansToDegrees * pigeonBody.getAngle());
+            // display power up remaining time
+            pigeonFonts.draw(batch, powerUpShieldTimeRemaining, pigeonBody.getPosition().x, pigeonBody.getPosition().y);
         }
 
     }
@@ -229,8 +249,11 @@ public class Pigeon {
 
         //Check if power up shield has expired
         //If so, set currentPowerUp back to CATEGORY_PIGEON, which is the default currentPowerUp setting
-        if (this.stateTime - this.currentPowerUpTime > 8) {
+        //If not, display time remaining on screen
+        if (this.stateTime - this.currentPowerUpTime > PowerUps.POWER_UP_SHIELD_DURATION) {
             removePowerUps();
+        } else if (this.currentPowerUp == game.CATEGORY_POWERUP_SHIELD){
+            powerUpShieldTimeRemaining = "" + MathUtils.floor(PowerUps.POWER_UP_SHIELD_DURATION -(this.stateTime - this.currentPowerUpTime) + 1);
         }
 
     }

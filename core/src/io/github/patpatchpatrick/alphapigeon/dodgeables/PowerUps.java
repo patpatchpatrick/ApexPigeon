@@ -35,6 +35,8 @@ public class PowerUps {
     private Animation<TextureRegion> powerUpShieldAnimation;
     private Texture powerUpShieldSheet;
     private long lastpowerUpShieldSpawnTime;
+    //power up shield duration in seconds
+    public static final float POWER_UP_SHIELD_DURATION = 8;
 
     //Shield intervals between spawns
     private final float SHIELD_INITIAL_SPAWN_INTERVAL_START_RANGE = 20000;
