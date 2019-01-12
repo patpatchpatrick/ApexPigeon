@@ -10,13 +10,14 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
+import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
 public class PowerUp extends Dodgeable {
 
     public final float WIDTH = 8f;
     public final float HEIGHT = 4.8f;
     private final float FORCE_X = -9.0f;
-
+    public int powerUpType = 0;
 
     public PowerUp(World gameWorld, AlphaPigeon game, OrthographicCamera camera) {
         super(gameWorld, game, camera);
@@ -34,20 +35,28 @@ public class PowerUp extends Dodgeable {
         powerUpShieldFixtureDef.friction = 0.5f;
         powerUpShieldFixtureDef.restitution = 0.3f;
         // set the powerup shield filter categories and masks for collisions
-        powerUpShieldFixtureDef.filter.categoryBits = game.CATEGORY_POWERUP_SHIELD;
-        powerUpShieldFixtureDef.filter.maskBits = game.MASK_POWERUP;
+        powerUpShieldFixtureDef.filter.categoryBits = GameVariables.CATEGORY_POWERUP_SHIELD;
+        powerUpShieldFixtureDef.filter.maskBits = GameVariables.MASK_POWERUP;
         //The JSON loader loaders a fixture 1 pixel by 1 pixel... the animation is 80 px x 48 px, so need to scale by a factor of 8 since the width is the limiting factor
         loader.attachFixture(dodgeableBody, "PowerUpShield", powerUpShieldFixtureDef, WIDTH);
         dodgeableBody.applyForceToCenter(FORCE_X, 0, true);
 
     }
 
-    public void init() {
+    public void init(int powerUpType) {
+
+        this.powerUpType = powerUpType;
 
         dodgeableBody.setActive(true);
         dodgeableBody.setTransform(camera.viewportWidth, MathUtils.random(0, camera.viewportHeight - HEIGHT), dodgeableBody.getAngle());
         dodgeableBody.applyForceToCenter(FORCE_X, 0, true);
         this.alive = true;
 
+    }
+
+    @Override
+    public void reset() {
+        super.reset();
+        this.powerUpType = 0;
     }
 }

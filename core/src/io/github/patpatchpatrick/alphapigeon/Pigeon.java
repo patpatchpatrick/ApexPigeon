@@ -20,6 +20,7 @@ import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Teleport;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.PowerUps;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
+import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
 public class Pigeon {
 
@@ -71,8 +72,8 @@ public class Pigeon {
         pigeonFixtureDef.friction = 0.5f;
         pigeonFixtureDef.restitution = 0.3f;
         // set the pigeon filter category and mask for collisions
-        pigeonFixtureDef.filter.categoryBits = game.CATEGORY_PIGEON;
-        pigeonFixtureDef.filter.maskBits = game.MASK_PIGEON;
+        pigeonFixtureDef.filter.categoryBits = GameVariables.CATEGORY_PIGEON;
+        pigeonFixtureDef.filter.maskBits = GameVariables.MASK_PIGEON;
         //pigeonFixtureDef.isSensor =  true;
         loader.attachFixture(pigeonBody, "AlphaPigeon", pigeonFixtureDef, 10);
         //Set fixed rotation to body... pigeon should not rotate
@@ -106,7 +107,7 @@ public class Pigeon {
         this.currentPowerUpTime = this.stateTime;
 
         //Play powerUp sounds
-        if (currentPowerUp == game.CATEGORY_POWERUP_SHIELD){
+        if (currentPowerUp == GameVariables.CATEGORY_POWERUP_SHIELD){
             powerUpShieldSound.play();
         }
 
@@ -115,7 +116,7 @@ public class Pigeon {
     private void removePowerUps(){
         //Remove the powerUps from the pigeon
         //Set the powerUp back to its default of PIGEON
-        this.currentPowerUp = game.CATEGORY_PIGEON;
+        this.currentPowerUp = GameVariables.CATEGORY_PIGEON;
         //Stop the power up sounds
         powerUpShieldSound.stop();
 
@@ -233,7 +234,7 @@ public class Pigeon {
         TextureRegion pigeonCurrentFrame = pigeonFlyAnimation.getKeyFrame(stateTime, true);
         batch.draw(pigeonCurrentFrame, pigeonBody.getPosition().x, pigeonBody.getPosition().y, 0, 0, 10, 5f, 1, 1, MathUtils.radiansToDegrees * pigeonBody.getAngle());
 
-        if (this.currentPowerUp == game.CATEGORY_POWERUP_SHIELD) {
+        if (this.currentPowerUp == GameVariables.CATEGORY_POWERUP_SHIELD) {
             // If the pigeon is powered up with a shield, draw the shield around it and also draw the shield time remaning
             // Get current frame of animation for the current stateTime and render it
             TextureRegion powUpShieldCurrentFrame = powerUpShieldAnimation.getKeyFrame(stateTime, true);
@@ -252,7 +253,7 @@ public class Pigeon {
         //If not, display time remaining on screen
         if (this.stateTime - this.currentPowerUpTime > PowerUps.POWER_UP_SHIELD_DURATION) {
             removePowerUps();
-        } else if (this.currentPowerUp == game.CATEGORY_POWERUP_SHIELD){
+        } else if (this.currentPowerUp == GameVariables.CATEGORY_POWERUP_SHIELD){
             powerUpShieldTimeRemaining = "" + MathUtils.floor(PowerUps.POWER_UP_SHIELD_DURATION -(this.stateTime - this.currentPowerUpTime) + 1);
         }
 

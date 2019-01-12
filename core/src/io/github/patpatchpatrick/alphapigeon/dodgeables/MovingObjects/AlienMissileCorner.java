@@ -35,8 +35,8 @@ public class AlienMissileCorner extends Dodgeable {
         alienCornerFixtureDef.friction = 0.5f;
         alienCornerFixtureDef.restitution = 0.3f;
         // set the alien corner filter categories and masks for collisions
-        alienCornerFixtureDef.filter.categoryBits = game.CATEGORY_ROCKET_EXPLOSION;
-        alienCornerFixtureDef.filter.maskBits = game.MASK_ROCKET_EXPLOSION;
+        alienCornerFixtureDef.filter.categoryBits = GameVariables.CATEGORY_ROCKET_EXPLOSION;
+        alienCornerFixtureDef.filter.maskBits = GameVariables.MASK_ROCKET_EXPLOSION;
         loader.attachFixture(dodgeableBody, "AlienMissileCorner", alienCornerFixtureDef, HEIGHT);
         dodgeableBody.applyForceToCenter(0,0, true);
 

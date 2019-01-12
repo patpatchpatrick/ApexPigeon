@@ -46,7 +46,7 @@ public abstract class Level {
     //L2 is "easy" difficulty
     //End time should be 120000f
     protected final float LEVEL_TWO_START_TIME = LEVEL_ONE_END_TIME;
-    protected final float LEVEL_TWO_END_TIME = 200000f;
+    protected final float LEVEL_TWO_END_TIME = 2f;
     //L3 is "medium" difficulty
     //End time shoudl be 180000f
     protected final float LEVEL_THREE_START_TIME = LEVEL_TWO_END_TIME;

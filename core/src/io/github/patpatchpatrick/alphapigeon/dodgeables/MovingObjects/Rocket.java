@@ -13,6 +13,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
+import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
 public class Rocket extends Dodgeable {
 
@@ -36,8 +37,8 @@ public class Rocket extends Dodgeable {
         rocketFixtureDef.friction = 0.5f;
         rocketFixtureDef.restitution = 0.3f;
         // set the rocket filter categories and masks for collisions
-        rocketFixtureDef.filter.categoryBits = game.CATEGORY_ROCKET;
-        rocketFixtureDef.filter.maskBits = game.MASK_ROCKET;
+        rocketFixtureDef.filter.categoryBits = GameVariables.CATEGORY_ROCKET;
+        rocketFixtureDef.filter.maskBits = GameVariables.MASK_ROCKET;
         loader.attachFixture(dodgeableBody, "Rocket", rocketFixtureDef, 10);
         dodgeableBody.setTransform(dodgeableBody.getPosition(), -90 * MathUtils.degreesToRadians);
 

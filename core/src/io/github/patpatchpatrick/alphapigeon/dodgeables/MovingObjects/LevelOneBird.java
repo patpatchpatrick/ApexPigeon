@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Birds;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
+import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
 public class LevelOneBird extends Dodgeable {
 
@@ -35,8 +36,8 @@ public class LevelOneBird extends Dodgeable {
         levelOneBirdFixtureDef.friction = 0.5f;
         levelOneBirdFixtureDef.restitution = 0.3f;
         // set the bird filter categories and masks for collisions
-        levelOneBirdFixtureDef.filter.categoryBits = game.CATEGORY_LEVEL_ONE_BIRD;
-        levelOneBirdFixtureDef.filter.maskBits = game.MASK_LEVEL_ONE_BIRD;
+        levelOneBirdFixtureDef.filter.categoryBits = GameVariables.CATEGORY_LEVEL_ONE_BIRD;
+        levelOneBirdFixtureDef.filter.maskBits = GameVariables.MASK_LEVEL_ONE_BIRD;
         loader.attachFixture(dodgeableBody, "BackwardsPigeon", levelOneBirdFixtureDef, HEIGHT);
 
 

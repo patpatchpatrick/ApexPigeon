@@ -37,8 +37,8 @@ public class AlienMissile extends Dodgeable {
         alienMissileFixtureDef.friction = 0.5f;
         alienMissileFixtureDef.restitution = 0.3f;
         // set the alien missile filter categories and masks for collisions
-        alienMissileFixtureDef.filter.categoryBits = game.CATEGORY_ALIEN_MISSILE;
-        alienMissileFixtureDef.filter.maskBits = game.MASK_ALIEN_MISSILE;
+        alienMissileFixtureDef.filter.categoryBits = GameVariables.CATEGORY_ALIEN_MISSILE;
+        alienMissileFixtureDef.filter.maskBits = GameVariables.MASK_ALIEN_MISSILE;
         loader.attachFixture(dodgeableBody, "Alien Missile", alienMissileFixtureDef, HEIGHT);
 
     }

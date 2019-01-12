@@ -14,6 +14,7 @@ import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Dodgeable;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.UFO;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
+import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
 public class UfoEnergyBeamLeft extends UfoEnergyBeam {
 
@@ -41,8 +42,8 @@ public class UfoEnergyBeamLeft extends UfoEnergyBeam {
         energyBeamFixtureDef.friction = 0.5f;
         energyBeamFixtureDef.restitution = 0.3f;
         // set the energybeam filter categories and masks for collisions
-        energyBeamFixtureDef.filter.categoryBits = game.CATEGORY_UFO;
-        energyBeamFixtureDef.filter.maskBits = game.MASK_UFO;
+        energyBeamFixtureDef.filter.categoryBits = GameVariables.CATEGORY_UFO;
+        energyBeamFixtureDef.filter.maskBits = GameVariables.MASK_UFO;
         loader.attachFixture(dodgeableBody, "EnergyBeam", energyBeamFixtureDef, WIDTH);
 
     }

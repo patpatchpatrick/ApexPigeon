@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.MathUtils;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Notifications;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Notifications.ExclamationMark;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.PowerUps;
 
 public class LevelTwo extends Level {
 
@@ -113,8 +114,8 @@ public class LevelTwo extends Level {
 
         spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
 
-        if (currentTimeInMillis - powerUps.getLastpowerUpShieldSpawnTime() > powerUpShieldInterval) {
-            powerUps.spawnPowerUpShield();
+        if (currentTimeInMillis - PowerUps.lastpowerUpShieldSpawnTime > powerUpShieldInterval) {
+            powerUps.spawnPowerUp(PowerUps.POWER_UP_TYPE_SHIELD);
         }
         if (currentTimeInMillis - rockets.getLastRocketSpawnTime(2) > RANDOM_WAVE_ROCKETS_SPAWN_DURATION) {
             rockets.spawnRocket(2);

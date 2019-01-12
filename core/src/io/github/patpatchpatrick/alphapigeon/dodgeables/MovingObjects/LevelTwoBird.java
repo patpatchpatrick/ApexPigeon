@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
+import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
 public class LevelTwoBird extends Dodgeable {
 
@@ -33,8 +34,8 @@ public class LevelTwoBird extends Dodgeable {
         levelTwoBirdFixtureDef.friction = 0.5f;
         levelTwoBirdFixtureDef.restitution = 0.3f;
         // set the bird filter categories and masks for collisions
-        levelTwoBirdFixtureDef.filter.categoryBits = game.CATEGORY_LEVEL_TWO_BIRD;
-        levelTwoBirdFixtureDef.filter.maskBits = game.MASK_LEVEL_TWO_BIRD;
+        levelTwoBirdFixtureDef.filter.categoryBits = GameVariables.CATEGORY_LEVEL_TWO_BIRD;
+        levelTwoBirdFixtureDef.filter.maskBits = GameVariables.MASK_LEVEL_TWO_BIRD;
         loader.attachFixture(dodgeableBody, "LevelTwoBird", levelTwoBirdFixtureDef, WIDTH);
     }
 

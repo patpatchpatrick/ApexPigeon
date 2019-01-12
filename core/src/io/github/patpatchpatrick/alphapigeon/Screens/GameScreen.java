@@ -32,11 +32,18 @@ import io.github.patpatchpatrick.alphapigeon.levels.Gameplay;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.Controller;
+import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.HighScore;
 import io.github.patpatchpatrick.alphapigeon.resources.ScrollingBackground;
+import io.github.patpatchpatrick.alphapigeon.resources.Sounds;
 
 public class GameScreen implements Screen {
     AlphaPigeon game;
+
+    //GAME STATE
+    private float gameState = 1;
+    private final float GAME_RUNNING = 1;
+    private final float GAME_PAUSED = 2;
 
     private OrthographicCamera camera;
     private Viewport viewport;
@@ -100,7 +107,8 @@ public class GameScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         // update the state time
-        deltaTime = Gdx.graphics.getDeltaTime();
+        // if game is paused, there is no change in time
+        deltaTime = gameState == GAME_PAUSED ? 0 : Gdx.graphics.getDeltaTime();
         stateTime += deltaTime;
 
         // tell the camera to update its matrices
@@ -135,10 +143,14 @@ public class GameScreen implements Screen {
     @Override
     public void pause() {
 
+        gameState = GAME_PAUSED;
+
     }
 
     @Override
     public void resume() {
+
+        gameState = GAME_RUNNING;
 
     }
 
@@ -162,7 +174,10 @@ public class GameScreen implements Screen {
     public void update() {
 
         // step the world
-        world.step(1 / 60f, 6, 2);
+        // if game is paused, don't step the world
+        if (gameState != GAME_PAUSED){
+            world.step(1 / 60f, 6, 2);
+        }
 
         sweepDeadBodies();
 
@@ -224,13 +239,16 @@ public class GameScreen implements Screen {
                 short fixtureBCategory = fixtureB.getFilterData().categoryBits;
 
                 //Boolean collision checks used to determine action to take
-                Boolean pigeonInvolvedInCollision = fixtureACategory == game.CATEGORY_PIGEON || fixtureBCategory == game.CATEGORY_PIGEON;
-                Boolean powerUpShieldInvolvedInCollision = fixtureACategory == game.CATEGORY_POWERUP_SHIELD || fixtureBCategory == game.CATEGORY_POWERUP_SHIELD;
+                Boolean pigeonInvolvedInCollision = fixtureACategory == GameVariables.CATEGORY_PIGEON || fixtureBCategory == GameVariables.CATEGORY_PIGEON;
+                Boolean birdInvolvedInCollision = fixtureACategory == GameVariables.CATEGORY_LEVEL_ONE_BIRD || fixtureACategory == GameVariables.CATEGORY_LEVEL_TWO_BIRD
+                        || fixtureBCategory == GameVariables.CATEGORY_LEVEL_ONE_BIRD || fixtureBCategory == GameVariables.CATEGORY_LEVEL_TWO_BIRD;
+                Boolean meteorInvolvedInCollision = fixtureACategory == GameVariables.CATEGORY_METEOR || fixtureBCategory == GameVariables.CATEGORY_METEOR;
+                Boolean powerUpShieldInvolvedInCollision = fixtureACategory == GameVariables.CATEGORY_POWERUP_SHIELD || fixtureBCategory == GameVariables.CATEGORY_POWERUP_SHIELD;
                 Boolean powerUpInvolvedInCollision = powerUpShieldInvolvedInCollision;
-                Boolean teleportInvolvedInCollision = fixtureACategory == game.CATEGORY_TELEPORT || fixtureBCategory == game.CATEGORY_TELEPORT;
-                Boolean rocketInvolvedInCollision = fixtureACategory == game.CATEGORY_ROCKET || fixtureBCategory == game.CATEGORY_ROCKET;
+                Boolean teleportInvolvedInCollision = fixtureACategory == GameVariables.CATEGORY_TELEPORT || fixtureBCategory == GameVariables.CATEGORY_TELEPORT;
+                Boolean rocketInvolvedInCollision = fixtureACategory == GameVariables.CATEGORY_ROCKET || fixtureBCategory == GameVariables.CATEGORY_ROCKET;
 
-                short powerUpType = game.CATEGORY_PIGEON;
+                short powerUpType = GameVariables.CATEGORY_PIGEON;
 
                 //Collision logic for pigeon:
                 //First, check if a power up is involved
@@ -241,19 +259,19 @@ public class GameScreen implements Screen {
                 if (pigeonInvolvedInCollision) {
                     if (powerUpInvolvedInCollision) {
                         if (powerUpShieldInvolvedInCollision) {
-                            powerUpType = game.CATEGORY_POWERUP_SHIELD;
+                            powerUpType = GameVariables.CATEGORY_POWERUP_SHIELD;
                         }
                         destroyPowerUp(fixtureA, fixtureB);
                         pigeon.powerUp(powerUpType);
                     } else if (teleportInvolvedInCollision) {
                         Fixture teleportFixture;
-                        if (fixtureA.getFilterData().categoryBits == game.CATEGORY_TELEPORT) {
+                        if (fixtureA.getFilterData().categoryBits == GameVariables.CATEGORY_TELEPORT) {
                             teleportFixture = fixtureA;
                         } else {
                             teleportFixture = fixtureB;
                         }
                         pigeon.teleport(teleportFixture);
-                    } else if (pigeon.getPowerUpType() == game.CATEGORY_POWERUP_SHIELD) {
+                    } else if (pigeon.getPowerUpType() == GameVariables.CATEGORY_POWERUP_SHIELD) {
                         destroyNonPigeonBody(fixtureA, fixtureB);
                     } else {
                         // If the pigeon is involved in the collision and does not have a shield applied, the game is over
@@ -271,7 +289,7 @@ public class GameScreen implements Screen {
                     if (!pigeonInvolvedInCollision){
                         final Body fixtureAExplosionBody = fixtureABody;
                         final Body fixtureBExplosionBody = fixtureBBody;
-                        if (fixtureA.getFilterData().categoryBits == game.CATEGORY_ROCKET){
+                        if (fixtureA.getFilterData().categoryBits == GameVariables.CATEGORY_ROCKET){
                             Gdx.app.postRunnable(new Runnable() {
 
                                 @Override
@@ -295,6 +313,17 @@ public class GameScreen implements Screen {
                             });
                         }
                     }
+                }
+
+                if (birdInvolvedInCollision){
+                    //if bird is involved in any collision, play a chirp sound
+                    Gdx.app.postRunnable(new Runnable() {
+
+                        @Override
+                        public void run () {
+                            Sounds.birdSound.play();
+                        }
+                    });
                 }
 
 
@@ -321,9 +350,9 @@ public class GameScreen implements Screen {
 
         // if a Power-Up is involved in a collision, determine which fixture was the power-up and destroy it
 
-        if (fixtureA.getFilterData().categoryBits == game.CATEGORY_POWERUP_SHIELD) {
+        if (fixtureA.getFilterData().categoryBits == GameVariables.CATEGORY_POWERUP_SHIELD) {
             fixtureA.getBody().setUserData(new BodyData(true));
-        } else if (fixtureB.getFilterData().categoryBits == game.CATEGORY_POWERUP_SHIELD) {
+        } else if (fixtureB.getFilterData().categoryBits == GameVariables.CATEGORY_POWERUP_SHIELD) {
             fixtureB.getBody().setUserData(new BodyData(true));
         }
 
@@ -334,9 +363,9 @@ public class GameScreen implements Screen {
         // Pigeon is charged and hits a dodgeable enemy
         // destroy the body that the pigeon touches
 
-        if (fixtureA.getFilterData().categoryBits == game.CATEGORY_PIGEON) {
+        if (fixtureA.getFilterData().categoryBits == GameVariables.CATEGORY_PIGEON) {
             fixtureB.getBody().setUserData(new BodyData(true));
-        } else if (fixtureB.getFilterData().categoryBits == game.CATEGORY_PIGEON) {
+        } else if (fixtureB.getFilterData().categoryBits == GameVariables.CATEGORY_PIGEON) {
             fixtureA.getBody().setUserData(new BodyData(true));
         }
 

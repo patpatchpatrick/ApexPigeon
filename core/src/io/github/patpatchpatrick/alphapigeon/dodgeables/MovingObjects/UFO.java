@@ -59,8 +59,8 @@ public class UFO extends Dodgeable {
         ufoFixtureDef.friction = 0.5f;
         ufoFixtureDef.restitution = 0.3f;
         // set the ufo filter categories and masks for collisions
-        ufoFixtureDef.filter.categoryBits = game.CATEGORY_UFO;
-        ufoFixtureDef.filter.maskBits = game.MASK_UFO;
+        ufoFixtureDef.filter.categoryBits = GameVariables.CATEGORY_UFO;
+        ufoFixtureDef.filter.maskBits = GameVariables.MASK_UFO;
         loader.attachFixture(dodgeableBody, "Ufo", ufoFixtureDef, HEIGHT);
 
 

@@ -12,6 +12,7 @@ import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Teleports;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
+import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
 public class Teleport extends Dodgeable {
 
@@ -35,8 +36,8 @@ public class Teleport extends Dodgeable {
         teleportFixtureDef.friction = 0.5f;
         teleportFixtureDef.restitution = 0.3f;
         // set the teleport filter categories and masks for collisions
-        teleportFixtureDef.filter.categoryBits = game.CATEGORY_TELEPORT;
-        teleportFixtureDef.filter.maskBits = game.MASK_TELEPORT;
+        teleportFixtureDef.filter.categoryBits = GameVariables.CATEGORY_TELEPORT;
+        teleportFixtureDef.filter.maskBits = GameVariables.MASK_TELEPORT;
         //The JSON loader loaders a fixture 1 pixel by 1 pixel... the animation is 100 px x 100 px, so need to scale by a factor of 10
         loader.attachFixture(dodgeableBody, "Teleport", teleportFixtureDef, HEIGHT);
 

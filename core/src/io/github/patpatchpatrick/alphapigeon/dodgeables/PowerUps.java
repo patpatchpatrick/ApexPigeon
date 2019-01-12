@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Dodgeable;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBird;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelTwoBird;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.PowerUp;
@@ -29,21 +30,31 @@ public class PowerUps {
     private OrthographicCamera camera;
     private Dodgeables dodgeables;
 
-    //PowerUp Shield variables
+    //PowerUps
     private final Array<PowerUp> activePowerUps = new Array<PowerUp>();
     private final Pool<PowerUp> powerUpsPool;
-    private Animation<TextureRegion> powerUpShieldAnimation;
-    private Texture powerUpShieldSheet;
-    private long lastpowerUpShieldSpawnTime;
+    public static final int POWER_UP_TYPE_SHIELD = 1;
+    public static final int POWER_UP_TYPE_SKULL = 2;
     //power up shield duration in seconds
     public static final float POWER_UP_SHIELD_DURATION = 8;
+
+    //PowerUp Shield variables
+    private Animation<TextureRegion> powerUpShieldAnimation;
+    private Texture powerUpShieldSheet;
+    public static long lastpowerUpShieldSpawnTime;
+
+    //PowerUp Skull variables
+    private Animation<TextureRegion> powerUpSkullAnimation;
+    private Texture powerUpSkullSheet;
+    public static long lastpowerUpSkullSpawnTime;
+
 
     //Shield intervals between spawns
     private final float SHIELD_INITIAL_SPAWN_INTERVAL_START_RANGE = 20000;
     private final float SHIELD_INITIAL_SPAWN_INTERVAL_END_RANGE = 60000;
     private float shieldRandomSpawnInterval;
 
-    public PowerUps(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables){
+    public PowerUps(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables) {
         this.gameWorld = gameWorld;
         this.game = game;
         this.camera = camera;
@@ -51,6 +62,7 @@ public class PowerUps {
 
         // initialize powerup animations
         initializePowerUpShieldAnimation();
+        initializePowerUpSkullAnimation();
 
         powerUpsPool = new Pool<PowerUp>() {
             @Override
@@ -65,15 +77,25 @@ public class PowerUps {
 
     }
 
-    public void render(float stateTime, SpriteBatch batch){
+    public void render(float stateTime, SpriteBatch batch) {
 
         TextureRegion powerUpShieldCurrentFrame = powerUpShieldAnimation.getKeyFrame(stateTime, true);
+        TextureRegion powerUpSkullCurrentFrame = powerUpSkullAnimation.getKeyFrame(stateTime, true);
 
         // Render all active powerups
         for (PowerUp powerUp : activePowerUps) {
             if (powerUp.alive) {
-                batch.draw(powerUpShieldCurrentFrame, powerUp.getPosition().x, powerUp.getPosition().y,
-                        0, 0, powerUp.WIDTH, powerUp.HEIGHT, 1, 1, powerUp.getAngle());
+                switch (powerUp.powerUpType) {
+                    case PowerUps.POWER_UP_TYPE_SHIELD:
+                        batch.draw(powerUpShieldCurrentFrame, powerUp.getPosition().x, powerUp.getPosition().y,
+                                0, 0, powerUp.WIDTH, powerUp.HEIGHT, 1, 1, powerUp.getAngle());
+                        break;
+                    case PowerUps.POWER_UP_TYPE_SKULL:
+                        batch.draw(powerUpSkullCurrentFrame, powerUp.getPosition().x, powerUp.getPosition().y,
+                                0, 0, powerUp.WIDTH, powerUp.HEIGHT, 1, 1, powerUp.getAngle());
+                        break;
+                }
+
             } else {
                 activePowerUps.removeValue(powerUp, false);
                 dodgeables.activeDodgeables.removeValue(powerUp, false);
@@ -83,12 +105,12 @@ public class PowerUps {
 
     }
 
-    public void update(){
+    public void update() {
 
         //Remove all powerups that are off the screen
 
-        for (PowerUp powerUp : activePowerUps){
-            if (powerUp.getPosition().x < 0 - powerUp.WIDTH){
+        for (PowerUp powerUp : activePowerUps) {
+            if (powerUp.getPosition().x < 0 - powerUp.WIDTH) {
                 activePowerUps.removeValue(powerUp, false);
                 dodgeables.activeDodgeables.removeValue(powerUp, false);
                 powerUpsPool.free(powerUp);
@@ -97,17 +119,33 @@ public class PowerUps {
 
     }
 
-    public void spawnPowerUpShield() {
+    public void spawnPowerUp(int powerUpType) {
 
         // Spawn(obtain) a new powerup from the powerups pool and add to list of active powerups
 
         PowerUp powerUp = powerUpsPool.obtain();
-        powerUp.init();
+        powerUp.init(powerUpType);
         activePowerUps.add(powerUp);
         dodgeables.activeDodgeables.add(powerUp);
 
-        //keep track of time the PowerUp shield was spawned
-        lastpowerUpShieldSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        //keep track of time the PowerUp was spawned
+        switch (powerUpType) {
+            case POWER_UP_TYPE_SHIELD:
+                lastpowerUpShieldSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+                break;
+            case POWER_UP_TYPE_SKULL:
+                lastpowerUpSkullSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+                break;
+        }
+
+
+    }
+
+    public void killAllActiveDodgeables() {
+
+        for (Dodgeable dodgeable : dodgeables.activeDodgeables) {
+            dodgeable.flagForDeletion = true;
+        }
 
     }
 
@@ -139,21 +177,46 @@ public class PowerUps {
 
     }
 
-    public float getPowerUpShieldIntervalTime(){
+    private void initializePowerUpSkullAnimation() {
+
+        // Load the power up shield sprite sheet as a Texture
+        powerUpSkullSheet = new Texture(Gdx.files.internal("sprites/PowerUpSkullSpriteSheet.png"));
+
+        // Use the split utility method to create a 2D array of TextureRegions. This is
+        // possible because this sprite sheet contains frames of equal size and they are
+        // all aligned.
+        TextureRegion[][] tmp = TextureRegion.split(powerUpSkullSheet,
+                powerUpSkullSheet.getWidth() / 4,
+                powerUpSkullSheet.getHeight() / 1);
+
+        // Place the regions into a 1D array in the correct order, starting from the top
+        // left, going across first. The Animation constructor requires a 1D array.
+        TextureRegion[] powerUpSkullFrames = new TextureRegion[4 * 1];
+        int index = 0;
+        for (int i = 0; i < 1; i++) {
+            for (int j = 0; j < 4; j++) {
+                powerUpSkullFrames[index++] = tmp[i][j];
+            }
+        }
+
+        // Initialize the Animation with the frame interval and array of frames
+        powerUpSkullAnimation = new Animation<TextureRegion>(0.08f, powerUpSkullFrames);
+
+
+    }
+
+    public float getPowerUpShieldIntervalTime() {
         return this.shieldRandomSpawnInterval;
     }
 
-    public long getLastpowerUpShieldSpawnTime(){
-        return lastpowerUpShieldSpawnTime;
-    }
 
-    public void sweepDeadBodies(){
+    public void sweepDeadBodies() {
 
         // If the powerup is flagged for deletion due to a collision, free the powerup from the pool
         // so that it moves off the screen and can be reused
 
-        for (PowerUp powerUp : activePowerUps){
-            if (!powerUp.isActive()){
+        for (PowerUp powerUp : activePowerUps) {
+            if (!powerUp.isActive()) {
                 activePowerUps.removeValue(powerUp, false);
                 dodgeables.activeDodgeables.removeValue(powerUp, false);
                 powerUpsPool.free(powerUp);
@@ -162,8 +225,9 @@ public class PowerUps {
 
     }
 
-    public void dispose(){
+    public void dispose() {
         powerUpShieldSheet.dispose();
+        powerUpSkullSheet.dispose();
     }
 
 }

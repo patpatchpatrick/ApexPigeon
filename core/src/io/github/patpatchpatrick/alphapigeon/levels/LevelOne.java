@@ -1,6 +1,7 @@
 package io.github.patpatchpatrick.alphapigeon.levels;
 
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.PowerUps;
 
 public class LevelOne extends Level {
 
@@ -25,8 +26,8 @@ public class LevelOne extends Level {
             if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() > L1BIRD_SPAWN_DURATION_WAVE_0) {
                 birds.spawnLevelOneBird(totalGameTime);
             }
-            if (currentTimeInMillis - powerUps.getLastpowerUpShieldSpawnTime() > powerUpShieldInterval) {
-                powerUps.spawnPowerUpShield();
+            if (currentTimeInMillis - PowerUps.lastpowerUpSkullSpawnTime > powerUpShieldInterval) {
+                powerUps.spawnPowerUp(PowerUps.POWER_UP_TYPE_SKULL);
             }
         } else if (totalGameTime >= LEVEL_ONE_WAVE_1 && totalGameTime < LEVEL_ONE_END_TIME) {
 
@@ -36,8 +37,8 @@ public class LevelOne extends Level {
             if (currentTimeInMillis - birds.getLastLevelTwoBirdSpawnTime() > L2BIRD_SPAWN_DURATION_WAVE_1) {
                 birds.spawnLevelTwoBird(totalGameTime);
             }
-            if (currentTimeInMillis - powerUps.getLastpowerUpShieldSpawnTime() > powerUpShieldInterval) {
-                powerUps.spawnPowerUpShield();
+            if (currentTimeInMillis - PowerUps.lastpowerUpShieldSpawnTime > powerUpShieldInterval) {
+                powerUps.spawnPowerUp(PowerUps.POWER_UP_TYPE_SHIELD);
             }
 
         }

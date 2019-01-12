@@ -11,6 +11,7 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
+import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
 public class Meteor extends Dodgeable {
 
@@ -37,8 +38,8 @@ public class Meteor extends Dodgeable {
         meteorFixtureDef.friction = 0.5f;
         meteorFixtureDef.restitution = 0.3f;
         // set the meteor filter categories and masks for collisions
-        meteorFixtureDef.filter.categoryBits = game.CATEGORY_METEOR;
-        meteorFixtureDef.filter.maskBits = game.MASK_METEOR;
+        meteorFixtureDef.filter.categoryBits = GameVariables.CATEGORY_METEOR;
+        meteorFixtureDef.filter.maskBits = GameVariables.MASK_METEOR;
         loader.attachFixture(dodgeableBody, "Meteor", meteorFixtureDef, WIDTH);
         dodgeableBody.applyForceToCenter(FORCE_X, FORCE_Y, true);
 

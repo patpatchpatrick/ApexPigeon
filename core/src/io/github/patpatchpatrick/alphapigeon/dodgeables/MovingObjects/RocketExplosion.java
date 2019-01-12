@@ -34,8 +34,8 @@ public class RocketExplosion extends Dodgeable {
         rocketExplosionFixtureDef.friction = 0.5f;
         rocketExplosionFixtureDef.restitution = 0.3f;
         // set the rocket explosion filter categories and masks for collisions
-        rocketExplosionFixtureDef.filter.categoryBits = game.CATEGORY_ROCKET_EXPLOSION;
-        rocketExplosionFixtureDef.filter.maskBits = game.MASK_ROCKET_EXPLOSION;
+        rocketExplosionFixtureDef.filter.categoryBits = GameVariables.CATEGORY_ROCKET_EXPLOSION;
+        rocketExplosionFixtureDef.filter.maskBits = GameVariables.MASK_ROCKET_EXPLOSION;
         loader.attachFixture(dodgeableBody, "RocketExplosion", rocketExplosionFixtureDef, WIDTH);
         dodgeableBody.applyForceToCenter(0, 0, true);
 
