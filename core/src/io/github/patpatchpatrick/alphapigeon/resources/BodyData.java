@@ -26,6 +26,9 @@ public class BodyData {
     private float energyBeamDirection;
     private UFO ufo;
 
+    //POWERUP DATA
+    public int powerUpType = 0;
+
 
     public BodyData(boolean flagForDelete) {
         flaggedForDelete = flagForDelete;
@@ -105,6 +108,8 @@ public class BodyData {
     public float getEnergyBeamDirection() {
         return this.energyBeamDirection;
     }
+
+
 
 
 }

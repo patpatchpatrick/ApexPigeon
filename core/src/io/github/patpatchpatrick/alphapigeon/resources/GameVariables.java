@@ -20,7 +20,7 @@ public class GameVariables {
     public final static short CATEGORY_LEVEL_ONE_BIRD = 0x0002;
     public final static short CATEGORY_METEOR = 0x0004;
     public final static short CATEGORY_LEVEL_TWO_BIRD = 0x0008;
-    public final static short CATEGORY_POWERUP_SHIELD = 0x0016;
+    public final static short CATEGORY_POWERUP = 0x0016;
     public final static short CATEGORY_TELEPORT = 0x0032;
     public final static short CATEGORY_ROCKET = 0x0064;
     public final static short CATEGORY_ROCKET_EXPLOSION = 0x0128;
@@ -29,7 +29,7 @@ public class GameVariables {
 
         // Filter Masks
     public final  static short MASK_PIGEON = CATEGORY_LEVEL_ONE_BIRD | CATEGORY_METEOR | CATEGORY_LEVEL_TWO_BIRD
-            | CATEGORY_POWERUP_SHIELD | CATEGORY_TELEPORT | CATEGORY_ROCKET | CATEGORY_ROCKET_EXPLOSION
+            | CATEGORY_POWERUP | CATEGORY_TELEPORT | CATEGORY_ROCKET | CATEGORY_ROCKET_EXPLOSION
             | CATEGORY_ALIEN_MISSILE | CATEGORY_UFO;
     public final static short MASK_LEVEL_ONE_BIRD = CATEGORY_PIGEON | CATEGORY_METEOR | CATEGORY_ROCKET ;
     public final static short MASK_METEOR = CATEGORY_PIGEON | CATEGORY_LEVEL_ONE_BIRD | CATEGORY_LEVEL_TWO_BIRD;

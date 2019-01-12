@@ -33,7 +33,10 @@ public class PowerUps {
     //PowerUps
     private final Array<PowerUp> activePowerUps = new Array<PowerUp>();
     private final Pool<PowerUp> powerUpsPool;
+    public static final int POWER_UP_TYPE_NONE = 0;
+    //Shields make the bird invincible and kill any enemy it touches
     public static final int POWER_UP_TYPE_SHIELD = 1;
+    //Skull power ups kill all active dodgeables
     public static final int POWER_UP_TYPE_SKULL = 2;
     //power up shield duration in seconds
     public static final float POWER_UP_SHIELD_DURATION = 8;

@@ -16,11 +16,13 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 
+import io.github.patpatchpatrick.alphapigeon.Screens.GameScreen;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Teleport;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.PowerUps;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
+import io.github.patpatchpatrick.alphapigeon.resources.Sounds;
 
 public class Pigeon {
 
@@ -29,11 +31,12 @@ public class Pigeon {
     private static final int FRAME_COLS = 4, FRAME_ROWS = 2;
     Body pigeonBody;
     AlphaPigeon game;
+    GameScreen gameScreen;
     World world;
     private float stateTime;
 
     //Power Up Variables
-    private short currentPowerUp;
+    private int currentPowerUp;
     private float currentPowerUpTime = 0;
     private final long MILLION_SCALE = 1000000;
     private String powerUpShieldTimeRemaining = "";
@@ -52,12 +55,13 @@ public class Pigeon {
     FreeTypeFontGenerator pigeonFontGenerator;
 
 
-    public Pigeon(World world, AlphaPigeon game) {
+    public Pigeon(World world, AlphaPigeon game, GameScreen gameScreen) {
 
         initializePigeonAnimation();
 
         this.game = game;
         this.world = world;
+        this.gameScreen = gameScreen;
 
         // create pigeon body, set position in the world
         // create pigeon fixture, attach the fixture created to the body created with the help of
@@ -101,32 +105,49 @@ public class Pigeon {
 
     //Pigeon actions
 
-    public void powerUp(short powerUpType) {
+    public void powerUp(Fixture powerUpFixture) {
+        Body powerUpBody = powerUpFixture.getBody();
+        BodyData powerUpData = (BodyData) powerUpBody.getUserData();
+        int powerUpType = powerUpData.powerUpType;
+
+        switch (powerUpType) {
+            case PowerUps.POWER_UP_TYPE_SHIELD:
+                //Play powerUp sounds
+                this.currentPowerUp = PowerUps.POWER_UP_TYPE_SHIELD;
+                powerUpShieldSound.play();
+                break;
+            case PowerUps.POWER_UP_TYPE_SKULL:
+                //Play powerUp sounds
+                this.currentPowerUp = PowerUps.POWER_UP_TYPE_SKULL;
+                //Kill all active dodgeables when a skull power up is grabbed
+                gameScreen.dodgeables.getPowerUps().killAllActiveDodgeables();
+                Sounds.powerUpSkullSound.play();
+                break;
+
+        }
         //Set the current power up type and the time that the power up was picked up by the pigeon
-        currentPowerUp = powerUpType;
         this.currentPowerUpTime = this.stateTime;
 
-        //Play powerUp sounds
-        if (currentPowerUp == GameVariables.CATEGORY_POWERUP_SHIELD){
-            powerUpShieldSound.play();
-        }
+        //Destroy the power up after the pigeon power ups
+        powerUpBody.setUserData(new BodyData(true));
+
 
     }
 
-    private void removePowerUps(){
+    private void removePowerUps() {
         //Remove the powerUps from the pigeon
         //Set the powerUp back to its default of PIGEON
-        this.currentPowerUp = GameVariables.CATEGORY_PIGEON;
+        this.currentPowerUp = PowerUps.POWER_UP_TYPE_NONE;
         //Stop the power up sounds
         powerUpShieldSound.stop();
 
     }
 
-    public void zapEnemy(){
+    public void zapEnemy() {
         powerUpShieldZapSound.play();
     }
 
-    public short getPowerUpType() {
+    public int getPowerUpType() {
         //Return the current type of power up applied to the pigeon
         return currentPowerUp;
     }
@@ -135,9 +156,9 @@ public class Pigeon {
         //Get the teleport data from the teleport fixture that contacted the pigeon
         final Body teleport = teleportFixture.getBody();
         BodyData teleportData = (BodyData) teleport.getUserData();
-        if (teleportData != null){
+        if (teleportData != null) {
             final Teleport oppositeTeleport = teleportData.getOppositeTeleport();
-            if (oppositeTeleport != null){
+            if (oppositeTeleport != null) {
 
                 final float positionX = oppositeTeleport.getPosition().x;
                 final float positionY = oppositeTeleport.getPosition().y;
@@ -157,7 +178,7 @@ public class Pigeon {
                 Gdx.app.postRunnable(new Runnable() {
 
                     @Override
-                    public void run () {
+                    public void run() {
                         pigeonBody.setTransform(positionX, positionY, angle);
                         oppositeTeleport.dodgeableBody.setUserData(deleteObjectOne);
                         teleport.setUserData(deleteObjectTwo);
@@ -167,8 +188,6 @@ public class Pigeon {
 
 
         }
-
-
 
 
     }
@@ -234,8 +253,8 @@ public class Pigeon {
         TextureRegion pigeonCurrentFrame = pigeonFlyAnimation.getKeyFrame(stateTime, true);
         batch.draw(pigeonCurrentFrame, pigeonBody.getPosition().x, pigeonBody.getPosition().y, 0, 0, 10, 5f, 1, 1, MathUtils.radiansToDegrees * pigeonBody.getAngle());
 
-        if (this.currentPowerUp == GameVariables.CATEGORY_POWERUP_SHIELD) {
-            // If the pigeon is powered up with a shield, draw the shield around it and also draw the shield time remaning
+        if (this.currentPowerUp == PowerUps.POWER_UP_TYPE_SHIELD) {
+            // If the pigeon is powered up with a shield, draw the shield around it and also draw the shield time remaining
             // Get current frame of animation for the current stateTime and render it
             TextureRegion powUpShieldCurrentFrame = powerUpShieldAnimation.getKeyFrame(stateTime, true);
             batch.draw(powUpShieldCurrentFrame, pigeonBody.getPosition().x - 2.5f, pigeonBody.getPosition().y - 2.5f, 0, 0, 15f, 10f, 1, 1, MathUtils.radiansToDegrees * pigeonBody.getAngle());
@@ -253,8 +272,8 @@ public class Pigeon {
         //If not, display time remaining on screen
         if (this.stateTime - this.currentPowerUpTime > PowerUps.POWER_UP_SHIELD_DURATION) {
             removePowerUps();
-        } else if (this.currentPowerUp == GameVariables.CATEGORY_POWERUP_SHIELD){
-            powerUpShieldTimeRemaining = "" + MathUtils.floor(PowerUps.POWER_UP_SHIELD_DURATION -(this.stateTime - this.currentPowerUpTime) + 1);
+        } else if (this.currentPowerUp == PowerUps.POWER_UP_TYPE_SHIELD) {
+            powerUpShieldTimeRemaining = "" + MathUtils.floor(PowerUps.POWER_UP_SHIELD_DURATION - (this.stateTime - this.currentPowerUpTime) + 1);
         }
 
     }

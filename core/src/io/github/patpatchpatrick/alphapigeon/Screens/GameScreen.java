@@ -1,36 +1,26 @@
 package io.github.patpatchpatrick.alphapigeon.Screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-
-import java.util.Iterator;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.Pigeon;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.PowerUps;
 import io.github.patpatchpatrick.alphapigeon.levels.Gameplay;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
-import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.Controller;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.HighScore;
@@ -49,7 +39,7 @@ public class GameScreen implements Screen {
     private Viewport viewport;
     private Controller controller;
     private Pigeon pigeon;
-    private Dodgeables dodgeables;
+    public Dodgeables dodgeables;
     public ScrollingBackground scrollingBackground;
     public HighScore highScore;
     private float stateTime;
@@ -78,7 +68,7 @@ public class GameScreen implements Screen {
         // initialize game resources
         this.scrollingBackground = new ScrollingBackground();
         this.highScore = new HighScore();
-        this.pigeon = new Pigeon(world, game);
+        this.pigeon = new Pigeon(world, game, this);
         this.dodgeables = new Dodgeables(this.pigeon, world, game, camera);
         pigeonBody = this.pigeon.getBody();
 
@@ -243,7 +233,7 @@ public class GameScreen implements Screen {
                 Boolean birdInvolvedInCollision = fixtureACategory == GameVariables.CATEGORY_LEVEL_ONE_BIRD || fixtureACategory == GameVariables.CATEGORY_LEVEL_TWO_BIRD
                         || fixtureBCategory == GameVariables.CATEGORY_LEVEL_ONE_BIRD || fixtureBCategory == GameVariables.CATEGORY_LEVEL_TWO_BIRD;
                 Boolean meteorInvolvedInCollision = fixtureACategory == GameVariables.CATEGORY_METEOR || fixtureBCategory == GameVariables.CATEGORY_METEOR;
-                Boolean powerUpShieldInvolvedInCollision = fixtureACategory == GameVariables.CATEGORY_POWERUP_SHIELD || fixtureBCategory == GameVariables.CATEGORY_POWERUP_SHIELD;
+                Boolean powerUpShieldInvolvedInCollision = fixtureACategory == GameVariables.CATEGORY_POWERUP || fixtureBCategory == GameVariables.CATEGORY_POWERUP;
                 Boolean powerUpInvolvedInCollision = powerUpShieldInvolvedInCollision;
                 Boolean teleportInvolvedInCollision = fixtureACategory == GameVariables.CATEGORY_TELEPORT || fixtureBCategory == GameVariables.CATEGORY_TELEPORT;
                 Boolean rocketInvolvedInCollision = fixtureACategory == GameVariables.CATEGORY_ROCKET || fixtureBCategory == GameVariables.CATEGORY_ROCKET;
@@ -258,11 +248,18 @@ public class GameScreen implements Screen {
                 //If pigeon has normal contact with an enemy, the game is over
                 if (pigeonInvolvedInCollision) {
                     if (powerUpInvolvedInCollision) {
-                        if (powerUpShieldInvolvedInCollision) {
-                            powerUpType = GameVariables.CATEGORY_POWERUP_SHIELD;
+                        Fixture powerUpFixture;
+                        Fixture collidedEnemyFixture;
+                        if (fixtureA.getFilterData().categoryBits == GameVariables.CATEGORY_POWERUP) {
+                            powerUpFixture = fixtureA;
+                            collidedEnemyFixture = fixtureB;
+
+                        } else {
+                            powerUpFixture = fixtureB;
+                            collidedEnemyFixture = fixtureA;
                         }
-                        destroyPowerUp(fixtureA, fixtureB);
-                        pigeon.powerUp(powerUpType);
+                        pigeon.powerUp(powerUpFixture);
+
                     } else if (teleportInvolvedInCollision) {
                         Fixture teleportFixture;
                         if (fixtureA.getFilterData().categoryBits == GameVariables.CATEGORY_TELEPORT) {
@@ -271,7 +268,8 @@ public class GameScreen implements Screen {
                             teleportFixture = fixtureB;
                         }
                         pigeon.teleport(teleportFixture);
-                    } else if (pigeon.getPowerUpType() == GameVariables.CATEGORY_POWERUP_SHIELD) {
+                    } else if (pigeon.getPowerUpType() == PowerUps.POWER_UP_TYPE_SHIELD) {
+                        //If bird has a shield power up, destroy the dodgeable it collides with
                         destroyNonPigeonBody(fixtureA, fixtureB);
                     } else {
                         // If the pigeon is involved in the collision and does not have a shield applied, the game is over
@@ -346,18 +344,6 @@ public class GameScreen implements Screen {
 
     }
 
-    private void destroyPowerUp(Fixture fixtureA, Fixture fixtureB) {
-
-        // if a Power-Up is involved in a collision, determine which fixture was the power-up and destroy it
-
-        if (fixtureA.getFilterData().categoryBits == GameVariables.CATEGORY_POWERUP_SHIELD) {
-            fixtureA.getBody().setUserData(new BodyData(true));
-        } else if (fixtureB.getFilterData().categoryBits == GameVariables.CATEGORY_POWERUP_SHIELD) {
-            fixtureB.getBody().setUserData(new BodyData(true));
-        }
-
-    }
-
     private void destroyNonPigeonBody(Fixture fixtureA, Fixture fixtureB) {
 
         // Pigeon is charged and hits a dodgeable enemy
@@ -373,6 +359,7 @@ public class GameScreen implements Screen {
         pigeon.zapEnemy();
 
     }
+
 
     private void destroyBody(Fixture fixture){
         fixture.getBody().setUserData(new BodyData(true));
