@@ -24,10 +24,13 @@ public class MainMenuScreen implements Screen {
 
     //Variables
     private final float imageScale = 10;
-    private final float START_BUTTON_WIDTH = 18f;
-    private final float START_BUTTON_HEIGHT = 7.2f;
-    private final float START_BUTTON_X = 30;
-    private final float START_BUTTON_Y = 12;
+
+    //Button Dimensions
+    private final float PLAY_BUTTON_X1 = 34.5f;
+    private final float PLAY_BUTTON_X2 = 45.5f;
+    private final float PLAY_BUTTON_Y1 = 14.0f;
+    private final float PLAY_BUTTON_Y2 = 18.0f;
+
 
     public MainMenuScreen(AlphaPigeon game){
 
@@ -78,14 +81,13 @@ public class MainMenuScreen implements Screen {
 
         //If the mouse is in bounds of the start button, show the selected start button, otherwise show the unselected start button
         //If the mouse is clicked while in the start button bounds, dispose, then start the game
-        if (mousePos.x > START_BUTTON_X && mousePos.x < START_BUTTON_X + START_BUTTON_WIDTH && mousePos.y > START_BUTTON_Y && mousePos.y < START_BUTTON_Y +  START_BUTTON_HEIGHT ){
-            game.batch.draw(startButtonSelected, START_BUTTON_X, START_BUTTON_Y, START_BUTTON_WIDTH, START_BUTTON_HEIGHT);
+        if (mousePos.x > PLAY_BUTTON_X1 && mousePos.x < PLAY_BUTTON_X2 && mousePos.y > PLAY_BUTTON_Y1 && mousePos.y < PLAY_BUTTON_Y2 ){
             if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
                 dispose();
                 game.setScreen(new GameScreen(game, camera, viewport));
             }
         } else {
-            game.batch.draw(startButtonNotSelected, START_BUTTON_X, START_BUTTON_Y, START_BUTTON_WIDTH, START_BUTTON_HEIGHT);
+
         }
 
 
