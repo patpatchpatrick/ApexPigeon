@@ -16,8 +16,8 @@ public class LevelOneBird extends Dodgeable {
 
     //Class for the bird dodgeable
 
-    public final float WIDTH = 6f;
-    public final float HEIGHT = 6f;
+    public final static float WIDTH = 6f;
+    public final static float HEIGHT = 6f;
     public final float FORCE_X = -9.0f;
 
     public LevelOneBird(World gameWorld, AlphaPigeon game, OrthographicCamera camera) {

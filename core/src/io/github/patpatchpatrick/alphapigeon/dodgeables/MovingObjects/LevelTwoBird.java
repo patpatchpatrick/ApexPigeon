@@ -14,8 +14,8 @@ import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
 public class LevelTwoBird extends Dodgeable {
 
-    public final float WIDTH = 12f;
-    public final float HEIGHT = 12f;
+    public final static float WIDTH = 12f;
+    public final static float HEIGHT = 12f;
     public final float FORCE_X = -18.0f;
 
     public LevelTwoBird(World gameWorld, AlphaPigeon game, OrthographicCamera camera) {
