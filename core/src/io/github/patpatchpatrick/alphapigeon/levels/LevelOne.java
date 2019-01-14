@@ -26,8 +26,8 @@ public class LevelOne extends Level {
             if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() > L1BIRD_SPAWN_DURATION_WAVE_0) {
                 birds.spawnLevelOneBird(totalGameTime);
             }
-            if (currentTimeInMillis - PowerUps.lastpowerUpSkullSpawnTime > powerUpShieldInterval) {
-                powerUps.spawnPowerUp(PowerUps.POWER_UP_TYPE_SKULL);
+            if (currentTimeInMillis - PowerUps.lastpowerUpShieldSpawnTime > powerUpShieldInterval) {
+                powerUps.spawnPowerUp(PowerUps.POWER_UP_TYPE_SHIELD);
             }
         } else if (totalGameTime >= LEVEL_ONE_WAVE_1 && totalGameTime < LEVEL_ONE_END_TIME) {
 

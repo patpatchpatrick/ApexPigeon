@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.PowerUps;
 
 public class LevelFinal extends Level {
 
@@ -104,6 +105,11 @@ public class LevelFinal extends Level {
 
         if (waveOneComplete && waveTwoComplete){
             waveIsInitiated = false;
+        }
+
+        if (currentTimeInMillis - PowerUps.lastpowerUpShieldSpawnTime > powerUpShieldInterval) {
+            powerUps.spawnPowerUp(PowerUps.POWER_UP_TYPE_SHIELD);
+            powerUps.spawnPowerUp(PowerUps.POWER_UP_TYPE_SKULL);
         }
 
 
