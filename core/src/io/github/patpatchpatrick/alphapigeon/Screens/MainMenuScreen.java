@@ -32,10 +32,21 @@ public class MainMenuScreen implements Screen {
     private float mainMenuDeltaTime;
 
     //Button Dimensions
+    //--Play Button
     private final float PLAY_BUTTON_X1 = 34.5f;
     private final float PLAY_BUTTON_X2 = 45.5f;
     private final float PLAY_BUTTON_Y1 = 14.0f;
     private final float PLAY_BUTTON_Y2 = 18.0f;
+    //--HighScores Button
+    private final float HIGH_SCORES_BUTTON_X1 = 30.8f;
+    private final float HIGH_SCORES_BUTTON_X2 = 49.5f;
+    private final float HIGH_SCORES_BUTTON_Y1 = 9.5f;
+    private final float HIGH_SCORES_BUTTON_Y2 = 12.0f;
+    //--Settings Button
+    private final float SETTINGS_BUTTON_X1 = 33.3f;
+    private final float SETTINGS_BUTTON_X2 = 46.9f;
+    private final float SETTINGS_BUTTON_Y1 = 4.7f;
+    private final float SETTINGS_BUTTON_Y2 = 7.5f;
 
     //Animations
     //---LevelOneBird
@@ -123,15 +134,22 @@ public class MainMenuScreen implements Screen {
         Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
         camera.unproject(mousePos);
 
-        //If the mouse is in bounds of the start button, show the selected start button, otherwise show the unselected start button
-        //If the mouse is clicked while in the start button bounds, dispose, then start the game
+        //If the mouse is in bounds of any of the buttons on the screen and the buttons are clicked, open corresponding screen
         if (mousePos.x > PLAY_BUTTON_X1 && mousePos.x < PLAY_BUTTON_X2 && mousePos.y > PLAY_BUTTON_Y1 && mousePos.y < PLAY_BUTTON_Y2) {
             if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
                 dispose();
-                game.setScreen(new GameScreen(game, camera, viewport));
+                game.setScreen(new GameScreen(game));
             }
-        } else {
-
+        } else if (mousePos.x > HIGH_SCORES_BUTTON_X1 && mousePos.x < HIGH_SCORES_BUTTON_X2 && mousePos.y > HIGH_SCORES_BUTTON_Y1 && mousePos.y < HIGH_SCORES_BUTTON_Y2) {
+            if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
+                dispose();
+                game.setScreen(new HighScoreScreen(game));
+            }
+        } else if (mousePos.x > SETTINGS_BUTTON_X1 && mousePos.x < SETTINGS_BUTTON_X2 && mousePos.y > SETTINGS_BUTTON_Y1 && mousePos.y < SETTINGS_BUTTON_Y2) {
+            if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
+                dispose();
+                game.setScreen(new SettingsScreen(game));
+            }
         }
 
 

@@ -13,6 +13,7 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
@@ -53,7 +54,7 @@ public class GameScreen implements Screen {
     final float PIGEON_WIDTH = 10.0f;
     final float PIGEON_HEIGHT = 5.0f;
 
-    public GameScreen(AlphaPigeon game, OrthographicCamera camera, Viewport viewport) {
+    public GameScreen(AlphaPigeon game) {
         this.game = game;
 
         world = new World(new Vector2(0, 0), true);
@@ -62,8 +63,13 @@ public class GameScreen implements Screen {
         // set initial time to 0
         stateTime = 0f;
 
-        this.camera = camera;
-        this.viewport = viewport;
+        // create the camera
+        camera = new OrthographicCamera();
+        camera.setToOrtho(false, GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT);
+        //the viewport object will handle camera's attributes
+        //the aspect provided (worldWidth/worldHeight) will be kept
+        viewport = new FitViewport(GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT, camera);
+
 
         // initialize game resources
         this.scrollingBackground = new ScrollingBackground();
