@@ -18,6 +18,7 @@ import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBird;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelTwoBird;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
+import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
 
 public class MainMenuScreen implements Screen {
     private AlphaPigeon game;
@@ -25,6 +26,7 @@ public class MainMenuScreen implements Screen {
     private Viewport viewport;
     private Texture mainMenuBackground;
     private Texture mainMenuLogoAndText;
+    private PlayServices playServices;
 
     //Variables
     private final float imageScale = 10;
@@ -70,9 +72,10 @@ public class MainMenuScreen implements Screen {
     private float levelTwoBirdTwoYPosition = 0;
 
 
-    public MainMenuScreen(AlphaPigeon game) {
+    public MainMenuScreen(AlphaPigeon game, PlayServices playServices) {
 
         this.game = game;
+        this.playServices = playServices;
 
         //Initialize World
 
@@ -90,6 +93,17 @@ public class MainMenuScreen implements Screen {
         initializeLevelOneBirdAnimation();
         initializeLevelTwoBirdAnimation();
 
+        /**
+        if(playServices.isSignedIn()) {
+            System.out.println("C:MenuState : F:MenuState Constructor : Already SignedIn Google PlayServices");
+
+        }
+        else {
+            playServices.onStartMethod();
+            playServices.signIn();
+            System.out.println("C:MenuState : F:MenuState Constructor : SignedIn Google PlayServices");
+        }
+*/
 
     }
 
@@ -138,17 +152,17 @@ public class MainMenuScreen implements Screen {
         if (mousePos.x > PLAY_BUTTON_X1 && mousePos.x < PLAY_BUTTON_X2 && mousePos.y > PLAY_BUTTON_Y1 && mousePos.y < PLAY_BUTTON_Y2) {
             if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
                 dispose();
-                game.setScreen(new GameScreen(game));
+                game.setScreen(new GameScreen(game, playServices));
             }
         } else if (mousePos.x > HIGH_SCORES_BUTTON_X1 && mousePos.x < HIGH_SCORES_BUTTON_X2 && mousePos.y > HIGH_SCORES_BUTTON_Y1 && mousePos.y < HIGH_SCORES_BUTTON_Y2) {
             if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
                 dispose();
-                game.setScreen(new HighScoreScreen(game));
+                game.setScreen(new HighScoreScreen(game, playServices));
             }
         } else if (mousePos.x > SETTINGS_BUTTON_X1 && mousePos.x < SETTINGS_BUTTON_X2 && mousePos.y > SETTINGS_BUTTON_Y1 && mousePos.y < SETTINGS_BUTTON_Y2) {
             if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
                 dispose();
-                game.setScreen(new SettingsScreen(game));
+                game.setScreen(new SettingsScreen(game,  playServices));
             }
         }
 

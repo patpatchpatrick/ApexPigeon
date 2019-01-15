@@ -25,6 +25,7 @@ import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.Controller;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.HighScore;
+import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
 import io.github.patpatchpatrick.alphapigeon.resources.ScrollingBackground;
 import io.github.patpatchpatrick.alphapigeon.resources.Sounds;
 
@@ -35,6 +36,7 @@ public class GameScreen implements Screen {
     private float gameState = 1;
     private final float GAME_RUNNING = 1;
     private final float GAME_PAUSED = 2;
+    private PlayServices playServices;
 
     private OrthographicCamera camera;
     private Viewport viewport;
@@ -54,8 +56,9 @@ public class GameScreen implements Screen {
     final float PIGEON_WIDTH = 10.0f;
     final float PIGEON_HEIGHT = 5.0f;
 
-    public GameScreen(AlphaPigeon game) {
+    public GameScreen(AlphaPigeon game, PlayServices playServices) {
         this.game = game;
+        this.playServices = playServices;
 
         world = new World(new Vector2(0, 0), true);
         debugRenderer = new Box2DDebugRenderer();

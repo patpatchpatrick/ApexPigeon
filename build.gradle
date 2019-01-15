@@ -2,10 +2,6 @@ buildscript {
     
 
     repositories {
-        mavenLocal()
-        mavenCentral()
-        maven { url "https://plugins.gradle.org/m2/" }
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         jcenter()
         google()
     }
@@ -33,11 +29,8 @@ allprojects {
     }
 
     repositories {
-        mavenLocal()
-        mavenCentral()
+        jcenter()
         google()
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        maven { url "https://oss.sonatype.org/content/repositories/releases/" }
     }
 }
 
@@ -84,6 +77,7 @@ project(":android") {
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86"
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86_64"
         implementation 'com.google.android.gms:play-services-games:16.0.0'
+        implementation "com.google.android.gms:play-services-auth:16.0.0"
         
     }
 }

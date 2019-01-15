@@ -3,4 +3,17 @@
 
     <string name="app_name">AlphaPigeon</string>
 
+    <!--
+ Google Play game services IDs.
+ Save this file as res/values/games-ids.xml in your project.
+ -->
+    <!-- app_id -->
+    <string name="app_id" translatable="false">353223411273</string>
+    <!-- package_name -->
+    <string name="package_name" translatable="false">io.github.patpatchpatrick.alphapigeon</string>
+    <!-- leaderboard Distance Traveled -->
+    <string name="leaderboard_distance_traveled" translatable="false">CgkIyYyG7qMKEAIQAQ</string>
+
 </resources>
+
+
