@@ -14,6 +14,10 @@
     <!-- leaderboard Distance Traveled -->
     <string name="leaderboard_distance_traveled" translatable="false">CgkIyYyG7qMKEAIQAQ</string>
 
+
+    <!-- Play Services Strings -->
+    <string name="signin_other_error" >Sign-in Failed</string>
+
 </resources>
 
 

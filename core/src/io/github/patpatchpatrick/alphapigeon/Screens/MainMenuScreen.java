@@ -93,6 +93,8 @@ public class MainMenuScreen implements Screen {
         initializeLevelOneBirdAnimation();
         initializeLevelTwoBirdAnimation();
 
+        playServices.signIn();
+
         /**
         if(playServices.isSignedIn()) {
             System.out.println("C:MenuState : F:MenuState Constructor : Already SignedIn Google PlayServices");
