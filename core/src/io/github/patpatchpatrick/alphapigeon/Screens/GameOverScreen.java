@@ -6,33 +6,32 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import java.text.DecimalFormat;
+
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
-import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBird;
-import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelTwoBird;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
+import io.github.patpatchpatrick.alphapigeon.resources.HighScore;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
 
-public class HighScoreScreen implements Screen {
+public class GameOverScreen implements Screen {
 
     private AlphaPigeon game;
-    private OrthographicCamera camera;
-    private  Viewport viewport;
     private PlayServices playServices;
-
-    //Leaderboard
-    private boolean leaderBoardShown = false;
+    private OrthographicCamera camera;
+    private Viewport viewport;
 
     //Variables
-    private float highScoreDeltaTime;
-    private float highScoreStateTime;
+    private float gameOverDeltaTime;
+    private float gameOverStateTime;
 
     //Textures
-    private Texture highScoreBackground;
+    private Texture gameOverBackground;
 
     //Button Dimensions
     private final float BACK_BUTTON_X1 = 1.8f;
@@ -40,8 +39,14 @@ public class HighScoreScreen implements Screen {
     private final float BACK_BUTTON_Y1 = 3.0f;
     private final float BACK_BUTTON_Y2 = 10.5f;
 
+    //Font Generator
+    private String scoreString;
+    private BitmapFont scoreBitmapFont;
+    private BitmapFont scoreFont;
+    FreeTypeFontGenerator generator;
 
-    public HighScoreScreen(AlphaPigeon game, PlayServices playServices){
+    public GameOverScreen(AlphaPigeon game, PlayServices playServices, HighScore highScore){
+
 
         this.game = game;
         this.playServices = playServices;
@@ -53,10 +58,21 @@ public class HighScoreScreen implements Screen {
         //the aspect provided (worldWidth/worldHeight) will be kept
         viewport = new FitViewport(GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT, camera);
 
-        highScoreBackground = new Texture(Gdx.files.internal("textures/HighScoresScreen.png"));
+        gameOverBackground = new Texture(Gdx.files.internal("textures/GameOverScreen.png"));
 
-
-
+        //Initialize font generator
+        scoreBitmapFont = new BitmapFont();
+        generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/univers.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = 20;
+        parameter.minFilter = Texture.TextureFilter.Linear;
+        parameter.magFilter = Texture.TextureFilter.Linear;
+        scoreFont = generator.generateFont(parameter);
+        scoreFont.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+        scoreFont.getData().setScale(0.1f);
+        scoreFont.setUseIntegerPositions(false);
+        DecimalFormat df = new DecimalFormat("#.##");
+        scoreString = "Distance...  " + df.format(highScore.score) + " m";
 
     }
 
@@ -68,8 +84,8 @@ public class HighScoreScreen implements Screen {
     @Override
     public void render(float delta) {
 
-        highScoreDeltaTime = Gdx.graphics.getDeltaTime();
-        highScoreStateTime += highScoreDeltaTime;
+        gameOverDeltaTime = Gdx.graphics.getDeltaTime();
+        gameOverStateTime += gameOverDeltaTime;
 
         // clear the screen with a dark blue color
         Gdx.gl.glClearColor(0, 0, 0.2f, 1);
@@ -84,7 +100,8 @@ public class HighScoreScreen implements Screen {
 
         update();
 
-        game.batch.draw(highScoreBackground, 0, 0, camera.viewportWidth, camera.viewportHeight);
+        game.batch.draw(gameOverBackground, 0, 0, camera.viewportWidth, camera.viewportHeight);
+        scoreFont.draw(game.batch, scoreString, 5, 20);
 
         //Get the mouse coordinates and unproject to the world coordinates
         Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
@@ -104,17 +121,9 @@ public class HighScoreScreen implements Screen {
 
         game.batch.end();
 
-        if (!leaderBoardShown){
-            playServices.showLeaderboard();
-            leaderBoardShown = true;
-        }
-
-
     }
 
-    private void update(){
-
-    }
+    private void update(){}
 
     @Override
     public void resize(int width, int height) {
@@ -139,7 +148,7 @@ public class HighScoreScreen implements Screen {
     @Override
     public void dispose() {
 
-        highScoreBackground.dispose();
+        gameOverBackground.dispose();
 
     }
 }

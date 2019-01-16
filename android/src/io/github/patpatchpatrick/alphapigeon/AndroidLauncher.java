@@ -27,18 +27,18 @@ import com.google.android.gms.common.util.Strings;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesClient;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.example.games.basegameutils.GameHelper;
 
 import static com.google.android.gms.common.api.CommonStatusCodes.SIGN_IN_REQUIRED;
 
 public class AndroidLauncher extends AndroidApplication implements PlayServices {
 
-    private GameHelper gameHelper;
-    private static final String leaderboard = "CgkIyYyG7qMKEAIQAQ";
-    // Client used to sign in with Google APIs
+    // Google Play Services Variables
     private GoogleSignInClient mGoogleSignInClient;
+    private static final String leaderboard = "CgkIyYyG7qMKEAIQAQ";
     private int RC_SIGN_IN = 1;
+    private static final int RC_LEADERBOARD_UI = 9004;
     private GoogleSignInAccount signedInAccount;
 
     @Override
@@ -52,21 +52,6 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
         // Create the client used to sign in to Google services.
         mGoogleSignInClient = GoogleSignIn.getClient(this,
                 new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN).build());
-
-        /**
-         gameHelper = new GameHelper(this, GameHelper.CLIENT_GAMES);
-         gameHelper.enableDebugLog(true);
-
-
-         GameHelper.GameHelperListener gameHelperListener = new GameHelper.GameHelperListener() {
-        @Override public void onSignInFailed() {
-        }
-
-        @Override public void onSignInSucceeded() {
-        }
-        };
-
-         gameHelper.setup(gameHelperListener); */
 
     }
 
@@ -206,6 +191,21 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 
     @Override
     public void showLevel() {
+
+    }
+
+    @Override
+    public void showLeaderboard() {
+
+            Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this))
+                    .getLeaderboardIntent(leaderboard)
+                    .addOnSuccessListener(new OnSuccessListener<Intent>() {
+                        @Override
+                        public void onSuccess(Intent intent) {
+                            startActivityForResult(intent, RC_LEADERBOARD_UI);
+                        }
+                    });
+
 
     }
 

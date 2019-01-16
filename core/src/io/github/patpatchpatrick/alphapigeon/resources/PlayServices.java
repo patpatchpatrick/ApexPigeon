@@ -14,6 +14,7 @@ public interface PlayServices {
     public void showAchievement();
     public void showScore(String LeaderBoard);
     public void showLevel();
+    public void showLeaderboard();
     public boolean isSignedIn();
 
 

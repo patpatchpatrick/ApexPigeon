@@ -68,7 +68,6 @@ public class AlienMissiles {
     private final Array<AlienMissileCornerExplosion> activeAlienMissileCornerExplosions = new Array<AlienMissileCornerExplosion>();
     private final Pool<AlienMissileCornerExplosion> alienMissileCornerExplosionsPool;
     private Animation<TextureRegion> alienMissileCornerExplosionAnimation;
-    private Texture alienMissileCornerExplosionSheet;
     private long lastAlienMissileCornerExplosionSpawnTime;
 
     //Sounds
@@ -462,7 +461,6 @@ public class AlienMissiles {
         alienMissileSheet.dispose();
         alienMissileExplosionSheet.dispose();
         alienMissileCornerSheet.dispose();
-        alienMissileCornerExplosionSheet.dispose();
         alienMissileExplosionSound.dispose();
     }
 

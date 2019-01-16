@@ -13,12 +13,14 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.Pigeon;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Dodgeable;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.PowerUps;
 import io.github.patpatchpatrick.alphapigeon.levels.Gameplay;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
@@ -36,6 +38,7 @@ public class GameScreen implements Screen {
     private float gameState = 1;
     private final float GAME_RUNNING = 1;
     private final float GAME_PAUSED = 2;
+    private boolean gameIsOver = false;
     private PlayServices playServices;
 
     private OrthographicCamera camera;
@@ -61,7 +64,7 @@ public class GameScreen implements Screen {
         this.playServices = playServices;
 
         world = new World(new Vector2(0, 0), true);
-        debugRenderer = new Box2DDebugRenderer();
+        //debugRenderer = new Box2DDebugRenderer();
 
         // set initial time to 0
         stateTime = 0f;
@@ -113,7 +116,7 @@ public class GameScreen implements Screen {
         // tell the camera to update its matrices
         camera.update();
 
-        debugRenderer.render(world, camera.combined);
+        //debugRenderer.render(world, camera.combined);
         // tell the SpriteBatch to render in the
         // coordinate system specified by the camera
         game.batch.setProjectionMatrix(camera.combined);
@@ -125,8 +128,13 @@ public class GameScreen implements Screen {
         pigeon.render(stateTime, game.batch);
         game.batch.end();
 
+        if (gameIsOver) {
+            gameOver();
+        }
+
         //Update method called after rendering
         update();
+
 
     }
 
@@ -162,11 +170,11 @@ public class GameScreen implements Screen {
     public void dispose() {
 
         // dispose of all the native resources... CALL THIS METHOD MANUALLY WHEN YOU EXIT A SCREEN
-        game.batch.dispose();
         pigeon.dispose();
         dodgeables.dispose();
         highScore.dispose();
         scrollingBackground.dispose();
+        world.dispose();
 
     }
 
@@ -174,7 +182,7 @@ public class GameScreen implements Screen {
 
         // step the world
         // if game is paused, don't step the world
-        if (gameState != GAME_PAUSED){
+        if (gameState != GAME_PAUSED) {
             world.step(1 / 60f, 6, 2);
         }
 
@@ -282,7 +290,7 @@ public class GameScreen implements Screen {
                         destroyNonPigeonBody(fixtureA, fixtureB);
                     } else {
                         // If the pigeon is involved in the collision and does not have a shield applied, the game is over
-                        gameOver();
+                        gameIsOver = true;
                     }
                 }
 
@@ -293,14 +301,14 @@ public class GameScreen implements Screen {
                 //the enemy will explode at collision. Then, destroy the rocket and the enemy it collided with
                 //The spawned rocket and destroyed bodies must be run on a separate thread so the world isn't locked
                 if (rocketInvolvedInCollision) {
-                    if (!pigeonInvolvedInCollision){
+                    if (!pigeonInvolvedInCollision) {
                         final Body fixtureAExplosionBody = fixtureABody;
                         final Body fixtureBExplosionBody = fixtureBBody;
-                        if (fixtureA.getFilterData().categoryBits == GameVariables.CATEGORY_ROCKET){
+                        if (fixtureA.getFilterData().categoryBits == GameVariables.CATEGORY_ROCKET) {
                             Gdx.app.postRunnable(new Runnable() {
 
                                 @Override
-                                public void run () {
+                                public void run() {
                                     dodgeables.spawnRocketExplosion(fixtureBExplosionBody.getWorldCenter().x, fixtureBExplosionBody.getWorldCenter().y);
                                     destroyBody(fixtureA);
                                     destroyBody(fixtureB);
@@ -312,7 +320,7 @@ public class GameScreen implements Screen {
                             Gdx.app.postRunnable(new Runnable() {
 
                                 @Override
-                                public void run () {
+                                public void run() {
                                     dodgeables.spawnRocketExplosion(fixtureAExplosionBody.getWorldCenter().x, fixtureAExplosionBody.getWorldCenter().y);
                                     destroyBody(fixtureA);
                                     destroyBody(fixtureB);
@@ -322,12 +330,12 @@ public class GameScreen implements Screen {
                     }
                 }
 
-                if (birdInvolvedInCollision){
+                if (birdInvolvedInCollision) {
                     //if bird is involved in any collision, play a chirp sound
                     Gdx.app.postRunnable(new Runnable() {
 
                         @Override
-                        public void run () {
+                        public void run() {
                             Sounds.birdSound.play();
                         }
                     });
@@ -370,7 +378,7 @@ public class GameScreen implements Screen {
     }
 
 
-    private void destroyBody(Fixture fixture){
+    private void destroyBody(Fixture fixture) {
         fixture.getBody().setUserData(new BodyData(true));
     }
 
@@ -378,7 +386,24 @@ public class GameScreen implements Screen {
 
         // bird has crashed, game is over
         // stop counting the high score
+        // reset all dodgeables to stop sounds
+        // destroy all world bodies
+        // dispose of game disposables
+        // set screen to game over screen
+
         highScore.stopCounting();
+        for (Dodgeable dodgeable : dodgeables.activeDodgeables) {
+            dodgeable.reset();
+        }
+        Array<Body> bodies = new Array<Body>();
+        world.getBodies(bodies);
+        for (int i = 0; i < bodies.size; i++) {
+            world.destroyBody(bodies.get(i));
+        }
+        dispose();
+        game.setScreen(new GameOverScreen(game, playServices, highScore));
+
+
     }
 
     public void sweepDeadBodies() {
