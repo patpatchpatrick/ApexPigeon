@@ -1,6 +1,7 @@
 package io.github.patpatchpatrick.alphapigeon.levels;
 
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.UFO;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.PowerUps;
 
 public class LevelOne extends Level {
@@ -28,6 +29,7 @@ public class LevelOne extends Level {
             }
             if (currentTimeInMillis - PowerUps.lastpowerUpShieldSpawnTime > powerUpShieldInterval) {
                 powerUps.spawnPowerUp(PowerUps.POWER_UP_TYPE_SHIELD);
+                meteors.spawnMeteor();
             }
         } else if (totalGameTime >= LEVEL_ONE_WAVE_1 && totalGameTime < LEVEL_ONE_END_TIME) {
 

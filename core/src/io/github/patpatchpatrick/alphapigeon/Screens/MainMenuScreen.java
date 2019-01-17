@@ -2,6 +2,7 @@ package io.github.patpatchpatrick.alphapigeon.Screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -29,10 +30,19 @@ public class MainMenuScreen implements Screen {
     private Texture mainMenuLogoAndText;
     private PlayServices playServices;
 
+    //Input Processor
+    private InputProcessor inputProcessor;
+
     //Variables
     private final float imageScale = 10;
     private float mainMenuStateTime;
     private float mainMenuDeltaTime;
+
+    //Icons
+    private Texture soundOnIcon;
+    private Texture soundOffIcon;
+    private final float SOUND_ICON_WIDTH = 8;
+    private final float SOUND_ICON_HEIGHT = SOUND_ICON_WIDTH;
 
     //Button Dimensions
     //--Play Button
@@ -50,6 +60,12 @@ public class MainMenuScreen implements Screen {
     private final float SETTINGS_BUTTON_X2 = 46.9f;
     private final float SETTINGS_BUTTON_Y1 = 4.7f;
     private final float SETTINGS_BUTTON_Y2 = 7.5f;
+
+    //--Sound Button
+    private final float SOUND_BUTTON_X1 = 80 - 9f;
+    private final float SOUND_BUTTON_X2 = 80 - 2.8f;
+    private final float SOUND_BUTTON_Y1 = 3f;
+    private final float SOUND_BUTTON_Y2 = 8.5f;
 
     //Animations
     //---LevelOneBird
@@ -87,8 +103,11 @@ public class MainMenuScreen implements Screen {
         //the aspect provided (worldWidth/worldHeight) will be kept
         viewport = new FitViewport(GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT, camera);
 
+        // Load textures
         mainMenuBackground = new Texture(Gdx.files.internal("textures/MainMenuScreen.png"));
         mainMenuLogoAndText = new Texture(Gdx.files.internal("textures/MainMenuScreenTransparent.png"));
+        soundOnIcon = new Texture(Gdx.files.internal("textures/icons/SoundOnIcon.png"));
+        soundOffIcon = new Texture(Gdx.files.internal("textures/icons/SoundOffIcon.png"));
 
 
         initializeLevelOneBirdAnimation();
@@ -98,21 +117,10 @@ public class MainMenuScreen implements Screen {
             playServices.signIn();
         }
 
-        //Start background music
-        Sounds.backgroundMusic.setLooping(true);
-        Sounds.backgroundMusic.play();
+        createInputProcessor();
 
-        /**
-        if(playServices.isSignedIn()) {
-            System.out.println("C:MenuState : F:MenuState Constructor : Already SignedIn Google PlayServices");
+        Sounds.initializeBackgroundMusic();
 
-        }
-        else {
-            playServices.onStartMethod();
-            playServices.signIn();
-            System.out.println("C:MenuState : F:MenuState Constructor : SignedIn Google PlayServices");
-        }
-*/
 
     }
 
@@ -150,31 +158,15 @@ public class MainMenuScreen implements Screen {
         game.batch.draw(levelOneCurrentFrame, levelOneBirdTwoXPosition, levelOneBirdTwoYPosition, 0, 0, LevelOneBird.WIDTH, LevelOneBird.HEIGHT, 1, 1, 0);
         game.batch.draw(levelTwoCurrentFrame, levelTwoBirdXPosition, levelTwoBirdYPosition, 0, 0, LevelTwoBird.WIDTH, LevelTwoBird.HEIGHT, 1, 1, 0);
         game.batch.draw(levelTwoCurrentFrame, levelTwoBirdTwoXPosition, levelTwoBirdTwoYPosition, 0, 0, LevelTwoBird.WIDTH, LevelTwoBird.HEIGHT, 1, 1, 0);
-
         game.batch.draw(mainMenuLogoAndText, 0, 0, camera.viewportWidth, camera.viewportHeight);
-
-        //Get the mouse coordinates and unproject to the world coordinates
-        Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-        camera.unproject(mousePos);
-
-        //If the mouse is in bounds of any of the buttons on the screen and the buttons are clicked, open corresponding screen
-        if (mousePos.x > PLAY_BUTTON_X1 && mousePos.x < PLAY_BUTTON_X2 && mousePos.y > PLAY_BUTTON_Y1 && mousePos.y < PLAY_BUTTON_Y2) {
-            if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-                dispose();
-                game.setScreen(new GameScreen(game, playServices));
-            }
-        } else if (mousePos.x > HIGH_SCORES_BUTTON_X1 && mousePos.x < HIGH_SCORES_BUTTON_X2 && mousePos.y > HIGH_SCORES_BUTTON_Y1 && mousePos.y < HIGH_SCORES_BUTTON_Y2) {
-            if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-                dispose();
-                game.setScreen(new HighScoreScreen(game, playServices));
-            }
-        } else if (mousePos.x > SETTINGS_BUTTON_X1 && mousePos.x < SETTINGS_BUTTON_X2 && mousePos.y > SETTINGS_BUTTON_Y1 && mousePos.y < SETTINGS_BUTTON_Y2) {
-            if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-                dispose();
-                game.setScreen(new SettingsScreen(game,  playServices));
-            }
+        if (Sounds.backgroundMusicOn){
+            game.batch.draw(soundOnIcon, camera.viewportWidth - SOUND_ICON_WIDTH - 2, 2, SOUND_ICON_WIDTH, SOUND_ICON_HEIGHT);
+        } else {
+            game.batch.draw(soundOffIcon, camera.viewportWidth - SOUND_ICON_WIDTH - 2, 2, SOUND_ICON_WIDTH, SOUND_ICON_HEIGHT);
         }
 
+
+        Gdx.input.setInputProcessor(inputProcessor);
 
         game.batch.end();
 
@@ -208,6 +200,8 @@ public class MainMenuScreen implements Screen {
     public void dispose() {
         mainMenuBackground.dispose();
         levelOneBirdFlySheet.dispose();
+        soundOnIcon.dispose();
+        soundOffIcon.dispose();
     }
 
     private void update() {
@@ -319,4 +313,84 @@ public class MainMenuScreen implements Screen {
 
     }
 
-}
+    private void createInputProcessor(){
+
+        inputProcessor = new InputProcessor() {
+            @Override
+            public boolean keyDown(int keycode) {
+                return false;
+            }
+
+            @Override
+            public boolean keyUp(int keycode) {
+                return false;
+            }
+
+            @Override
+            public boolean keyTyped(char character) {
+                return false;
+            }
+
+            @Override
+            public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+                //Get the mouse coordinates and unproject to the world coordinates
+                Vector3 mousePos = new Vector3(screenX, screenY, 0);
+                camera.unproject(mousePos);
+
+                //If the mouse is in bounds of any of the buttons on the screen and the buttons are clicked, open corresponding screen
+                if (mousePos.x > PLAY_BUTTON_X1 && mousePos.x < PLAY_BUTTON_X2 && mousePos.y > PLAY_BUTTON_Y1 && mousePos.y < PLAY_BUTTON_Y2) {
+                    if (button == Input.Buttons.LEFT) {
+                        dispose();
+                        game.setScreen(new GameScreen(game, playServices));
+                        return true;
+                    }
+                } else if (mousePos.x > HIGH_SCORES_BUTTON_X1 && mousePos.x < HIGH_SCORES_BUTTON_X2 && mousePos.y > HIGH_SCORES_BUTTON_Y1 && mousePos.y < HIGH_SCORES_BUTTON_Y2) {
+                    if (button == Input.Buttons.LEFT) {
+                        dispose();
+                        game.setScreen(new HighScoreScreen(game, playServices));
+                        return true;
+                    }
+                } else if (mousePos.x > SETTINGS_BUTTON_X1 && mousePos.x < SETTINGS_BUTTON_X2 && mousePos.y > SETTINGS_BUTTON_Y1 && mousePos.y < SETTINGS_BUTTON_Y2) {
+                    if (button == Input.Buttons.LEFT) {
+                        dispose();
+                        game.setScreen(new SettingsScreen(game,  playServices));
+                        return true;
+                    }
+                } else if (mousePos.x > SOUND_BUTTON_X1 && mousePos.x < SOUND_BUTTON_X2 && mousePos.y > SOUND_BUTTON_Y1 && mousePos.y < SOUND_BUTTON_Y2){
+                    if (button == Input.Buttons.LEFT) {
+                        //Turn background music on or off
+                        if (Sounds.backgroundMusicOn){
+                            Sounds.setBackgroundMusic(false);
+                            return true;
+                        } else {
+                            Sounds.setBackgroundMusic(true);
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            }
+
+            @Override
+            public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+                return false;
+            }
+
+            @Override
+            public boolean touchDragged(int screenX, int screenY, int pointer) {
+                return false;
+            }
+
+            @Override
+            public boolean mouseMoved(int screenX, int screenY) {
+                return false;
+            }
+
+            @Override
+            public boolean scrolled(int amount) {
+                return false;
+            }
+        };
+
+}}

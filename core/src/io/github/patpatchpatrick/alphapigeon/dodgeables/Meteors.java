@@ -41,7 +41,7 @@ public class Meteors {
     private final float METEOR_HEIGHT = METEOR_WIDTH / 2;
 
     //Sounds
-    private Sound meteorSound = Gdx.audio.newSound(Gdx.files.internal("sounds/meteor.wav"));
+    private Sound meteorSound = Gdx.audio.newSound(Gdx.files.internal("sounds/meteor.mp3"));
 
     public Meteors(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables){
 

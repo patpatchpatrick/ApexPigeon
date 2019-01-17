@@ -104,7 +104,7 @@ public class HighScoreScreen implements Screen {
 
         game.batch.end();
 
-        if (!leaderBoardShown){
+        if (!leaderBoardShown && playServices != null){
             playServices.showLeaderboard();
             leaderBoardShown = true;
         }

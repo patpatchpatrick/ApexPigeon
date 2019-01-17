@@ -385,23 +385,33 @@ public class GameScreen implements Screen {
     private void gameOver() {
 
         // bird has crashed, game is over
+        // play game over sound
         // stop counting the high score
         // reset all dodgeables to stop sounds
-        // destroy all world bodies
+        // destroy all world bodies (in postRunnable so the world is not locked)
         // dispose of game disposables
         // set screen to game over screen
 
-        highScore.stopCounting();
-        for (Dodgeable dodgeable : dodgeables.activeDodgeables) {
-            dodgeable.reset();
-        }
-        Array<Body> bodies = new Array<Body>();
-        world.getBodies(bodies);
-        for (int i = 0; i < bodies.size; i++) {
-            world.destroyBody(bodies.get(i));
-        }
-        dispose();
-        game.setScreen(new GameOverScreen(game, playServices, highScore));
+        Gdx.app.postRunnable(new Runnable() {
+
+            @Override
+            public void run() {
+                Sounds.gameOverSound.play();
+                highScore.stopCounting();
+                for (Dodgeable dodgeable : dodgeables.activeDodgeables) {
+                    dodgeable.reset();
+                }
+                Array<Body> bodies = new Array<Body>();
+                world.getBodies(bodies);
+                for (int i = 0; i < bodies.size; i++) {
+                    world.destroyBody(bodies.get(i));
+                }
+                dispose();
+                game.setScreen(new GameOverScreen(game, playServices, highScore));
+            }
+        });
+
+
 
 
     }

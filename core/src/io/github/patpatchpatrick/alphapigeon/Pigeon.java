@@ -86,8 +86,8 @@ public class Pigeon {
         initializePowerUpShieldAnimation();
 
         // load the powerUpShield sound effect
-        powerUpShieldSound = Gdx.audio.newSound(Gdx.files.internal("sounds/powerUpShield.wav"));
-        powerUpShieldZapSound = Gdx.audio.newSound(Gdx.files.internal("sounds/powerUpShieldZap.wav"));
+        powerUpShieldSound = Gdx.audio.newSound(Gdx.files.internal("sounds/powerUpShield.mp3"));
+        powerUpShieldZapSound = Gdx.audio.newSound(Gdx.files.internal("sounds/powerUpShieldZap.mp3"));
         teleportSound = Gdx.audio.newSound(Gdx.files.internal("sounds/teleportSound.mp3"));
 
         //Initialize font pigeonFontGenerator for powerups

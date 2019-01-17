@@ -238,7 +238,13 @@ public class UFO extends Dodgeable {
 
         //Clear all values set on previous UFOs
         this.energyBallIsSpawned = false;
+        for (EnergyBall energyBall : this.energyBalls){
+            energyBall.reset();
+        }
         this.energyBalls.clear();
+        for (UfoEnergyBeam energyBeam : this.energyBeams){
+            energyBeam.reset();
+        }
         this.energyBeams.clear();
         this.spawnTime = 0;
         this.stopInCenterOfScreen = false;

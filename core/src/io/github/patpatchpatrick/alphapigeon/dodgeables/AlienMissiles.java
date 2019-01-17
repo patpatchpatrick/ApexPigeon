@@ -71,7 +71,7 @@ public class AlienMissiles {
     private long lastAlienMissileCornerExplosionSpawnTime;
 
     //Sounds
-    private Sound alienMissileExplosionSound = Gdx.audio.newSound(Gdx.files.internal("sounds/alienMissileExplosion.wav"));
+    private Sound alienMissileExplosionSound = Gdx.audio.newSound(Gdx.files.internal("sounds/alienMissileExplosion.mp3"));
 
     public AlienMissiles(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables){
         this.gameWorld = gameWorld;

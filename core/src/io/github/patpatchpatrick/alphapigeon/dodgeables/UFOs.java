@@ -83,9 +83,9 @@ public class UFOs {
     private Texture energyBeamStaticSheet;
 
     //Sounds
-    private Sound ufoFlyingSound = Gdx.audio.newSound(Gdx.files.internal("sounds/ufoFlying.wav"));
-    private Sound ufoEnergyBallSound = Gdx.audio.newSound(Gdx.files.internal("sounds/ufoEnergyBall.wav"));
-    private Sound ufoEnergyBeamSound = Gdx.audio.newSound(Gdx.files.internal("sounds/ufoEnergyBeam.wav"));
+    private Sound ufoFlyingSound = Gdx.audio.newSound(Gdx.files.internal("sounds/ufoFlying.mp3"));
+    private Sound ufoEnergyBallSound = Gdx.audio.newSound(Gdx.files.internal("sounds/ufoEnergyBall.mp3"));
+    private Sound ufoEnergyBeamSound = Gdx.audio.newSound(Gdx.files.internal("sounds/ufoEnergyBeam.mp3"));
 
     public UFOs(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, final Dodgeables dodgeables) {
 
