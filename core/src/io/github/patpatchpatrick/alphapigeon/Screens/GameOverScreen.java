@@ -18,6 +18,7 @@ import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.HighScore;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
+import sun.rmi.runtime.Log;
 
 public class GameOverScreen implements Screen {
 
@@ -72,7 +73,13 @@ public class GameOverScreen implements Screen {
         scoreFont.getData().setScale(0.1f);
         scoreFont.setUseIntegerPositions(false);
         DecimalFormat df = new DecimalFormat("#.##");
-        scoreString = "Distance...  " + df.format(highScore.score) + " m";
+        scoreString = "Distance: " + df.format(highScore.score) + " m" + "\n Long: " + df.format((long) (highScore.score * 100));
+
+        if (playServices != null){
+            //Format the score for Google Play Services and submit the score
+            long highScoreFormatted = (long)(highScore.score * 100);
+            playServices.submitScore(highScoreFormatted);
+        }
 
     }
 
@@ -101,7 +108,7 @@ public class GameOverScreen implements Screen {
         update();
 
         game.batch.draw(gameOverBackground, 0, 0, camera.viewportWidth, camera.viewportHeight);
-        scoreFont.draw(game.batch, scoreString, 5, 20);
+        scoreFont.draw(game.batch, scoreString, 29, 30);
 
         //Get the mouse coordinates and unproject to the world coordinates
         Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);

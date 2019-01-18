@@ -170,7 +170,10 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
     }
 
     @Override
-    public void submitScore(String LeaderBoard, int highScore) {
+    public void submitScore(long highScore) {
+
+        Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this))
+                .submitScore((leaderboard), highScore);
 
     }
 

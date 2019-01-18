@@ -9,7 +9,7 @@ public interface PlayServices {
     public void signOut();
     public void rateGame();
     public void unlockAchievement(String str);
-    public void submitScore(String LeaderBoard,int highScore);
+    public void submitScore(long highScore);
     public void submitLevel(int highLevel);
     public void showAchievement();
     public void showScore(String LeaderBoard);

@@ -45,7 +45,7 @@ public class HighScore {
         DecimalFormat df = new DecimalFormat("#.##");
         if (pigeonHasNotCrashed) {
             score = score + GameVariables.pigeonSpeed * deltaTime;
-            scoreString = "Distance        " + df.format(score) + "  m";
+            scoreString = "Distance    " + df.format(score) + "  m";
         }
 
     }
