@@ -18,6 +18,10 @@
     <!-- Play Services Strings -->
     <string name="signin_other_error" >Sign-in Failed</string>
 
+    <!-- Shared Preferences -->
+    <string name="high_score_pref" >HighScore</string>
+    <string name="number_of_games_pref" >NumGames</string>
+
 </resources>
 
 

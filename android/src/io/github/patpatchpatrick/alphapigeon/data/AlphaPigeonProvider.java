@@ -100,10 +100,11 @@ public class AlphaPigeonProvider extends ContentProvider {
 
         // Checks to determine values are ok before inserting into database
         // Check to ensure name is not null
+        /**
         float totalNumberOfGames = values.getAsFloat(ScoresEntry.COLUMN_SCORES_NUM_GAMES_PLAYED);
         if (totalNumberOfGames <= 0.0f) {
             throw new IllegalArgumentException("Value greater than 0 required");
-        }
+        }*/
 
         float highScore = values.getAsFloat(ScoresEntry.COLUMN_SCORES_HIGH_SCORES);
         if (highScore <= 0.0f) {

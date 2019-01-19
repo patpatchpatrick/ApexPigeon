@@ -29,6 +29,10 @@ public class GameOverScreen implements Screen {
     private OrthographicCamera camera;
     private Viewport viewport;
 
+    //High Scores
+    private float currentHighScore = 0;
+    private float totalNumGames = 0;
+
     //Variables
     private float gameOverDeltaTime;
     private float gameOverStateTime;
@@ -75,12 +79,16 @@ public class GameOverScreen implements Screen {
         scoreFont.setColor(1.0f, 1.0f, 1.0f, 1.0f);
         scoreFont.getData().setScale(0.1f);
         scoreFont.setUseIntegerPositions(false);
-        DecimalFormat df = new DecimalFormat("#.##");
-        scoreString = "Distance: " + df.format(highScore.score) + " m" + "\n Long: " + df.format((long) (highScore.score * 100));
 
         //Handle submitting high score to play services and to local databases
-        handlePlayServices(highScore);
         handleLocalData(highScore);
+        handlePlayServices(highScore);
+
+        //Update the high score string to be displayed
+        DecimalFormat df = new DecimalFormat("#.##");
+        scoreString = "Distance: " + df.format(highScore.score) + " m" + "\n Long: " + df.format((long) (highScore.score * 100))
+                + "\n High Score: " + currentHighScore + "\n Total Games: " + totalNumGames;
+
 
 
     }
@@ -134,25 +142,38 @@ public class GameOverScreen implements Screen {
 
     private void handlePlayServices(HighScore highScore){
 
-        if (playServices != null){
-            //Format the score for Google Play Services and submit the score
-            long highScoreFormatted = (long)(highScore.score * 100);
-            playServices.submitScore(highScoreFormatted);
+        boolean newHighScore = currentHighScore == highScore.score;
+        if (newHighScore){
+            if (playServices != null){
+                //Format the score for Google Play Services and submit the score
+                long highScoreFormatted = (long)(highScore.score * 100);
+                playServices.submitScore(highScoreFormatted);
+            }
         }
+
 
     }
 
     private void handleLocalData(HighScore highScore){
 
-        if (databaseManager != null){
+        //Update high score
+        currentHighScore = databaseManager.getHighScore();
+        float currentScore = highScore.score;
 
-            float currentScore = highScore.score;
-            float currentHighScore = highScore.score;
-            float numGamesPlayed = 1;
-
-            databaseManager.insert(currentHighScore, currentScore, numGamesPlayed);
-
+        if (currentScore  > currentHighScore){
+            currentHighScore = currentScore;
         }
+
+        //Insert new local scores data
+        if (databaseManager != null){
+            databaseManager.insert(currentHighScore, currentScore);
+            //Update total number of games
+            totalNumGames = databaseManager.getTotalNumGames();
+        }
+
+
+
+
 
     }
 

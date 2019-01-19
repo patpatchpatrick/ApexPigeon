@@ -235,9 +235,9 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
 
 
     @Override
-    public void insert(float highScore,  float lastScore,  float totalNumberOfGames) {
+    public void insert(float highScore,  float lastScore) {
 
-        DatabaseHandler.insert(highScore, lastScore, totalNumberOfGames);
+        DatabaseHandler.insert(this, highScore, lastScore);
 
     }
 
@@ -245,5 +245,15 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
     public void query() {
 
         DatabaseHandler.query();
+    }
+
+    @Override
+    public float getHighScore() {
+        return DatabaseHandler.getHighScore(this);
+    }
+
+    @Override
+    public float getTotalNumGames() {
+        return DatabaseHandler.getTotalNumberOfGames(this);
     }
 }
