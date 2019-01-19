@@ -1,6 +1,7 @@
 package io.github.patpatchpatrick.alphapigeon;
 
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.resources.DatabaseManager;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
 
 import com.badlogic.gdx.backends.android.AndroidGraphics;
@@ -32,7 +34,7 @@ import com.google.android.gms.tasks.Task;
 
 import static com.google.android.gms.common.api.CommonStatusCodes.SIGN_IN_REQUIRED;
 
-public class AndroidLauncher extends AndroidApplication implements PlayServices {
+public class AndroidLauncher extends AndroidApplication implements PlayServices, DatabaseManager {
 
     // Google Play Services Variables
     private GoogleSignInClient mGoogleSignInClient;
@@ -41,13 +43,19 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
     private static final int RC_LEADERBOARD_UI = 9004;
     private GoogleSignInAccount signedInAccount;
 
+    //Database tools
+    protected static ContentResolver contentResolver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
         config.useImmersiveMode = true;
         config.useCompass = false;
-        initialize(new AlphaPigeon(this), config);
+        initialize(new AlphaPigeon(this, this), config);
+        contentResolver = getContentResolver();
+
+
 
         // Create the client used to sign in to Google services.
         mGoogleSignInClient = GoogleSignIn.getClient(this,
@@ -226,5 +234,16 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
     }
 
 
+    @Override
+    public void insert(float highScore,  float lastScore,  float totalNumberOfGames) {
 
+        DatabaseHandler.insert(highScore, lastScore, totalNumberOfGames);
+
+    }
+
+    @Override
+    public void query() {
+
+        DatabaseHandler.query();
+    }
 }

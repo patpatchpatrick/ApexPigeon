@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.resources.DatabaseManager;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
 
@@ -20,6 +21,7 @@ public class SettingsScreen implements Screen {
     private OrthographicCamera camera;
     private Viewport viewport;
     private PlayServices playServices;
+    private DatabaseManager databaseManager;
 
     //Variables
     private float settingsDeltaTime;
@@ -34,9 +36,10 @@ public class SettingsScreen implements Screen {
     private final float BACK_BUTTON_Y1 = 3.0f;
     private final float BACK_BUTTON_Y2 = 10.5f;
 
-    public SettingsScreen(AlphaPigeon game, PlayServices playServices){
+    public SettingsScreen(AlphaPigeon game, PlayServices playServices, DatabaseManager databaseManager){
         this.game = game;
         this.playServices = playServices;
+        this.databaseManager = databaseManager;
 
         // create the camera
         camera = new OrthographicCamera();
@@ -84,7 +87,7 @@ public class SettingsScreen implements Screen {
         if (mousePos.x > BACK_BUTTON_X1 && mousePos.x < BACK_BUTTON_X2 && mousePos.y > BACK_BUTTON_Y1 && mousePos.y < BACK_BUTTON_Y2) {
             if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
                 dispose();
-                game.setScreen(new MainMenuScreen(game, playServices));
+                game.setScreen(new MainMenuScreen(game, playServices, databaseManager));
             }
         } else {
 

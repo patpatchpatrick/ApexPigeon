@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBird;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelTwoBird;
+import io.github.patpatchpatrick.alphapigeon.resources.DatabaseManager;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
 
@@ -23,6 +24,7 @@ public class HighScoreScreen implements Screen {
     private OrthographicCamera camera;
     private  Viewport viewport;
     private PlayServices playServices;
+    private DatabaseManager databaseManager;
 
     //Leaderboard
     private boolean leaderBoardShown = false;
@@ -41,10 +43,11 @@ public class HighScoreScreen implements Screen {
     private final float BACK_BUTTON_Y2 = 10.5f;
 
 
-    public HighScoreScreen(AlphaPigeon game, PlayServices playServices){
+    public HighScoreScreen(AlphaPigeon game, PlayServices playServices, DatabaseManager databaseManager){
 
         this.game = game;
         this.playServices = playServices;
+        this.databaseManager = databaseManager;
 
         // create the camera
         camera = new OrthographicCamera();
@@ -95,7 +98,7 @@ public class HighScoreScreen implements Screen {
         if (mousePos.x > BACK_BUTTON_X1 && mousePos.x < BACK_BUTTON_X2 && mousePos.y > BACK_BUTTON_Y1 && mousePos.y < BACK_BUTTON_Y2) {
             if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
                 dispose();
-                game.setScreen(new MainMenuScreen(game, playServices));
+                game.setScreen(new MainMenuScreen(game, playServices, databaseManager));
             }
         } else {
 

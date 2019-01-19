@@ -16,8 +16,6 @@ public class AlphaPigeonProvider extends ContentProvider {
 
     private static final int SCORE = 100;
     private static final int SCORE_ID = 101;
-    private static final int MATCH = 200;
-    private static final int MATCH_ID = 201;
 
 
     //URI matcher to handle different URIs input into provider
@@ -117,6 +115,7 @@ public class AlphaPigeonProvider extends ContentProvider {
             throw new IllegalArgumentException("Value greater than 0 required");
         }
 
+        /**
         float totalPlayTime = values.getAsFloat(ScoresEntry.COLUMN_SCORES_TOTAL_PLAY_TIME);
         if (totalPlayTime <= 0.0f) {
             throw new IllegalArgumentException("Value greater than 0 required");
@@ -126,6 +125,7 @@ public class AlphaPigeonProvider extends ContentProvider {
         if (lastPlayTime <= 0.0f) {
             throw new IllegalArgumentException("Value greater than 0 required");
         }
+         */
 
 
         //If data is valid, insert data into SQL database

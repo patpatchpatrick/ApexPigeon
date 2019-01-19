@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import java.text.DecimalFormat;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.resources.DatabaseManager;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.HighScore;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
@@ -24,6 +25,7 @@ public class GameOverScreen implements Screen {
 
     private AlphaPigeon game;
     private PlayServices playServices;
+    private DatabaseManager databaseManager;
     private OrthographicCamera camera;
     private Viewport viewport;
 
@@ -46,11 +48,12 @@ public class GameOverScreen implements Screen {
     private BitmapFont scoreFont;
     FreeTypeFontGenerator generator;
 
-    public GameOverScreen(AlphaPigeon game, PlayServices playServices, HighScore highScore){
+    public GameOverScreen(AlphaPigeon game, PlayServices playServices, DatabaseManager databaseManager, HighScore highScore){
 
 
         this.game = game;
         this.playServices = playServices;
+        this.databaseManager = databaseManager;
 
         // create the camera
         camera = new OrthographicCamera();
@@ -75,11 +78,10 @@ public class GameOverScreen implements Screen {
         DecimalFormat df = new DecimalFormat("#.##");
         scoreString = "Distance: " + df.format(highScore.score) + " m" + "\n Long: " + df.format((long) (highScore.score * 100));
 
-        if (playServices != null){
-            //Format the score for Google Play Services and submit the score
-            long highScoreFormatted = (long)(highScore.score * 100);
-            playServices.submitScore(highScoreFormatted);
-        }
+        //Handle submitting high score to play services and to local databases
+        handlePlayServices(highScore);
+        handleLocalData(highScore);
+
 
     }
 
@@ -119,7 +121,7 @@ public class GameOverScreen implements Screen {
         if (mousePos.x > BACK_BUTTON_X1 && mousePos.x < BACK_BUTTON_X2 && mousePos.y > BACK_BUTTON_Y1 && mousePos.y < BACK_BUTTON_Y2) {
             if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
                 dispose();
-                game.setScreen(new MainMenuScreen(game, playServices));
+                game.setScreen(new MainMenuScreen(game, playServices, databaseManager));
             }
         } else {
 
@@ -127,6 +129,30 @@ public class GameOverScreen implements Screen {
 
 
         game.batch.end();
+
+    }
+
+    private void handlePlayServices(HighScore highScore){
+
+        if (playServices != null){
+            //Format the score for Google Play Services and submit the score
+            long highScoreFormatted = (long)(highScore.score * 100);
+            playServices.submitScore(highScoreFormatted);
+        }
+
+    }
+
+    private void handleLocalData(HighScore highScore){
+
+        if (databaseManager != null){
+
+            float currentScore = highScore.score;
+            float currentHighScore = highScore.score;
+            float numGamesPlayed = 1;
+
+            databaseManager.insert(currentHighScore, currentScore, numGamesPlayed);
+
+        }
 
     }
 

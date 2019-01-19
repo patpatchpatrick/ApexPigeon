@@ -18,6 +18,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBird;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelTwoBird;
+import io.github.patpatchpatrick.alphapigeon.resources.DatabaseManager;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
 import io.github.patpatchpatrick.alphapigeon.resources.Sounds;
@@ -29,6 +30,7 @@ public class MainMenuScreen implements Screen {
     private Texture mainMenuBackground;
     private Texture mainMenuLogoAndText;
     private PlayServices playServices;
+    private DatabaseManager databaseManager;
 
     //Input Processor
     private InputProcessor inputProcessor;
@@ -89,10 +91,11 @@ public class MainMenuScreen implements Screen {
     private float levelTwoBirdTwoYPosition = 0;
 
 
-    public MainMenuScreen(AlphaPigeon game, PlayServices playServices) {
+    public MainMenuScreen(AlphaPigeon game, PlayServices playServices, DatabaseManager databaseManager) {
 
         this.game = game;
         this.playServices = playServices;
+        this.databaseManager = databaseManager;
 
         //Initialize World
 
@@ -341,19 +344,19 @@ public class MainMenuScreen implements Screen {
                 if (mousePos.x > PLAY_BUTTON_X1 && mousePos.x < PLAY_BUTTON_X2 && mousePos.y > PLAY_BUTTON_Y1 && mousePos.y < PLAY_BUTTON_Y2) {
                     if (button == Input.Buttons.LEFT) {
                         dispose();
-                        game.setScreen(new GameScreen(game, playServices));
+                        game.setScreen(new GameScreen(game, playServices, databaseManager));
                         return true;
                     }
                 } else if (mousePos.x > HIGH_SCORES_BUTTON_X1 && mousePos.x < HIGH_SCORES_BUTTON_X2 && mousePos.y > HIGH_SCORES_BUTTON_Y1 && mousePos.y < HIGH_SCORES_BUTTON_Y2) {
                     if (button == Input.Buttons.LEFT) {
                         dispose();
-                        game.setScreen(new HighScoreScreen(game, playServices));
+                        game.setScreen(new HighScoreScreen(game, playServices, databaseManager));
                         return true;
                     }
                 } else if (mousePos.x > SETTINGS_BUTTON_X1 && mousePos.x < SETTINGS_BUTTON_X2 && mousePos.y > SETTINGS_BUTTON_Y1 && mousePos.y < SETTINGS_BUTTON_Y2) {
                     if (button == Input.Buttons.LEFT) {
                         dispose();
-                        game.setScreen(new SettingsScreen(game,  playServices));
+                        game.setScreen(new SettingsScreen(game,  playServices, databaseManager));
                         return true;
                     }
                 } else if (mousePos.x > SOUND_BUTTON_X1 && mousePos.x < SOUND_BUTTON_X2 && mousePos.y > SOUND_BUTTON_Y1 && mousePos.y < SOUND_BUTTON_Y2){

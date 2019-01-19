@@ -25,6 +25,7 @@ import io.github.patpatchpatrick.alphapigeon.dodgeables.PowerUps;
 import io.github.patpatchpatrick.alphapigeon.levels.Gameplay;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.Controller;
+import io.github.patpatchpatrick.alphapigeon.resources.DatabaseManager;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.HighScore;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
@@ -40,6 +41,7 @@ public class GameScreen implements Screen {
     private final float GAME_PAUSED = 2;
     private boolean gameIsOver = false;
     private PlayServices playServices;
+    private DatabaseManager databaseManager;
 
     private OrthographicCamera camera;
     private Viewport viewport;
@@ -59,9 +61,10 @@ public class GameScreen implements Screen {
     final float PIGEON_WIDTH = 10.0f;
     final float PIGEON_HEIGHT = 5.0f;
 
-    public GameScreen(AlphaPigeon game, PlayServices playServices) {
+    public GameScreen(AlphaPigeon game, PlayServices playServices, DatabaseManager databaseManager) {
         this.game = game;
         this.playServices = playServices;
+        this.databaseManager = databaseManager;
 
         world = new World(new Vector2(0, 0), true);
         //debugRenderer = new Box2DDebugRenderer();
@@ -407,7 +410,7 @@ public class GameScreen implements Screen {
                     world.destroyBody(bodies.get(i));
                 }
                 dispose();
-                game.setScreen(new GameOverScreen(game, playServices, highScore));
+                game.setScreen(new GameOverScreen(game, playServices, databaseManager,  highScore));
             }
         });
 
