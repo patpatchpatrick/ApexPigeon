@@ -45,7 +45,7 @@ public class GameOverScreen implements Screen {
     private final float BACK_BUTTON_Y2 = 10.5f;
 
     //Font Generator
-    private String scoreString;
+    private String gameOverString;
     private BitmapFont scoreBitmapFont;
     private BitmapFont scoreFont;
     FreeTypeFontGenerator generator;
@@ -84,7 +84,7 @@ public class GameOverScreen implements Screen {
 
         //Update the high currentScore string to be displayed
         DecimalFormat df = new DecimalFormat("#.##");
-        scoreString = "Distance: " + df.format(highScore.currentScore) + " m" + "\n Long: " + df.format((long) (highScore.currentScore * 100))
+        gameOverString = "Distance: " + df.format(highScore.currentScore) + " m" + "\n Long: " + df.format((long) (highScore.currentScore * 100))
                 + "\n High Score: " + HighScore.currentHighScore + "\n Total Games: " + totalNumGames;
 
 
@@ -116,7 +116,7 @@ public class GameOverScreen implements Screen {
         update();
 
         game.batch.draw(gameOverBackground, 0, 0, camera.viewportWidth, camera.viewportHeight);
-        scoreFont.draw(game.batch, scoreString, 29, 30);
+        scoreFont.draw(game.batch, gameOverString, 29, 30);
 
         //Get the mouse coordinates and unproject to the world coordinates
         Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);

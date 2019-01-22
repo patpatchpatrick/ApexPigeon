@@ -6,9 +6,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import io.github.patpatchpatrick.alphapigeon.Screens.MainMenuScreen;
 import io.github.patpatchpatrick.alphapigeon.resources.DatabaseManager;
+import io.github.patpatchpatrick.alphapigeon.resources.MobileCallbacks;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
 
-public class AlphaPigeon extends Game {
+public class AlphaPigeon extends Game{
     public SpriteBatch batch;
     public BitmapFont font;
     private PlayServices playServices;
@@ -51,7 +52,5 @@ public class AlphaPigeon extends Game {
         batch.dispose();
         font.dispose();
     }
-
-
 
 }

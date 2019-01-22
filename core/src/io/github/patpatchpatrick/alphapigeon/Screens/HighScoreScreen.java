@@ -6,19 +6,20 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
-import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBird;
-import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelTwoBird;
 import io.github.patpatchpatrick.alphapigeon.resources.DatabaseManager;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
+import io.github.patpatchpatrick.alphapigeon.resources.HighScore;
+import io.github.patpatchpatrick.alphapigeon.resources.MobileCallbacks;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
 
-public class HighScoreScreen implements Screen {
+public class HighScoreScreen implements Screen, MobileCallbacks {
 
     private AlphaPigeon game;
     private OrthographicCamera camera;
@@ -42,12 +43,19 @@ public class HighScoreScreen implements Screen {
     private final float BACK_BUTTON_Y1 = 3.0f;
     private final float BACK_BUTTON_Y2 = 10.5f;
 
+    //Font Generator
+    private String highScoresString = "";
+    private BitmapFont scoreBitmapFont;
+    private BitmapFont scoreFont;
+    FreeTypeFontGenerator generator;
+
 
     public HighScoreScreen(AlphaPigeon game, PlayServices playServices, DatabaseManager databaseManager){
 
         this.game = game;
         this.playServices = playServices;
         this.databaseManager = databaseManager;
+        playServices.setMobileCallbacks(this);
 
         // create the camera
         camera = new OrthographicCamera();
@@ -57,6 +65,20 @@ public class HighScoreScreen implements Screen {
         viewport = new FitViewport(GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT, camera);
 
         highScoreBackground = new Texture(Gdx.files.internal("textures/HighScoresScreen.png"));
+
+        //Initialize font generator
+        scoreBitmapFont = new BitmapFont();
+        generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/univers.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = 20;
+        parameter.minFilter = Texture.TextureFilter.Linear;
+        parameter.magFilter = Texture.TextureFilter.Linear;
+        scoreFont = generator.generateFont(parameter);
+        scoreFont.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+        scoreFont.getData().setScale(0.1f);
+        scoreFont.setUseIntegerPositions(false);
+
+        handlePlayServices();
 
 
 
@@ -88,6 +110,7 @@ public class HighScoreScreen implements Screen {
         update();
 
         game.batch.draw(highScoreBackground, 0, 0, camera.viewportWidth, camera.viewportHeight);
+        scoreFont.draw(game.batch, highScoresString, 29, 30);
 
         //Get the mouse coordinates and unproject to the world coordinates
         Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
@@ -107,15 +130,28 @@ public class HighScoreScreen implements Screen {
 
         game.batch.end();
 
+        /**
         if (!leaderBoardShown && playServices != null){
             playServices.showLeaderboard();
             leaderBoardShown = true;
-        }
+        }*/
 
 
     }
 
     private void update(){
+
+    }
+
+    private void handlePlayServices(){
+
+        //Get player centered high scores
+
+        if (playServices != null){
+
+            playServices.getPlayerCenteredScores();
+
+        }
 
     }
 
@@ -144,5 +180,11 @@ public class HighScoreScreen implements Screen {
 
         highScoreBackground.dispose();
 
+    }
+
+    @Override
+    public void setPlayerCenteredHighScores(String playerCenteredHighScores) {
+
+        highScoresString = playerCenteredHighScores;
     }
 }

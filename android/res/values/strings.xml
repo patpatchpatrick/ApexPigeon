@@ -22,6 +22,10 @@
     <string name="high_score_pref" >HighScore</string>
     <string name="number_of_games_pref" >NumGames</string>
 
+    <!-- Exception Error Message -->
+    <string name="status_exception_error">%1$s (status %2$d). %3$s.</string>
+    <string name="leaderboards_exception">There was an issue communicating with leaderboards.</string>
+
 </resources>
 
 

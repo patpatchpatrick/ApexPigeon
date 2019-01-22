@@ -15,6 +15,7 @@ import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.resources.DatabaseManager;
+import io.github.patpatchpatrick.alphapigeon.resources.MobileCallbacks;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
 
 import com.badlogic.gdx.backends.android.AndroidGraphics;
@@ -26,22 +27,35 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.util.Strings;
+import com.google.android.gms.games.AnnotatedData;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesClient;
+import com.google.android.gms.games.LeaderboardsClient;
+import com.google.android.gms.games.leaderboard.Leaderboard;
+import com.google.android.gms.games.leaderboard.LeaderboardScore;
+import com.google.android.gms.games.leaderboard.LeaderboardScoreBuffer;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
 import static com.google.android.gms.common.api.CommonStatusCodes.SIGN_IN_REQUIRED;
+import static com.google.android.gms.games.leaderboard.LeaderboardVariant.COLLECTION_PUBLIC;
+import static com.google.android.gms.games.leaderboard.LeaderboardVariant.TIME_SPAN_ALL_TIME;
 
 public class AndroidLauncher extends AndroidApplication implements PlayServices, DatabaseManager {
 
     // Google Play Services Variables
     private GoogleSignInClient mGoogleSignInClient;
-    private static final String leaderboard = "CgkIyYyG7qMKEAIQAQ";
     private int RC_SIGN_IN = 1;
-    private static final int RC_LEADERBOARD_UI = 9004;
     private GoogleSignInAccount signedInAccount;
+    // -- Leaderboard variables
+    private static final int RC_LEADERBOARD_UI = 9004;
+    private static final String leaderboard = "CgkIyYyG7qMKEAIQAQ";
+    private String playerCenteredScoresString = ""; //String of high scores (player centered)
+
+    // Interface to send callbacks back to libgdx from mobile device
+    private MobileCallbacks mobileCallbacks;
 
     //Database tools
     protected static ContentResolver contentResolver;
@@ -221,10 +235,53 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
     }
 
     @Override
+    public void getPlayerCenteredScores() {
+
+        //Get a list of player centered high scores and return it in string format
+
+        playerCenteredScoresString = "";
+
+        Task<AnnotatedData<LeaderboardsClient.LeaderboardScores>> playerCenteredScoresTask =
+                Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this))
+                .loadPlayerCenteredScores(leaderboard, TIME_SPAN_ALL_TIME, COLLECTION_PUBLIC, 10, false );
+
+        playerCenteredScoresTask.addOnSuccessListener(new OnSuccessListener<AnnotatedData<LeaderboardsClient.LeaderboardScores>>() {
+            @Override
+            public void onSuccess(AnnotatedData<LeaderboardsClient.LeaderboardScores> leaderboardScoresAnnotatedData) {
+
+                LeaderboardsClient.LeaderboardScores leaderboardScores = leaderboardScoresAnnotatedData.get();
+                LeaderboardScoreBuffer leaderboardScoreBuffer = leaderboardScores.getScores();
+                int count = 0;
+                if (leaderboardScoreBuffer != null) {
+                    count = leaderboardScoreBuffer.getCount();
+                }
+                for (int i = 0; i < count; i++) {
+                    LeaderboardScore score = leaderboardScoreBuffer.get(i);
+                    playerCenteredScoresString += "Name: " + score.getScoreHolderDisplayName() +
+                            " Rank: " + score.getDisplayRank() + " Score: " + score.getDisplayScore();
+                }
+                mobileCallbacks.setPlayerCenteredHighScores(playerCenteredScoresString);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                handleException(e, getString(R.string.leaderboards_exception));
+            }
+        });
+
+
+    }
+
+    @Override
     public boolean isSignedIn() {
             //Return false if the last signed in account is null
             return GoogleSignIn.getLastSignedInAccount(this) != null;
 
+    }
+
+    @Override
+    public void setMobileCallbacks(MobileCallbacks mobileCallbacks) {
+        this.mobileCallbacks = mobileCallbacks;
     }
 
     @Override
@@ -256,4 +313,21 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
     public float getTotalNumGames() {
         return DatabaseHandler.getTotalNumberOfGames(this);
     }
+
+    private void handleException(Exception e, String details) {
+        int status = 0;
+
+        if (e instanceof ApiException) {
+            ApiException apiException = (ApiException) e;
+            status = apiException.getStatusCode();
+        }
+
+        String message = getString(R.string.status_exception_error, details, status, e);
+
+        new AlertDialog.Builder(this)
+                .setMessage(message)
+                .setNeutralButton(android.R.string.ok, null)
+                .show();
+    }
+
 }

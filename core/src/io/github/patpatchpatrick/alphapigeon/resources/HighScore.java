@@ -10,6 +10,8 @@ import java.text.DecimalFormat;
 
 import javax.xml.crypto.Data;
 
+import sun.rmi.runtime.Log;
+
 
 public class HighScore {
 

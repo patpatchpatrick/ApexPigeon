@@ -15,7 +15,9 @@ public interface PlayServices {
     public void showScore(String LeaderBoard);
     public void showLevel();
     public void showLeaderboard();
+    public void getPlayerCenteredScores();
     public boolean isSignedIn();
+    public void setMobileCallbacks(MobileCallbacks mobileCallbacks);
 
 
 }

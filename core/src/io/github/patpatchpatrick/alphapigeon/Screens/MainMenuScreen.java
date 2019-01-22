@@ -20,6 +20,7 @@ import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBi
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelTwoBird;
 import io.github.patpatchpatrick.alphapigeon.resources.DatabaseManager;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
+import io.github.patpatchpatrick.alphapigeon.resources.MobileCallbacks;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
 import io.github.patpatchpatrick.alphapigeon.resources.Sounds;
 
@@ -31,6 +32,7 @@ public class MainMenuScreen implements Screen {
     private Texture mainMenuLogoAndText;
     private PlayServices playServices;
     private DatabaseManager databaseManager;
+    private MobileCallbacks mobileCallbacks;
 
     //Input Processor
     private InputProcessor inputProcessor;
