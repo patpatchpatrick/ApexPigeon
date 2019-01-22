@@ -389,7 +389,7 @@ public class GameScreen implements Screen {
 
         // bird has crashed, game is over
         // play game over sound
-        // stop counting the high score
+        // stop counting the high currentScore
         // reset all dodgeables to stop sounds
         // destroy all world bodies (in postRunnable so the world is not locked)
         // dispose of game disposables

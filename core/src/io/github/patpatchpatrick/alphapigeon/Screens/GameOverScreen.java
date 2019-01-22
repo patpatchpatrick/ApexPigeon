@@ -19,7 +19,6 @@ import io.github.patpatchpatrick.alphapigeon.resources.DatabaseManager;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.HighScore;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
-import sun.rmi.runtime.Log;
 
 public class GameOverScreen implements Screen {
 
@@ -30,7 +29,6 @@ public class GameOverScreen implements Screen {
     private Viewport viewport;
 
     //High Scores
-    private float currentHighScore = 0;
     private float totalNumGames = 0;
 
     //Variables
@@ -80,14 +78,14 @@ public class GameOverScreen implements Screen {
         scoreFont.getData().setScale(0.1f);
         scoreFont.setUseIntegerPositions(false);
 
-        //Handle submitting high score to play services and to local databases
-        handleLocalData(highScore);
-        handlePlayServices(highScore);
+        //Handle submitting high currentScore to play services and to local databases
+        handleLocalData();
+        handlePlayServices();
 
-        //Update the high score string to be displayed
+        //Update the high currentScore string to be displayed
         DecimalFormat df = new DecimalFormat("#.##");
-        scoreString = "Distance: " + df.format(highScore.score) + " m" + "\n Long: " + df.format((long) (highScore.score * 100))
-                + "\n High Score: " + currentHighScore + "\n Total Games: " + totalNumGames;
+        scoreString = "Distance: " + df.format(highScore.currentScore) + " m" + "\n Long: " + df.format((long) (highScore.currentScore * 100))
+                + "\n High Score: " + HighScore.currentHighScore + "\n Total Games: " + totalNumGames;
 
 
 
@@ -140,34 +138,22 @@ public class GameOverScreen implements Screen {
 
     }
 
-    private void handlePlayServices(HighScore highScore){
+    private void handlePlayServices(){
 
-        boolean newHighScore = currentHighScore == highScore.score;
-        if (newHighScore){
-            if (playServices != null){
-                //Format the score for Google Play Services and submit the score
-                long highScoreFormatted = (long)(highScore.score * 100);
-                playServices.submitScore(highScoreFormatted);
-            }
-        }
+        //Check if there is a new high score and if so, submit it to google play services
+        HighScore.submitNewHighScore(playServices);
 
 
     }
 
-    private void handleLocalData(HighScore highScore){
+    private void handleLocalData(){
 
-        //Update high score
-        currentHighScore = databaseManager.getHighScore();
-        float currentScore = highScore.score;
-
-        if (currentScore  > currentHighScore){
-            currentHighScore = currentScore;
-        }
-
-        //Insert new local scores data
         if (databaseManager != null){
-            databaseManager.insert(currentHighScore, currentScore);
-            //Update total number of games
+
+            //Insert game data for the recent game into the local database/shared prefs
+           HighScore.updateLocalGameStatisticsData(databaseManager);
+
+            //Get the total number of games from the local database to display in the game over screen
             totalNumGames = databaseManager.getTotalNumGames();
         }
 

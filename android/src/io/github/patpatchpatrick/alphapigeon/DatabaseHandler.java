@@ -17,7 +17,7 @@ public class DatabaseHandler {
 
     public static void insert(Context context, float highScore, float lastScore){
 
-        // Update the high score
+        // Update the high currentScore
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String highScorePreference = context.getResources().getString(R.string.high_score_pref);
         sharedPreferences.edit().putFloat(highScorePreference,  highScore).commit();
@@ -26,7 +26,7 @@ public class DatabaseHandler {
         String numOfGamesPref = context.getResources().getString(R.string.number_of_games_pref);
         float numOfGames = sharedPreferences.getFloat(numOfGamesPref, 0);
         numOfGames = numOfGames + 1;
-        sharedPreferences.edit().putFloat(numOfGamesPref, numOfGames);
+        sharedPreferences.edit().putFloat(numOfGamesPref, numOfGames).commit();
 
         ContentValues values = new ContentValues();
         values.put(ScoresEntry.COLUMN_SCORES_HIGH_SCORES, highScore);
@@ -41,7 +41,7 @@ public class DatabaseHandler {
 
     public static float getHighScore(Context context){
 
-        //Return current high score
+        //Return current high currentScore
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String highScorePreference = context.getResources().getString(R.string.high_score_pref);
         return sharedPreferences.getFloat(highScorePreference, 0);

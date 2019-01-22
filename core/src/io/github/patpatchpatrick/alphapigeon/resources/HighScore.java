@@ -8,12 +8,13 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 
 import java.text.DecimalFormat;
 
-import static java.lang.Math.floor;
+import javax.xml.crypto.Data;
 
 
 public class HighScore {
 
-    public float score;
+    public static float currentScore;
+    public static float currentHighScore = 0;
     private String scoreString;
     private BitmapFont scoreBitmapFont;
     private BitmapFont font12;
@@ -22,8 +23,8 @@ public class HighScore {
 
     public HighScore() {
 
-        // set default score and create and set up the font used for the high score display
-        score = 0;
+        // set default currentScore and create and set up the font used for the high currentScore display
+        currentScore = 0;
         scoreString = "Distance: 0";
         scoreBitmapFont = new BitmapFont();
         generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/univers.ttf"));
@@ -38,22 +39,57 @@ public class HighScore {
     }
 
     public void update(float deltaTime) {
-        // increase score
-        // the score is equal to the distance (meters) that the bird has traveled
-        // if the pigeon has not crashed, keep increasing the score
-        // after the pigeon crashes, stop increasing score
+        // increase currentScore
+        // the currentScore is equal to the distance (meters) that the bird has traveled
+        // if the pigeon has not crashed, keep increasing the currentScore
+        // after the pigeon crashes, stop increasing currentScore
         DecimalFormat df = new DecimalFormat("#.##");
         if (pigeonHasNotCrashed) {
-            score = score + GameVariables.pigeonSpeed * deltaTime;
-            scoreString = "Distance    " + df.format(score) + "  m";
+            currentScore = currentScore + GameVariables.pigeonSpeed * deltaTime;
+            scoreString = "Distance    " + df.format(currentScore) + "  m";
         }
 
     }
 
     public void render(SpriteBatch batch) {
-        // display score
+        // display currentScore
         font12.draw(batch, scoreString, 60, 45);
 
+    }
+
+    public static void updateLocalGameStatisticsData(DatabaseManager databaseManager){
+
+        //Update local game stats (high scores, total number of games, etc..) data for the user after a game is complete
+        //Use the database manager to update local data
+
+        //Get the current high score from the local  database/shared prefs of the users device
+        HighScore.currentHighScore = databaseManager.getHighScore();
+
+        //If the recent game score is greater than the high score, that score becomes the new high score
+        if (HighScore.currentScore  > HighScore.currentHighScore){
+            HighScore.currentHighScore = HighScore.currentScore;
+        }
+
+        //Insert the game round data into the local database
+        databaseManager.insert(HighScore.currentHighScore, currentScore);
+
+    }
+
+    public static boolean newHighScore(){
+        //If the current High Score equals the current score, a new high score was reached this round
+        return currentHighScore == currentScore;
+    }
+
+    public static void submitNewHighScore(PlayServices playServices){
+        if (newHighScore()){
+            if (playServices != null){
+                //Format the currentScore for Google Play Services and submit the currentScore
+                //Google play services does not take decimals, so the score must be multiplied by 100
+                // to remove the decimal places
+                long highScoreFormatted = (long)(currentScore * 100);
+                playServices.submitScore(highScoreFormatted);
+            }
+        }
     }
 
     public void dispose() {
