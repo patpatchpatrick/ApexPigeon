@@ -2,6 +2,7 @@ package io.github.patpatchpatrick.alphapigeon.Screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -26,6 +27,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
     private  Viewport viewport;
     private PlayServices playServices;
     private DatabaseManager databaseManager;
+    private InputProcessor inputProcessor;
 
     //Leaderboard
     private boolean leaderBoardShown = false;
@@ -80,6 +82,8 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
 
         handlePlayServices();
 
+        //Create input processor for user controls
+        createInputProcessor();
 
 
 
@@ -112,21 +116,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
         game.batch.draw(highScoreBackground, 0, 0, camera.viewportWidth, camera.viewportHeight);
         scoreFont.draw(game.batch, highScoresString, 29, 30);
 
-        //Get the mouse coordinates and unproject to the world coordinates
-        Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-        camera.unproject(mousePos);
-
-        //If the mouse is in bounds of the start button, show the selected start button, otherwise show the unselected start button
-        //If the mouse is clicked while in the start button bounds, dispose, then start the game
-        if (mousePos.x > BACK_BUTTON_X1 && mousePos.x < BACK_BUTTON_X2 && mousePos.y > BACK_BUTTON_Y1 && mousePos.y < BACK_BUTTON_Y2) {
-            if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-                dispose();
-                game.setScreen(new MainMenuScreen(game, playServices, databaseManager));
-            }
-        } else {
-
-        }
-
+        Gdx.input.setInputProcessor(inputProcessor);
 
         game.batch.end();
 
@@ -186,5 +176,64 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
     public void setPlayerCenteredHighScores(String playerCenteredHighScores) {
 
         highScoresString = playerCenteredHighScores;
+    }
+
+    private void createInputProcessor(){
+
+        inputProcessor = new InputProcessor() {
+            @Override
+            public boolean keyDown(int keycode) {
+                return false;
+            }
+
+            @Override
+            public boolean keyUp(int keycode) {
+                return false;
+            }
+
+            @Override
+            public boolean keyTyped(char character) {
+                return false;
+            }
+
+            @Override
+            public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+                //Get the mouse coordinates and unproject to the world coordinates
+                Vector3 mousePos = new Vector3(screenX, screenY, 0);
+                camera.unproject(mousePos);
+
+                //If the mouse is in bounds of the back button, go back to the main menu
+                if (mousePos.x > BACK_BUTTON_X1 && mousePos.x < BACK_BUTTON_X2 && mousePos.y > BACK_BUTTON_Y1 && mousePos.y < BACK_BUTTON_Y2) {
+                    if (button == Input.Buttons.LEFT) {
+                        dispose();
+                        game.setScreen(new MainMenuScreen(game, playServices, databaseManager));
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            @Override
+            public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+                return false;
+            }
+
+            @Override
+            public boolean touchDragged(int screenX, int screenY, int pointer) {
+                return false;
+            }
+
+            @Override
+            public boolean mouseMoved(int screenX, int screenY) {
+                return false;
+            }
+
+            @Override
+            public boolean scrolled(int amount) {
+                return false;
+            }
+        };
+
     }
 }

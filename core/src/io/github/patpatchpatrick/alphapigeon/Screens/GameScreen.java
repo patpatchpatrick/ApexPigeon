@@ -1,10 +1,13 @@
 package io.github.patpatchpatrick.alphapigeon.Screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.Contact;
@@ -23,8 +26,8 @@ import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Dodgeable;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.PowerUps;
 import io.github.patpatchpatrick.alphapigeon.levels.Gameplay;
+import io.github.patpatchpatrick.alphapigeon.resources.AccelerometerController;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
-import io.github.patpatchpatrick.alphapigeon.resources.Controller;
 import io.github.patpatchpatrick.alphapigeon.resources.DatabaseManager;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.HighScore;
@@ -42,10 +45,11 @@ public class GameScreen implements Screen {
     private boolean gameIsOver = false;
     private PlayServices playServices;
     private DatabaseManager databaseManager;
+    private InputProcessor inputProcessor;
 
     private OrthographicCamera camera;
     private Viewport viewport;
-    private Controller controller;
+    private AccelerometerController accelerometerController;
     private Pigeon pigeon;
     public Dodgeables dodgeables;
     public ScrollingBackground scrollingBackground;
@@ -60,6 +64,7 @@ public class GameScreen implements Screen {
     //Variables
     final float PIGEON_WIDTH = 10.0f;
     final float PIGEON_HEIGHT = 5.0f;
+    private final float PIGEON_INPUT_FORCE = 7.0f;
 
     public GameScreen(AlphaPigeon game, PlayServices playServices, DatabaseManager databaseManager) {
         this.game = game;
@@ -87,8 +92,9 @@ public class GameScreen implements Screen {
         this.dodgeables = new Dodgeables(this.pigeon, world, game, camera);
         pigeonBody = this.pigeon.getBody();
 
-        // Create the controller class to read user input
-        controller = new Controller(this.pigeon, this.camera);
+        // Create the accelerometerController class and input processor to read user input
+        accelerometerController = new AccelerometerController(this.pigeon, this.camera);
+        createInputProcessor();
 
         // initialize the gameplay class
         gameplay = new Gameplay(this.dodgeables);
@@ -198,9 +204,8 @@ public class GameScreen implements Screen {
         pigeon.update(stateTime);
 
         // process user input
-        controller.processTouchInput();
-        controller.processKeyInput();
-        controller.processAccelerometerInput();
+        Gdx.input.setInputProcessor(inputProcessor);
+        accelerometerController.processAccelerometerInput();
 
 
         // make sure the pigeon stays within the screen bounds
@@ -410,12 +415,84 @@ public class GameScreen implements Screen {
                     world.destroyBody(bodies.get(i));
                 }
                 dispose();
-                game.setScreen(new GameOverScreen(game, playServices, databaseManager,  highScore));
+                game.setScreen(new GameOverScreen(game, playServices, databaseManager, highScore));
             }
         });
 
 
+    }
 
+    private void createInputProcessor() {
+
+        inputProcessor = new InputProcessor() {
+            @Override
+            public boolean keyDown(int keycode) {
+
+                {
+                    switch (keycode) {
+                        case Input.Keys.LEFT:
+                            pigeonBody.applyForceToCenter(-PIGEON_INPUT_FORCE, 0,  true);
+                            break;
+                        case Input.Keys.RIGHT:
+                            pigeonBody.applyForceToCenter(PIGEON_INPUT_FORCE, 0,  true);
+                            break;
+                        case Input.Keys.DOWN:
+                            pigeonBody.applyForceToCenter(0, -PIGEON_INPUT_FORCE,  true);
+                            break;
+                        case Input.Keys.UP:
+                            pigeonBody.applyForceToCenter(0, PIGEON_INPUT_FORCE,  true);
+                            break;
+                    }
+                    return true;
+                }
+
+            }
+
+            @Override
+            public boolean keyUp(int keycode) {
+                return false;
+            }
+
+            @Override
+            public boolean keyTyped(char character) {
+                return false;
+            }
+
+            @Override
+            public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+                //Get the mouse coordinates and unproject to the world coordinates
+                Vector3 mousePos = new Vector3(screenX, screenY, 0);
+                camera.unproject(mousePos);
+
+                if (button == Input.Buttons.LEFT) {
+                    pigeonBody.applyForceToCenter(0.3f * (mousePos.x - pigeonBody.getPosition().x), 0.3f * (mousePos.y - pigeonBody.getPosition().y), true);
+                    return true;
+                }
+
+
+                return false;
+            }
+
+            @Override
+            public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+                return false;
+            }
+
+            @Override
+            public boolean touchDragged(int screenX, int screenY, int pointer) {
+                return false;
+            }
+
+            @Override
+            public boolean mouseMoved(int screenX, int screenY) {
+                return false;
+            }
+
+            @Override
+            public boolean scrolled(int amount) {
+                return false;
+            }
+        };
 
     }
 
