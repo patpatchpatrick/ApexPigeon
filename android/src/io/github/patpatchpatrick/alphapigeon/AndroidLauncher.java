@@ -4,10 +4,12 @@ import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.Toast;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
@@ -64,8 +66,9 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-        config.useImmersiveMode = true;
+        //config.useImmersiveMode = true;
         config.useCompass = false;
+        useImmersiveMode(true);
         initialize(new AlphaPigeon(this, this), config);
         contentResolver = getContentResolver();
 
@@ -76,6 +79,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
                 new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN).build());
 
     }
+
 
     private void signInSilently() {
         //GoogleSignInClient signInClient = GoogleSignIn.getClient(this,
@@ -258,7 +262,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
                 for (int i = 0; i < count; i++) {
                     LeaderboardScore score = leaderboardScoreBuffer.get(i);
                     playerCenteredScoresString += "Name: " + score.getScoreHolderDisplayName() +
-                            " Rank: " + score.getDisplayRank() + " Score: " + score.getDisplayScore();
+                            "\nRank: " + score.getDisplayRank() + "\nScore: " + score.getDisplayScore();
                 }
                 mobileCallbacks.setPlayerCenteredHighScores(playerCenteredScoresString);
             }
@@ -329,5 +333,16 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
                 .setNeutralButton(android.R.string.ok, null)
                 .show();
     }
+
+    private void hideSystemUi() {
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE);
+    }
+
 
 }

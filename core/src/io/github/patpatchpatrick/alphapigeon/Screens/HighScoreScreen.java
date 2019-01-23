@@ -10,13 +10,18 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.resources.DatabaseManager;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
-import io.github.patpatchpatrick.alphapigeon.resources.HighScore;
 import io.github.patpatchpatrick.alphapigeon.resources.MobileCallbacks;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
 
@@ -24,7 +29,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
 
     private AlphaPigeon game;
     private OrthographicCamera camera;
-    private  Viewport viewport;
+    private Viewport viewport;
     private PlayServices playServices;
     private DatabaseManager databaseManager;
     private InputProcessor inputProcessor;
@@ -46,18 +51,24 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
     private final float BACK_BUTTON_Y2 = 10.5f;
 
     //Font Generator
-    private String highScoresString = "";
     private BitmapFont scoreBitmapFont;
     private BitmapFont scoreFont;
     FreeTypeFontGenerator generator;
 
+    //ScrollPane
+    private Stage stage;
+    private FitViewport scrollPaneViewport;
+    private Boolean scrollPaneCreated = false;
 
-    public HighScoreScreen(AlphaPigeon game, PlayServices playServices, DatabaseManager databaseManager){
+
+    public HighScoreScreen(AlphaPigeon game, PlayServices playServices, DatabaseManager databaseManager) {
 
         this.game = game;
         this.playServices = playServices;
         this.databaseManager = databaseManager;
-        playServices.setMobileCallbacks(this);
+        if (playServices != null) {
+            playServices.setMobileCallbacks(this);
+        }
 
         // create the camera
         camera = new OrthographicCamera();
@@ -84,7 +95,6 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
 
         //Create input processor for user controls
         createInputProcessor();
-
 
 
     }
@@ -114,30 +124,35 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
         update();
 
         game.batch.draw(highScoreBackground, 0, 0, camera.viewportWidth, camera.viewportHeight);
-        scoreFont.draw(game.batch, highScoresString, 29, 30);
 
         Gdx.input.setInputProcessor(inputProcessor);
 
         game.batch.end();
 
+        if (scrollPaneCreated) {
+            stage.draw();
+            stage.act();
+        }
+
+
         /**
-        if (!leaderBoardShown && playServices != null){
-            playServices.showLeaderboard();
-            leaderBoardShown = true;
-        }*/
+         if (!leaderBoardShown && playServices != null){
+         playServices.showLeaderboard();
+         leaderBoardShown = true;
+         }*/
 
 
     }
 
-    private void update(){
+    private void update() {
 
     }
 
-    private void handlePlayServices(){
+    private void handlePlayServices() {
 
         //Get player centered high scores
 
-        if (playServices != null){
+        if (playServices != null) {
 
             playServices.getPlayerCenteredScores();
 
@@ -173,12 +188,19 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
     }
 
     @Override
-    public void setPlayerCenteredHighScores(String playerCenteredHighScores) {
+    public void setPlayerCenteredHighScores(final String playerCenteredHighScores) {
 
-        highScoresString = playerCenteredHighScores;
+        Gdx.app.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                createScrollPane(playerCenteredHighScores);
+            }
+        });
+
+
     }
 
-    private void createInputProcessor(){
+    private void createInputProcessor() {
 
         inputProcessor = new InputProcessor() {
             @Override
@@ -236,4 +258,33 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
         };
 
     }
+
+    private void createScrollPane(String scrollPaneScores) {
+
+        scrollPaneViewport = new FitViewport(800, 480);
+
+        stage = new Stage(scrollPaneViewport);
+        Skin skin = new Skin(Gdx.files.internal("skin/glassy-ui.json"));
+
+        Table scrollableTable = new Table();
+        scrollableTable.setFillParent(true);
+        stage.addActor(scrollableTable);
+
+        Table table = new Table();
+        table.add(new TextButton(scrollPaneScores, skin)).row();
+        table.pack();
+        table.setTransform(true);  //clipping enabled
+
+        table.setOrigin(400, table.getHeight() / 2);
+        table.setScale(.5f);
+
+        final ScrollPane scroll = new ScrollPane(table, skin);
+        scrollableTable.add(scroll).expand().fill();
+
+        //stage.setDebugAll(true);
+        Gdx.input.setInputProcessor(stage);
+
+        scrollPaneCreated = true;
+    }
+
 }
