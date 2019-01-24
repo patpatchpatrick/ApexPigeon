@@ -26,7 +26,6 @@ import io.github.patpatchpatrick.alphapigeon.resources.DatabaseManager;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.MobileCallbacks;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
-import sun.rmi.runtime.Log;
 
 public class HighScoreScreen implements Screen, MobileCallbacks {
 
@@ -41,9 +40,6 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
 
     //Leaderboard
     private boolean leaderBoardShown = false;
-    //--Types of scores to request from network/databases
-    private final int GLOBAL_SCORES = 1;
-    private final int LOCAL_SCORES = 2;
 
     //Variables
     private float highScoreDeltaTime;
@@ -59,18 +55,41 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
     private final float BACK_BUTTON_Y1 = 3.0f;
     private final float BACK_BUTTON_Y2 = 10.5f;
     //--Buttons for if global or local high scores are selected
-    private Texture globalSelectedButton;
-    private Texture localSelectedButton;
+    private Texture globalButtonTexture;
+    private Texture localButtonTexture;
     private final float GLOBAL_LOCAL_BUTTON_X1 = 24.7f;
     private final float GLOBAL_LOCAL_BUTTON_Y1 = 36.0f;
     private final float LOCAL_BUTTON_ENDPOINT = 39.2f;
     private final float GLOBAL_LOCAL_BUTTON_WIDTH = 30.2f;
     private final float GLOBAL_LOCAL_BUTTON_HEIGHT = 4.2f;
-    //--Boolean to determine if global or local button is selected. One must be always selected
-    private boolean globalButtonSelected = false;
+    //--Buttons for rank and top scores
+    private Texture rankButtonTexture;
+    private Texture topDayButtonTexture;
+    private Texture topWeekButtonTexture;
+    private Texture topAllTimeButtonTexture;
+    private final float RANK_TOP_BUTTON_WIDTH = 24.5f;
+    private final float RANK_TOP_BUTTON_HEIGHT = 6.5f;
+    private final float RANK_TOP_BUTTON_X1 = LOCAL_BUTTON_ENDPOINT;
+    private final float RANK_TOP_BUTTON_Y1 = GLOBAL_LOCAL_BUTTON_Y1 - RANK_TOP_BUTTON_HEIGHT + 0.2f;
+    private final float RANK_BUTTON_ENDPOINT = 47.5f;
+    private final float RANK_BUTTON_X1 = LOCAL_BUTTON_ENDPOINT;
+    private final float RANK_BUTTON_BOTTOM = 33.3f;
+    private final float TOP_BUTTON_ENDPOINT = GLOBAL_LOCAL_BUTTON_X1 + GLOBAL_LOCAL_BUTTON_WIDTH;
+    private final float DAY_BUTTON_ENDPOINT = 44.9f;
+    private final float WEEK_BUTTON_ENDPOINT = 52.1f;
+    private final float ALL_TIME_BUTTON_ENDPOINT = 63.7f;
+    private final float DAY_BUTTON_BOTTOM = 29.7f;
+    //--Integers to define which button is selected when a high score is requested
+    //--Type of score selected will determine type of request to make from network/databases
+    private final int LOCAL_BUTTON = 2;
+    private final int GLOBAL_BUTTON_RANK = 3;
+    private final int GLOBAL_BUTTON_TOP_DAY = 4;
+    private final int GLOBAL_BUTTON_TOP_WEEK = 5;
+    private final int GLOBAL_BUTTON_TOP_ALLTIME = 6;
+    private int currentButtonSelected = LOCAL_BUTTON;
+    
     //--Boolean to determine if scores request is needed from the network
     private boolean scoresRequestNeeded = false;
-
 
     //Font Generator
     private BitmapFont scoreBitmapFont;
@@ -101,8 +120,12 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
 
         highScoreBackground = new Texture(Gdx.files.internal("textures/highscoresscreen/HighScoresScreen.png"));
         backButton = new Texture(Gdx.files.internal("textures/BackArrow.png"));
-        globalSelectedButton = new Texture(Gdx.files.internal("textures/highscoresscreen/GlobalLocalButtonsGSelected.png"));
-        localSelectedButton = new Texture(Gdx.files.internal("textures/highscoresscreen/GlobalLocalButtonsLSelected.png"));
+        globalButtonTexture = new Texture(Gdx.files.internal("textures/highscoresscreen/GlobalLocalButtonsGSelected.png"));
+        localButtonTexture = new Texture(Gdx.files.internal("textures/highscoresscreen/GlobalLocalButtonsLSelected.png"));
+        rankButtonTexture = new Texture(Gdx.files.internal("textures/highscoresscreen/RankTopButtonRank.png"));
+        topDayButtonTexture = new Texture(Gdx.files.internal("textures/highscoresscreen/RankTopButtonTopDay.png"));
+        topWeekButtonTexture = new Texture(Gdx.files.internal("textures/highscoresscreen/RankTopButtonTopWeek.png"));
+        topAllTimeButtonTexture = new Texture(Gdx.files.internal("textures/highscoresscreen/RankTopButtonTopAllTime.png"));
 
 
         //Initialize font generator
@@ -167,7 +190,14 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
 
         game.batch.draw(backButton, BACK_BUTTON_X1, BACK_BUTTON_Y1, BACK_BUTTON_WIDTH, BACK_BUTTON_HEIGHT);
         //Render global or local button, depending on which is pushed
-        game.batch.draw(globalOrLocalButton(), GLOBAL_LOCAL_BUTTON_X1, GLOBAL_LOCAL_BUTTON_Y1, GLOBAL_LOCAL_BUTTON_WIDTH, GLOBAL_LOCAL_BUTTON_HEIGHT);
+        if (currentButtonSelected != LOCAL_BUTTON) {
+            //If local button is not selected, draw the global buttons
+            game.batch.draw(globalButtonTexture, GLOBAL_LOCAL_BUTTON_X1, GLOBAL_LOCAL_BUTTON_Y1, GLOBAL_LOCAL_BUTTON_WIDTH, GLOBAL_LOCAL_BUTTON_HEIGHT);
+            game.batch.draw(globalRankTopButtonSelected(), RANK_TOP_BUTTON_X1, RANK_TOP_BUTTON_Y1, RANK_TOP_BUTTON_WIDTH, RANK_TOP_BUTTON_HEIGHT);
+        } else {
+            //If local button is selected, draw the local button
+            game.batch.draw(localButtonTexture, GLOBAL_LOCAL_BUTTON_X1, GLOBAL_LOCAL_BUTTON_Y1, GLOBAL_LOCAL_BUTTON_WIDTH, GLOBAL_LOCAL_BUTTON_HEIGHT);
+        }
 
         game.batch.end();
 
@@ -183,7 +213,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
 
     }
 
-    private void createTestScroll(){
+    private void createTestScroll() {
 
         ArrayList<String> testStrings = new ArrayList<String>();
         testStrings.add(new String("NAME: Joe RANK: 1 SCORE: 95.22"));
@@ -219,20 +249,15 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
         createScrollPane(testStrings);
 
 
-
     }
 
-    private void checkIfScoreRequestNeeded(){
+    private void checkIfScoreRequestNeeded() {
 
         //If a score request is needed, request type of score needed
         //A callback will be received after score is queried
 
-        if (scoresRequestNeeded){
-            if (globalButtonSelected){
-                requestScores(GLOBAL_SCORES);
-            } else {
-                requestScores(LOCAL_SCORES);
-            }
+        if (scoresRequestNeeded) {
+            requestScores();
             scoresRequestNeeded = false;
         }
 
@@ -250,37 +275,55 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
 
         if (databaseManager != null) {
 
-            requestScores(LOCAL_SCORES);
+            requestScores();
 
         }
 
     }
 
-    private void requestScores(int scoreType){
+    private void requestScores() {
 
-        //Request scores from network or database
+        //Request scores from network or database depending on the button selected and type of scores needed
 
-            switch(scoreType) {
-                case GLOBAL_SCORES:
-                    //Request player centered scores from play services
-                    if (playServices != null){
-                        playServices.getPlayerCenteredScores();
-                        Gdx.app.log("GLOBAL SCORES REQUESTED", "TEST");
-                    }
-                    break;
-                case LOCAL_SCORES:
-                    //Request player local scores from the mobile device database
-                    if (databaseManager != null){
-                        databaseManager.queryHighScores();
-                        Gdx.app.log("LOCAL SCORES REQUESTED", "TEST");
-                    }
-                    break;
-                default:
-                    // code block
-            }
-
-
-
+        switch (currentButtonSelected) {
+            case GLOBAL_BUTTON_TOP_DAY:
+                //Request player centered scores from play services
+                if (playServices != null) {
+                    playServices.getPlayerCenteredScores();
+                    Gdx.app.log("GLOBAL SCORES REQUESTED", "TEST");
+                }
+                break;
+            case GLOBAL_BUTTON_TOP_WEEK:
+                //Request player centered scores from play services
+                if (playServices != null) {
+                    playServices.getPlayerCenteredScores();
+                    Gdx.app.log("GLOBAL SCORES REQUESTED", "TEST");
+                }
+                break;
+            case GLOBAL_BUTTON_TOP_ALLTIME:
+                //Request player centered scores from play services
+                if (playServices != null) {
+                    playServices.getPlayerCenteredScores();
+                    Gdx.app.log("GLOBAL SCORES REQUESTED", "TEST");
+                }
+                break;
+            case GLOBAL_BUTTON_RANK:
+                //Request player centered scores from play services
+                if (playServices != null) {
+                    playServices.getPlayerCenteredScores();
+                    Gdx.app.log("GLOBAL SCORES REQUESTED", "TEST");
+                }
+                break;
+            case LOCAL_BUTTON:
+                //Request player local scores from the mobile device database
+                if (databaseManager != null) {
+                    databaseManager.queryHighScores();
+                    Gdx.app.log("LOCAL SCORES REQUESTED", "TEST");
+                }
+                break;
+            default:
+                // code block
+        }
 
 
     }
@@ -311,8 +354,12 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
 
         highScoreBackground.dispose();
         backButton.dispose();
-        globalSelectedButton.dispose();
-        localSelectedButton.dispose();
+        globalButtonTexture.dispose();
+        localButtonTexture.dispose();
+        rankButtonTexture.dispose();
+        topDayButtonTexture.dispose();
+        topWeekButtonTexture.dispose();
+        topAllTimeButtonTexture.dispose();
 
     }
 
@@ -344,7 +391,6 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
                 createScrollPane(localScores);
             }
         });
-
 
 
     }
@@ -383,21 +429,74 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
                 } else if (mousePos.x > GLOBAL_LOCAL_BUTTON_X1 && mousePos.x < LOCAL_BUTTON_ENDPOINT && mousePos.y > GLOBAL_LOCAL_BUTTON_Y1 && mousePos.y < GLOBAL_LOCAL_BUTTON_Y1 + GLOBAL_LOCAL_BUTTON_HEIGHT) {
                     if (button == Input.Buttons.LEFT) {
                         //Local button pushed
-                        if (globalButtonSelected){
-                            //If the button changes, a new score request is needed
+                        if (currentButtonSelected != LOCAL_BUTTON) {
+                            //If the button changes, a new score request is needed and will be made in the update method
                             scoresRequestNeeded = true;
                         }
-                        globalButtonSelected = false;
+                        currentButtonSelected = LOCAL_BUTTON;
                         return true;
                     }
                 } else if (mousePos.x > LOCAL_BUTTON_ENDPOINT && mousePos.x < GLOBAL_LOCAL_BUTTON_X1 + GLOBAL_LOCAL_BUTTON_WIDTH && mousePos.y > GLOBAL_LOCAL_BUTTON_Y1 && mousePos.y < GLOBAL_LOCAL_BUTTON_Y1 + GLOBAL_LOCAL_BUTTON_HEIGHT) {
                     if (button == Input.Buttons.LEFT) {
-                        //Global button pushed
-                        if (!globalButtonSelected){
-                            //If the button changes, a new score request is needed
+                        //Global button pushed... if local button is currently selected, request a
+                        // global rank score request by default.  Otherwise, do nothing and leave the current
+                        // global button selected
+                        if (currentButtonSelected == LOCAL_BUTTON) {
+                            //If the button changes, a new score request is needed and will be made in the update method
+                            scoresRequestNeeded = true;
+                            currentButtonSelected = GLOBAL_BUTTON_RANK;
+                        }
+                        return true;
+                    }
+                } else if (mousePos.x > RANK_BUTTON_X1 && mousePos.x < RANK_BUTTON_ENDPOINT && mousePos.y > RANK_BUTTON_BOTTOM && mousePos.y < GLOBAL_LOCAL_BUTTON_Y1) {
+                    if (button == Input.Buttons.LEFT) {
+                        //Rank button pushed
+                        if (currentButtonSelected != GLOBAL_BUTTON_RANK) {
+                            //If the button changes, a new score request is needed and will be made in the update method
                             scoresRequestNeeded = true;
                         }
-                        globalButtonSelected = true;
+                        currentButtonSelected = GLOBAL_BUTTON_RANK;
+                        return true;
+                    }
+                } else if (mousePos.x > RANK_BUTTON_ENDPOINT && mousePos.x < TOP_BUTTON_ENDPOINT && mousePos.y > RANK_BUTTON_BOTTOM && mousePos.y < GLOBAL_LOCAL_BUTTON_Y1) {
+                    if (button == Input.Buttons.LEFT) {
+                        //Top button pushed
+                        //If the current button pushed does not equal any of the top score buttons, push the TOP_DAY button by default
+                        if (currentButtonSelected != GLOBAL_BUTTON_TOP_DAY && currentButtonSelected != GLOBAL_BUTTON_TOP_WEEK && currentButtonSelected != GLOBAL_BUTTON_TOP_ALLTIME) {
+                            //If the button changes, a new score request is needed and will be made in the update method
+                            scoresRequestNeeded = true;
+                            currentButtonSelected = GLOBAL_BUTTON_TOP_DAY;
+                        }
+                        return true;
+                    }
+                } else if (mousePos.x > RANK_BUTTON_X1 && mousePos.x < DAY_BUTTON_ENDPOINT && mousePos.y > DAY_BUTTON_BOTTOM && mousePos.y < RANK_BUTTON_BOTTOM) {
+                    if (button == Input.Buttons.LEFT) {
+                        //Top day button pushed
+                        if (currentButtonSelected != GLOBAL_BUTTON_TOP_DAY) {
+                            //If the button changes, a new score request is needed and will be made in the update method
+                            scoresRequestNeeded = true;
+                        }
+                        currentButtonSelected = GLOBAL_BUTTON_TOP_DAY;
+                        return true;
+                    }
+                } else if (mousePos.x > DAY_BUTTON_ENDPOINT && mousePos.x < WEEK_BUTTON_ENDPOINT && mousePos.y > DAY_BUTTON_BOTTOM && mousePos.y < RANK_BUTTON_BOTTOM) {
+                    if (button == Input.Buttons.LEFT) {
+                        //Top week button pushed
+                        if (currentButtonSelected != GLOBAL_BUTTON_TOP_WEEK) {
+                            //If the button changes, a new score request is needed and will be made in the update method
+                            scoresRequestNeeded = true;
+                        }
+                        currentButtonSelected = GLOBAL_BUTTON_TOP_WEEK;
+                        return true;
+                    }
+                } else if (mousePos.x > WEEK_BUTTON_ENDPOINT && mousePos.x < ALL_TIME_BUTTON_ENDPOINT && mousePos.y > DAY_BUTTON_BOTTOM && mousePos.y < RANK_BUTTON_BOTTOM) {
+                    if (button == Input.Buttons.LEFT) {
+                        //Top all time button pushed
+                        if (currentButtonSelected != GLOBAL_BUTTON_TOP_ALLTIME) {
+                            //If the button changes, a new score request is needed and will be made in the update method
+                            scoresRequestNeeded = true;
+                        }
+                        currentButtonSelected = GLOBAL_BUTTON_TOP_ALLTIME;
                         return true;
                     }
                 }
@@ -430,14 +529,22 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
 
     }
 
-    private Texture globalOrLocalButton() {
+    private Texture globalRankTopButtonSelected() {
 
-        if (globalButtonSelected){
-            return globalSelectedButton;
-        } else {
-            return localSelectedButton;
+        //Depending on the current button selected, return corresponding button texture
+
+        switch (currentButtonSelected) {
+            case GLOBAL_BUTTON_TOP_DAY:
+                return topDayButtonTexture;
+            case GLOBAL_BUTTON_TOP_WEEK:
+                return topWeekButtonTexture;
+            case GLOBAL_BUTTON_TOP_ALLTIME:
+                return topAllTimeButtonTexture;
+            case GLOBAL_BUTTON_RANK:
+                return rankButtonTexture;
         }
 
+        return topDayButtonTexture;
 
     }
 
