@@ -6,7 +6,7 @@ public interface DatabaseManager {
 
     public void insert(float highScore, float lastScore);
 
-    public void query();
+    public void queryHighScores();
 
     public float getHighScore();
 

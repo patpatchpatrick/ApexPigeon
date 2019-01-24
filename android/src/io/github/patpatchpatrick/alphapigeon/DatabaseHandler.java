@@ -1,5 +1,6 @@
 package io.github.patpatchpatrick.alphapigeon;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -9,18 +10,22 @@ import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+
 import io.github.patpatchpatrick.alphapigeon.data.AlphaPigeonContract.ScoresEntry;
+import io.github.patpatchpatrick.alphapigeon.resources.MobileCallbacks;
 
 public class DatabaseHandler {
 
     // Class to handle calls to the Android SQLite database
 
-    public static void insert(Context context, float highScore, float lastScore){
+    public static void insert(Context context, float highScore, float lastScore) {
 
         // Update the high currentScore
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String highScorePreference = context.getResources().getString(R.string.high_score_pref);
-        sharedPreferences.edit().putFloat(highScorePreference,  highScore).commit();
+        sharedPreferences.edit().putFloat(highScorePreference, highScore).commit();
 
         //Update the number of games to increase by 1
         String numOfGamesPref = context.getResources().getString(R.string.number_of_games_pref);
@@ -39,7 +44,7 @@ public class DatabaseHandler {
 
     }
 
-    public static float getHighScore(Context context){
+    public static float getHighScore(Context context) {
 
         //Return current high currentScore
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -48,15 +53,15 @@ public class DatabaseHandler {
 
     }
 
-    public static float getTotalNumberOfGames(Context context){
+    public static float getTotalNumberOfGames(Context context) {
         //Return current total number of games played
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String numOfGamesPreference = context.getResources().getString(R.string.number_of_games_pref);
         return sharedPreferences.getFloat(numOfGamesPreference, 0);
     }
 
-    public static void query(){
-        //Query standings
+    public static void query(MobileCallbacks mobileCallbacks) {
+        //Query player scores and send callback with ArrayList<String> of scores to device
         String[] scoresProjection = {
                 ScoresEntry._ID,
                 ScoresEntry.COLUMN_SCORES_HIGH_SCORES,
@@ -67,11 +72,37 @@ public class DatabaseHandler {
 
         };
 
+        //Query the players scores in descending order
         Cursor scoresCursor = AndroidLauncher.contentResolver.query(ScoresEntry.CONTENT_URI, scoresProjection,
                 null, null,
-                null);
+                ScoresEntry.COLUMN_SCORES_LAST_SCORE + " DESC");
+
+        ArrayList<String> scoreStrings = new ArrayList<>();
+
+
+        scoresCursor.moveToPosition(-1);
+        int i = 1;
+
+        DecimalFormat df = new DecimalFormat("#.##");
+        while (scoresCursor.moveToNext()) {
+            String scoreString = "";
+
+            scoreString += "\n" + i + ". " + df.format(scoresCursor.getFloat(scoresCursor.getColumnIndexOrThrow(ScoresEntry.COLUMN_SCORES_LAST_SCORE)));
+            scoreStrings.add(scoreString);
+
+            i++;
+
+            //Break loop if you have more than 15 scores
+            if (i > 16){
+                break;
+            }
+
+        }
+        scoresCursor.close();
+
+        //Send callback to game to display scores
+        mobileCallbacks.playerLocalScoresReceived(scoreStrings);
+
 
     }
-
-
 }

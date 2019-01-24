@@ -41,6 +41,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
+import java.util.ArrayList;
+
 import static com.google.android.gms.common.api.CommonStatusCodes.SIGN_IN_REQUIRED;
 import static com.google.android.gms.games.leaderboard.LeaderboardVariant.COLLECTION_PUBLIC;
 import static com.google.android.gms.games.leaderboard.LeaderboardVariant.TIME_SPAN_ALL_TIME;
@@ -54,7 +56,6 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
     // -- Leaderboard variables
     private static final int RC_LEADERBOARD_UI = 9004;
     private static final String leaderboard = "CgkIyYyG7qMKEAIQAQ";
-    private String playerCenteredScoresString = ""; //String of high scores (player centered)
 
     // Interface to send callbacks back to libgdx from mobile device
     private MobileCallbacks mobileCallbacks;
@@ -241,9 +242,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
     @Override
     public void getPlayerCenteredScores() {
 
-        //Get a list of player centered high scores and return it in string format
-
-        playerCenteredScoresString = "";
+        //Get a list of player centered high scores and return it in ArrayList<String> format
 
         Task<AnnotatedData<LeaderboardsClient.LeaderboardScores>> playerCenteredScoresTask =
                 Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this))
@@ -259,12 +258,16 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
                 if (leaderboardScoreBuffer != null) {
                     count = leaderboardScoreBuffer.getCount();
                 }
+                ArrayList<String> playerCenteredHighScores = new ArrayList<>();
                 for (int i = 0; i < count; i++) {
                     LeaderboardScore score = leaderboardScoreBuffer.get(i);
-                    playerCenteredScoresString += "Name: " + score.getScoreHolderDisplayName() +
-                            "\nRank: " + score.getDisplayRank() + "\nScore: " + score.getDisplayScore();
+                    String scoreString = "";
+                    scoreString += "Name: " + score.getScoreHolderDisplayName() +
+                            " Rank: " + score.getDisplayRank() + " Score: " + score.getDisplayScore();
+                    playerCenteredHighScores.add(scoreString);
                 }
-                mobileCallbacks.setPlayerCenteredHighScores(playerCenteredScoresString);
+                leaderboardScoreBuffer.release();
+                mobileCallbacks.setPlayerCenteredHighScores(playerCenteredHighScores);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -303,9 +306,9 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
     }
 
     @Override
-    public void query() {
+    public void queryHighScores() {
 
-        DatabaseHandler.query();
+        DatabaseHandler.query(mobileCallbacks);
     }
 
     @Override

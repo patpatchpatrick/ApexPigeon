@@ -152,10 +152,9 @@ public class MainMenuScreen implements Screen {
         camera.update();
 
         game.batch.setProjectionMatrix(camera.combined);
+
         // begin a new batch and draw the game world and objects within it
         game.batch.begin();
-
-        update();
 
         game.batch.draw(mainMenuBackground, 0, 0, camera.viewportWidth, camera.viewportHeight);
 
@@ -174,6 +173,8 @@ public class MainMenuScreen implements Screen {
         Gdx.input.setInputProcessor(inputProcessor);
 
         game.batch.end();
+
+        update();
 
 
     }

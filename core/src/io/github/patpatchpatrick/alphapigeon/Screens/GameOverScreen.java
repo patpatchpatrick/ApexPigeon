@@ -119,8 +119,6 @@ public class GameOverScreen implements Screen {
         // begin a new batch and draw the game world and objects within it
         game.batch.begin();
 
-        update();
-
         game.batch.draw(gameOverBackground, 0, 0, camera.viewportWidth, camera.viewportHeight);
         scoreFont.draw(game.batch, gameOverString, 29, 30);
 
@@ -128,6 +126,8 @@ public class GameOverScreen implements Screen {
         Gdx.input.setInputProcessor(inputProcessor);
 
         game.batch.end();
+
+        update();
 
     }
 

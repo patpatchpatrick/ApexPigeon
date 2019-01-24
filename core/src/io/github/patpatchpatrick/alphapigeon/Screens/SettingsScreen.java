@@ -77,15 +77,18 @@ public class SettingsScreen implements Screen {
 
         game.batch.setProjectionMatrix(camera.combined);
         // begin a new batch and draw the game world and objects within it
+
+
         game.batch.begin();
 
-        update();
 
         game.batch.draw(settingsBackground, 0, 0, camera.viewportWidth, camera.viewportHeight);
 
         Gdx.input.setInputProcessor(inputProcessor);
 
         game.batch.end();
+
+        update();
 
     }
 
