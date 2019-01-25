@@ -7,7 +7,7 @@ com.badlogic.gdx.graphics.Color: {
 	light_blue: { r: 0.64705884, g: 0.64705884, b: 1, a: 1 },
 	grey: { r: 0.7, g: 0.7, b: 0.7, a: 1 },
 	dark_grey: { r: 0.4, g: 0.4, b: 0.4, a: 1 },
-	blue: { r: 0.25882354, g: 0.25882354, b: 0.90588236, a: 1 },
+	blue: { r: 0.219, g: 0.584, b: 0.7098, a: 1 },
 	black: { a: 1 }
 },
 com.badlogic.gdx.graphics.g2d.BitmapFont: {
@@ -26,7 +26,7 @@ com.badlogic.gdx.scenes.scene2d.ui.ProgressBar$ProgressBarStyle: {
 com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
 	default: {
 		font: commodore-64,
-		fontColor: { a: 1, b: 1, g: 0.64705884, r: 0.64705884 },
+		fontColor: { a: 1, b: 1, g: 1, r: 1 },
 		downFontColor: { a: 1, b: 0.90588236, g: 0.25882354, r: 0.25882354 },
 		disabledFontColor: { a: 1, b: 0.8, g: 0.8, r: 0.8 },
 		up: button,
@@ -34,7 +34,7 @@ com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
 	},
 	toggle: {
 		font: commodore-64,
-		fontColor: { a: 1, b: 1, g: 0.64705884, r: 0.64705884 },
+		fontColor: { a: 1, b: 1, g: 1, r: 1 },
 		downFontColor: { a: 1, b: 0.90588236, g: 0.25882354, r: 0.25882354 },
 		checkedFontColor: { a: 1, b: 0.90588236, g: 0.25882354, r: 0.25882354 },
 		up: button,
@@ -88,7 +88,7 @@ com.badlogic.gdx.scenes.scene2d.ui.TextField$TextFieldStyle: {
 	},
 	nobg: {
 		font: commodore-64,
-		fontColor: { a: 1, b: 1, g: 0.64705884, r: 0.64705884 },
+		fontColor: { a: 1, b: 1, g: 1, r: 1 },
 		cursor: cursor,
 		selection: white,
 		messageFont: commodore-64,
@@ -110,15 +110,15 @@ com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
 	},
 	default: {
 		font: commodore-64,
-		fontColor: { a: 1, b: 1, g: 0.64705884, r: 0.64705884 }
+		fontColor: { a: 1, b: 1, g: 1, r: 1 }
 	},
 	error: {
 		font: commodore-64,
-		fontColor: { a: 1, b: 0.4, g: 0.4, r: 0.4 }
+		fontColor: { a: 1, b: 1, g: 1, r: 1 }
 	},
 	title: {
 		font: commodore-64,
-		fontColor: { a: 1, b: 1, g: 0.64705884, r: 0.64705884 },
+		fontColor: { a: 1, b: 1, g: 1, r: 1 },
 		background: button
 	}
 },
@@ -126,13 +126,13 @@ com.badlogic.gdx.scenes.scene2d.ui.List$ListStyle: {
 	default: {
 		font: commodore-64,
 		fontColorSelected: { a: 1, b: 0.90588236, g: 0.25882354, r: 0.25882354 },
-		fontColorUnselected: { a: 1, b: 1, g: 0.64705884, r: 0.64705884 },
+		fontColorUnselected: { a: 1, b: 1, g: 1, r: 1 },
 		selection: white
 	},
 	dimmed: {
 		font: commodore-64,
 		fontColorSelected: { a: 1, b: 0.90588236, g: 0.25882354, r: 0.25882354 },
-		fontColorUnselected: { a: 1, b: 0.90588236, g: 0.25882354, r: 0.25882354 },
+		fontColorUnselected: { a: 1, b: 1, g: 1, r: 1 },
 		selection: light-blue,
 		background: white
 	}
@@ -162,7 +162,7 @@ com.badlogic.gdx.scenes.scene2d.ui.Slider$SliderStyle: {
 com.badlogic.gdx.scenes.scene2d.ui.SelectBox$SelectBoxStyle: {
 	default: {
 		font: commodore-64,
-		fontColor: { a: 1, b: 1, g: 0.64705884, r: 0.64705884 },
+		fontColor: { a: 1, b: 1, g: 1, r: 1 },
 		background: list,
 		scrollStyle: default
 		listStyle: dimmed

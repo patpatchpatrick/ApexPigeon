@@ -20,6 +20,7 @@ public interface PlayServices {
     public void showLevel();
     public void showLeaderboard();
     public void getPlayerCenteredScores();
+    public void getTopScores(int scoreType);
     public boolean isSignedIn();
 
 

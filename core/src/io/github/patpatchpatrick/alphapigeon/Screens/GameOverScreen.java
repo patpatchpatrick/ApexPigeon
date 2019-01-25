@@ -87,7 +87,7 @@ public class GameOverScreen implements Screen {
 
         //Update the high currentScore string to be displayed
         DecimalFormat df = new DecimalFormat("#.##");
-        gameOverString = "Distance: " + df.format(highScore.currentScore) + " m" + "\n Long: " + df.format((long) (highScore.currentScore * 100))
+        gameOverString = "Distance: " + df.format(highScore.currentScore) + " m"
                 + "\n High Score: " + HighScore.currentHighScore + "\n Total Games: " + totalNumGames;
 
         //Create input processor for user controls

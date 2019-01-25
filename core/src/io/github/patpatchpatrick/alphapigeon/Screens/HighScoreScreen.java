@@ -48,21 +48,24 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
     //Textures and Buttons
     private Texture highScoreBackground;
     private Texture backButton;
+    //--Back button
     private final float BACK_BUTTON_WIDTH = 15.8f;
     private final float BACK_BUTTON_HEIGHT = 8.4f;
     private final float BACK_BUTTON_X1 = 1.8f;
     private final float BACK_BUTTON_X2 = 17.7f;
     private final float BACK_BUTTON_Y1 = 3.0f;
     private final float BACK_BUTTON_Y2 = 10.5f;
-    //--Buttons for if global or local high scores are selected
+    //--Global and Local scores buttons
     private Texture globalButtonTexture;
     private Texture localButtonTexture;
-    private final float GLOBAL_LOCAL_BUTTON_X1 = 24.7f;
-    private final float GLOBAL_LOCAL_BUTTON_Y1 = 36.0f;
+    private final float LOCAL_BUTTON_X1 = 24.7f;
+    private final float GLOBAL_AND_LOCAL_BUTTON_Y1 = 36.0f;
     private final float LOCAL_BUTTON_ENDPOINT = 39.2f;
     private final float GLOBAL_LOCAL_BUTTON_WIDTH = 30.2f;
     private final float GLOBAL_LOCAL_BUTTON_HEIGHT = 4.2f;
-    //--Buttons for rank and top scores
+    private final float GLOBAL_BUTTON_X1 = LOCAL_BUTTON_ENDPOINT;
+    private final float GLOBAL_BUTTON_ENDPOINT =  LOCAL_BUTTON_X1 + GLOBAL_LOCAL_BUTTON_WIDTH;
+    //--Rank and Top scores buttons
     private Texture rankButtonTexture;
     private Texture topDayButtonTexture;
     private Texture topWeekButtonTexture;
@@ -70,25 +73,30 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
     private final float RANK_TOP_BUTTON_WIDTH = 24.5f;
     private final float RANK_TOP_BUTTON_HEIGHT = 6.5f;
     private final float RANK_TOP_BUTTON_X1 = LOCAL_BUTTON_ENDPOINT;
-    private final float RANK_TOP_BUTTON_Y1 = GLOBAL_LOCAL_BUTTON_Y1 - RANK_TOP_BUTTON_HEIGHT + 0.2f;
+    private final float RANK_TOP_BUTTON_Y1 = GLOBAL_AND_LOCAL_BUTTON_Y1 - RANK_TOP_BUTTON_HEIGHT + 0.2f;
     private final float RANK_BUTTON_ENDPOINT = 47.5f;
     private final float RANK_BUTTON_X1 = LOCAL_BUTTON_ENDPOINT;
-    private final float RANK_BUTTON_BOTTOM = 33.3f;
-    private final float TOP_BUTTON_ENDPOINT = GLOBAL_LOCAL_BUTTON_X1 + GLOBAL_LOCAL_BUTTON_WIDTH;
+    private final float RANK_AND_TOP_BUTTON_Y1 = 33.3f;
+    private final float TOP_BUTTON_X1 = RANK_BUTTON_ENDPOINT;
+    private final float TOP_BUTTON_ENDPOINT = LOCAL_BUTTON_X1 + GLOBAL_LOCAL_BUTTON_WIDTH;
+    private final float DAY_BUTTON_X1 = RANK_BUTTON_X1;
     private final float DAY_BUTTON_ENDPOINT = 44.9f;
+    private final float WEEK_BUTTON_X1 = DAY_BUTTON_ENDPOINT;
     private final float WEEK_BUTTON_ENDPOINT = 52.1f;
+    private final float ALL_TIME_BUTTON_X1 = WEEK_BUTTON_ENDPOINT;
     private final float ALL_TIME_BUTTON_ENDPOINT = 63.7f;
-    private final float DAY_BUTTON_BOTTOM = 29.7f;
-    //--Integers to define which button is selected when a high score is requested
-    //--Type of score selected will determine type of request to make from network/databases
-    private final int LOCAL_BUTTON = 2;
-    private final int GLOBAL_BUTTON_RANK = 3;
-    private final int GLOBAL_BUTTON_TOP_DAY = 4;
-    private final int GLOBAL_BUTTON_TOP_WEEK = 5;
-    private final int GLOBAL_BUTTON_TOP_ALLTIME = 6;
+    private final float DAY_WEEK_ALLTIME_BUTTON_Y1 = 29.7f;
+    //--Integers to define which button is selected
+    //--Button selected will determine type of score and request to make from network/databases
+    public static final int LOCAL_BUTTON = 2;
+    public static final int GLOBAL_BUTTON_RANK = 3;
+    public static final int GLOBAL_BUTTON_TOP_DAY = 4;
+    public static final int GLOBAL_BUTTON_TOP_WEEK = 5;
+    public static final int GLOBAL_BUTTON_TOP_ALLTIME = 6;
     private int currentButtonSelected = LOCAL_BUTTON;
     
     //--Boolean to determine if scores request is needed from the network
+    //--By default is false, unless a button is changed, then a score request for new type of button is made
     private boolean scoresRequestNeeded = false;
 
     //Font Generator
@@ -147,7 +155,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
         createInputProcessor();
 
         //REMOVE THIS!!!!
-        //createTestScroll();
+        createTestScroll();
 
 
     }
@@ -192,11 +200,11 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
         //Render global or local button, depending on which is pushed
         if (currentButtonSelected != LOCAL_BUTTON) {
             //If local button is not selected, draw the global buttons
-            game.batch.draw(globalButtonTexture, GLOBAL_LOCAL_BUTTON_X1, GLOBAL_LOCAL_BUTTON_Y1, GLOBAL_LOCAL_BUTTON_WIDTH, GLOBAL_LOCAL_BUTTON_HEIGHT);
+            game.batch.draw(globalButtonTexture, LOCAL_BUTTON_X1, GLOBAL_AND_LOCAL_BUTTON_Y1, GLOBAL_LOCAL_BUTTON_WIDTH, GLOBAL_LOCAL_BUTTON_HEIGHT);
             game.batch.draw(globalRankTopButtonSelected(), RANK_TOP_BUTTON_X1, RANK_TOP_BUTTON_Y1, RANK_TOP_BUTTON_WIDTH, RANK_TOP_BUTTON_HEIGHT);
         } else {
             //If local button is selected, draw the local button
-            game.batch.draw(localButtonTexture, GLOBAL_LOCAL_BUTTON_X1, GLOBAL_LOCAL_BUTTON_Y1, GLOBAL_LOCAL_BUTTON_WIDTH, GLOBAL_LOCAL_BUTTON_HEIGHT);
+            game.batch.draw(localButtonTexture, LOCAL_BUTTON_X1, GLOBAL_AND_LOCAL_BUTTON_Y1, GLOBAL_LOCAL_BUTTON_WIDTH, GLOBAL_LOCAL_BUTTON_HEIGHT);
         }
 
         game.batch.end();
@@ -216,36 +224,24 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
     private void createTestScroll() {
 
         ArrayList<String> testStrings = new ArrayList<String>();
-        testStrings.add(new String("NAME: Joe RANK: 1 SCORE: 95.22"));
-        testStrings.add(new String("NAME: Sham RANK: 2 SCORE: 95.11"));
-        testStrings.add(new String("NAME: Sham RANK: 2 SCORE: 95.11"));
-        testStrings.add(new String("NAME: Sham RANK: 2 SCORE: 95.11"));
-        testStrings.add(new String("NAME: Sham RANK: 2 SCORE: 95.11"));
-        testStrings.add(new String("NAME: Shamrock Farms RANK: 2123123 SCORE: 95.11"));
-        testStrings.add(new String("NAME: Joe RANK: 1 SCORE: 95.22"));
-        testStrings.add(new String("NAME: Sham RANK: 2 SCORE: 95.11"));
-        testStrings.add(new String("NAME: Sham RANK: 2 SCORE: 95.11"));
-        testStrings.add(new String("NAME: Sham RANK: 2 SCORE: 95.11"));
-        testStrings.add(new String("NAME: Sham RANK: 2 SCORE: 95.11"));
-        testStrings.add(new String("NAME: Shamrock Farms RANK: 2123123 SCORE: 95.11"));
-        testStrings.add(new String("NAME: Joe RANK: 1 SCORE: 95.22"));
-        testStrings.add(new String("NAME: Sham RANK: 2 SCORE: 95.11"));
-        testStrings.add(new String("NAME: Sham RANK: 2 SCORE: 95.11"));
-        testStrings.add(new String("NAME: Sham RANK: 2 SCORE: 95.11"));
-        testStrings.add(new String("NAME: Sham RANK: 2 SCORE: 95.11"));
-        testStrings.add(new String("NAME: Shamrock Farms RANK: 2123123 SCORE: 95.11"));
-        testStrings.add(new String("NAME: Joe RANK: 1 SCORE: 95.22"));
-        testStrings.add(new String("NAME: Sham RANK: 2 SCORE: 95.11"));
-        testStrings.add(new String("NAME: Sham RANK: 2 SCORE: 95.11"));
-        testStrings.add(new String("NAME: Sham RANK: 2 SCORE: 95.11"));
-        testStrings.add(new String("NAME: Sham RANK: 2 SCORE: 95.11"));
-        testStrings.add(new String("NAME: Shamrock Farms RANK: 2123123 SCORE: 95.11"));
-        testStrings.add(new String("NAME: Joe RANK: 1 SCORE: 95.22"));
-        testStrings.add(new String("NAME: Sham RANK: 2 SCORE: 95.11"));
-        testStrings.add(new String("NAME: Sham RANK: 2 SCORE: 95.11"));
-        testStrings.add(new String("NAME: Sham RANK: 2 SCORE: 95.11"));
-        testStrings.add(new String("NAME: Sham RANK: 2 SCORE: 95.11"));
-        testStrings.add(new String("NAME: Shamrock Farms RANK: 2123123 SCORE: 95.11"));
+        testStrings.add(new String("NAME: Joe" + "\nRANK: 1 " + "\nSCORE: 95.22"));
+        testStrings.add(new String("NAME: Test blah balh !123*&^%" + "\nRANK: 1898237 " + "\nSCORE: 95.2222"));
+        testStrings.add(new String("NAME: Joe" + "\nRANK: 1 " + "\nSCORE: 95.22"));
+        testStrings.add(new String("NAME: Test blah balh !123*&^%" + "\nRANK: 1898237 " + "\nSCORE: 95.2222"));
+        testStrings.add(new String("NAME: Joe" + "\nRANK: 1 " + "\nSCORE: 95.22"));
+        testStrings.add(new String("NAME: Test blah balh !123*&^%" + "\nRANK: 1898237 " + "\nSCORE: 95.2222"));
+        testStrings.add(new String("NAME: Joe" + "\nRANK: 1 " + "\nSCORE: 95.22"));
+        testStrings.add(new String("NAME: Test blah balh !123*&^%" + "\nRANK: 1898237 " + "\nSCORE: 95.2222"));
+        testStrings.add(new String("NAME: Joe" + "\nRANK: 1 " + "\nSCORE: 95.22"));
+        testStrings.add(new String("NAME: Test blah balh !123*&^%" + "\nRANK: 1898237 " + "\nSCORE: 95.2222"));
+        testStrings.add(new String("NAME: Joe" + "\nRANK: 1 " + "\nSCORE: 95.22"));
+        testStrings.add(new String("NAME: Test blah balh !123*&^%" + "\nRANK: 1898237 " + "\nSCORE: 95.2222"));
+        testStrings.add(new String("NAME: Joe" + "\nRANK: 1 " + "\nSCORE: 95.22"));
+        testStrings.add(new String("NAME: Test blah balh !123*&^%" + "\nRANK: 1898237 " + "\nSCORE: 95.2222"));
+        testStrings.add(new String("NAME: Joe" + "\nRANK: 1 " + "\nSCORE: 95.22"));
+        testStrings.add(new String("NAME: Test blah balh !123*&^%" + "\nRANK: 1898237 " + "\nSCORE: 95.2222"));
+        testStrings.add(new String("NAME: Joe" + "\nRANK: 1 " + "\nSCORE: 95.22"));
+        testStrings.add(new String("NAME: Test blah balh !123*&^%" + "\nRANK: 1898237 " + "\nSCORE: 95.2222"));
         createScrollPane(testStrings);
 
 
@@ -287,38 +283,33 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
 
         switch (currentButtonSelected) {
             case GLOBAL_BUTTON_TOP_DAY:
-                //Request player centered scores from play services
+                //Request top scores from play services leaderboard
                 if (playServices != null) {
-                    playServices.getPlayerCenteredScores();
-                    Gdx.app.log("GLOBAL SCORES REQUESTED", "TEST");
+                    playServices.getTopScores(currentButtonSelected);
                 }
                 break;
             case GLOBAL_BUTTON_TOP_WEEK:
-                //Request player centered scores from play services
+                //Request top scores from play services leaderboard
                 if (playServices != null) {
-                    playServices.getPlayerCenteredScores();
-                    Gdx.app.log("GLOBAL SCORES REQUESTED", "TEST");
+                    playServices.getTopScores(currentButtonSelected);
                 }
                 break;
             case GLOBAL_BUTTON_TOP_ALLTIME:
-                //Request player centered scores from play services
+                //Request top scores from play services leaderboard
                 if (playServices != null) {
-                    playServices.getPlayerCenteredScores();
-                    Gdx.app.log("GLOBAL SCORES REQUESTED", "TEST");
+                    playServices.getTopScores(currentButtonSelected);
                 }
                 break;
             case GLOBAL_BUTTON_RANK:
                 //Request player centered scores from play services
                 if (playServices != null) {
                     playServices.getPlayerCenteredScores();
-                    Gdx.app.log("GLOBAL SCORES REQUESTED", "TEST");
                 }
                 break;
             case LOCAL_BUTTON:
                 //Request player local scores from the mobile device database
                 if (databaseManager != null) {
                     databaseManager.queryHighScores();
-                    Gdx.app.log("LOCAL SCORES REQUESTED", "TEST");
                 }
                 break;
             default:
@@ -364,7 +355,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
     }
 
     @Override
-    public void setPlayerCenteredHighScores(final ArrayList<String> playerCenteredHighScores) {
+    public void requestedHighScoresReceived(final ArrayList<String> playerCenteredHighScores) {
 
         //Callback received from mobile device for global high scores (player centered)
         //If received, set the scrollPane to show global scores (player centered)
@@ -426,7 +417,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
                         game.setScreen(new MainMenuScreen(game, playServices, databaseManager));
                         return true;
                     }
-                } else if (mousePos.x > GLOBAL_LOCAL_BUTTON_X1 && mousePos.x < LOCAL_BUTTON_ENDPOINT && mousePos.y > GLOBAL_LOCAL_BUTTON_Y1 && mousePos.y < GLOBAL_LOCAL_BUTTON_Y1 + GLOBAL_LOCAL_BUTTON_HEIGHT) {
+                } else if (mousePos.x > LOCAL_BUTTON_X1 && mousePos.x < LOCAL_BUTTON_ENDPOINT && mousePos.y > GLOBAL_AND_LOCAL_BUTTON_Y1 && mousePos.y < GLOBAL_AND_LOCAL_BUTTON_Y1 + GLOBAL_LOCAL_BUTTON_HEIGHT) {
                     if (button == Input.Buttons.LEFT) {
                         //Local button pushed
                         if (currentButtonSelected != LOCAL_BUTTON) {
@@ -436,7 +427,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
                         currentButtonSelected = LOCAL_BUTTON;
                         return true;
                     }
-                } else if (mousePos.x > LOCAL_BUTTON_ENDPOINT && mousePos.x < GLOBAL_LOCAL_BUTTON_X1 + GLOBAL_LOCAL_BUTTON_WIDTH && mousePos.y > GLOBAL_LOCAL_BUTTON_Y1 && mousePos.y < GLOBAL_LOCAL_BUTTON_Y1 + GLOBAL_LOCAL_BUTTON_HEIGHT) {
+                } else if (mousePos.x > GLOBAL_BUTTON_X1 && mousePos.x < GLOBAL_BUTTON_ENDPOINT && mousePos.y > GLOBAL_AND_LOCAL_BUTTON_Y1 && mousePos.y < GLOBAL_AND_LOCAL_BUTTON_Y1 + GLOBAL_LOCAL_BUTTON_HEIGHT) {
                     if (button == Input.Buttons.LEFT) {
                         //Global button pushed... if local button is currently selected, request a
                         // global rank score request by default.  Otherwise, do nothing and leave the current
@@ -448,7 +439,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
                         }
                         return true;
                     }
-                } else if (mousePos.x > RANK_BUTTON_X1 && mousePos.x < RANK_BUTTON_ENDPOINT && mousePos.y > RANK_BUTTON_BOTTOM && mousePos.y < GLOBAL_LOCAL_BUTTON_Y1) {
+                } else if (mousePos.x > RANK_BUTTON_X1 && mousePos.x < RANK_BUTTON_ENDPOINT && mousePos.y > RANK_AND_TOP_BUTTON_Y1 && mousePos.y < GLOBAL_AND_LOCAL_BUTTON_Y1) {
                     if (button == Input.Buttons.LEFT) {
                         //Rank button pushed
                         if (currentButtonSelected != GLOBAL_BUTTON_RANK) {
@@ -458,7 +449,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
                         currentButtonSelected = GLOBAL_BUTTON_RANK;
                         return true;
                     }
-                } else if (mousePos.x > RANK_BUTTON_ENDPOINT && mousePos.x < TOP_BUTTON_ENDPOINT && mousePos.y > RANK_BUTTON_BOTTOM && mousePos.y < GLOBAL_LOCAL_BUTTON_Y1) {
+                } else if (mousePos.x > TOP_BUTTON_X1 && mousePos.x < TOP_BUTTON_ENDPOINT && mousePos.y > RANK_AND_TOP_BUTTON_Y1 && mousePos.y < GLOBAL_AND_LOCAL_BUTTON_Y1) {
                     if (button == Input.Buttons.LEFT) {
                         //Top button pushed
                         //If the current button pushed does not equal any of the top score buttons, push the TOP_DAY button by default
@@ -469,7 +460,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
                         }
                         return true;
                     }
-                } else if (mousePos.x > RANK_BUTTON_X1 && mousePos.x < DAY_BUTTON_ENDPOINT && mousePos.y > DAY_BUTTON_BOTTOM && mousePos.y < RANK_BUTTON_BOTTOM) {
+                } else if (mousePos.x > DAY_BUTTON_X1 && mousePos.x < DAY_BUTTON_ENDPOINT && mousePos.y > DAY_WEEK_ALLTIME_BUTTON_Y1 && mousePos.y < RANK_AND_TOP_BUTTON_Y1) {
                     if (button == Input.Buttons.LEFT) {
                         //Top day button pushed
                         if (currentButtonSelected != GLOBAL_BUTTON_TOP_DAY) {
@@ -479,7 +470,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
                         currentButtonSelected = GLOBAL_BUTTON_TOP_DAY;
                         return true;
                     }
-                } else if (mousePos.x > DAY_BUTTON_ENDPOINT && mousePos.x < WEEK_BUTTON_ENDPOINT && mousePos.y > DAY_BUTTON_BOTTOM && mousePos.y < RANK_BUTTON_BOTTOM) {
+                } else if (mousePos.x > WEEK_BUTTON_X1 && mousePos.x < WEEK_BUTTON_ENDPOINT && mousePos.y > DAY_WEEK_ALLTIME_BUTTON_Y1 && mousePos.y < RANK_AND_TOP_BUTTON_Y1) {
                     if (button == Input.Buttons.LEFT) {
                         //Top week button pushed
                         if (currentButtonSelected != GLOBAL_BUTTON_TOP_WEEK) {
@@ -489,7 +480,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
                         currentButtonSelected = GLOBAL_BUTTON_TOP_WEEK;
                         return true;
                     }
-                } else if (mousePos.x > WEEK_BUTTON_ENDPOINT && mousePos.x < ALL_TIME_BUTTON_ENDPOINT && mousePos.y > DAY_BUTTON_BOTTOM && mousePos.y < RANK_BUTTON_BOTTOM) {
+                } else if (mousePos.x > ALL_TIME_BUTTON_X1 && mousePos.x < ALL_TIME_BUTTON_ENDPOINT && mousePos.y > DAY_WEEK_ALLTIME_BUTTON_Y1 && mousePos.y < RANK_AND_TOP_BUTTON_Y1) {
                     if (button == Input.Buttons.LEFT) {
                         //Top all time button pushed
                         if (currentButtonSelected != GLOBAL_BUTTON_TOP_ALLTIME) {
@@ -570,10 +561,12 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
         table.setScale(0.75f);
 
         final ScrollPane scroll = new ScrollPane(table, skin);
-        scrollableTable.add(scroll).expand().fill();
+        //scrollableTable.add(scroll).expand().fill();
+        scrollableTable.add(scroll).maxHeight(300).expand().fill();
 
 
-        stage.setDebugAll(true);
+
+        //stage.setDebugAll(true);
 
 
         //When stage is created, set input processor to be a multiplexer to look at both screen and stage controls
