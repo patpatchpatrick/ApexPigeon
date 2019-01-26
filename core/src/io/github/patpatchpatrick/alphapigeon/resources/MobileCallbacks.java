@@ -9,6 +9,6 @@ public interface MobileCallbacks {
 
     public void requestedHighScoresReceived(ArrayList<String> playerCenteredHighScores);
 
-    public void playerLocalScoresReceived(ArrayList<String> localScores);
+    public void requestedLocalScoresReceived(ArrayList<String> localScores);
 
 }

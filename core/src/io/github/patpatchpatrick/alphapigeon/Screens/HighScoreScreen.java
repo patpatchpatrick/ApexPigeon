@@ -38,9 +38,6 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
     // -- Input Multiplexer to handle both the scrollpane(stage) and screen input processors
     private InputMultiplexer inputMultiplexer = new InputMultiplexer();
 
-    //Leaderboard
-    private boolean leaderBoardShown = false;
-
     //Variables
     private float highScoreDeltaTime;
     private float highScoreStateTime;
@@ -48,6 +45,12 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
     //Textures and Buttons
     private Texture highScoreBackground;
     private Texture backButton;
+    //--Google Play Leaderboards Button
+    private Texture googlePlayLeaderboardsButton;
+    private final float GOOGLE_PLAY_LEADERBOARDS_BUTTON_X1 = 71.6f;
+    private final float GOOGLE_PLAY_LEADERBOARDS_BUTTON_Y1 = 41.5f;
+    private final float GOOGLE_PLAY_LEADERBOARDS_BUTTON_WIDTH = 5.0f;
+    private final float GOOGLE_PLAY_LEADERBOARDS_BUTTON_HEIGHT = 4.1f;
     //--Back button
     private final float BACK_BUTTON_WIDTH = 15.8f;
     private final float BACK_BUTTON_HEIGHT = 8.4f;
@@ -64,7 +67,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
     private final float GLOBAL_LOCAL_BUTTON_WIDTH = 30.2f;
     private final float GLOBAL_LOCAL_BUTTON_HEIGHT = 4.2f;
     private final float GLOBAL_BUTTON_X1 = LOCAL_BUTTON_ENDPOINT;
-    private final float GLOBAL_BUTTON_ENDPOINT =  LOCAL_BUTTON_X1 + GLOBAL_LOCAL_BUTTON_WIDTH;
+    private final float GLOBAL_BUTTON_ENDPOINT = LOCAL_BUTTON_X1 + GLOBAL_LOCAL_BUTTON_WIDTH;
     //--Rank and Top scores buttons
     private Texture rankButtonTexture;
     private Texture topDayButtonTexture;
@@ -94,7 +97,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
     public static final int GLOBAL_BUTTON_TOP_WEEK = 5;
     public static final int GLOBAL_BUTTON_TOP_ALLTIME = 6;
     private int currentButtonSelected = LOCAL_BUTTON;
-    
+
     //--Boolean to determine if scores request is needed from the network
     //--By default is false, unless a button is changed, then a score request for new type of button is made
     private boolean scoresRequestNeeded = false;
@@ -134,6 +137,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
         topDayButtonTexture = new Texture(Gdx.files.internal("textures/highscoresscreen/RankTopButtonTopDay.png"));
         topWeekButtonTexture = new Texture(Gdx.files.internal("textures/highscoresscreen/RankTopButtonTopWeek.png"));
         topAllTimeButtonTexture = new Texture(Gdx.files.internal("textures/highscoresscreen/RankTopButtonTopAllTime.png"));
+        googlePlayLeaderboardsButton = new Texture(Gdx.files.internal("textures/highscoresscreen/GooglePlayLeaderboardsButton.png"));
 
 
         //Initialize font generator
@@ -197,6 +201,8 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
         game.batch.begin();
 
         game.batch.draw(backButton, BACK_BUTTON_X1, BACK_BUTTON_Y1, BACK_BUTTON_WIDTH, BACK_BUTTON_HEIGHT);
+        game.batch.draw(googlePlayLeaderboardsButton, GOOGLE_PLAY_LEADERBOARDS_BUTTON_X1, GOOGLE_PLAY_LEADERBOARDS_BUTTON_Y1,
+                GOOGLE_PLAY_LEADERBOARDS_BUTTON_WIDTH, GOOGLE_PLAY_LEADERBOARDS_BUTTON_HEIGHT);
         //Render global or local button, depending on which is pushed
         if (currentButtonSelected != LOCAL_BUTTON) {
             //If local button is not selected, draw the global buttons
@@ -212,11 +218,6 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
         update();
 
 
-        /**
-         if (!leaderBoardShown && playServices != null){
-         playServices.showLeaderboard();
-         leaderBoardShown = true;
-         }*/
 
 
     }
@@ -244,6 +245,14 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
         testStrings.add(new String("NAME: Test blah balh !123*&^%" + "\nRANK: 1898237 " + "\nSCORE: 95.2222"));
         createScrollPane(testStrings);
 
+
+    }
+
+    private void startPlayServicesLeaderboardIntent(){
+
+         if (playServices != null){
+         playServices.showLeaderboard();
+         }
 
     }
 
@@ -371,7 +380,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
     }
 
     @Override
-    public void playerLocalScoresReceived(final ArrayList<String> localScores) {
+    public void requestedLocalScoresReceived(final ArrayList<String> localScores) {
 
         //Callback received from mobile device for local high scores (top 15)
         //If received, set the scrollPane to show local scores (top 15)
@@ -415,6 +424,12 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
                     if (button == Input.Buttons.LEFT) {
                         dispose();
                         game.setScreen(new MainMenuScreen(game, playServices, databaseManager));
+                        return true;
+                    }
+                } else if (mousePos.x > GOOGLE_PLAY_LEADERBOARDS_BUTTON_X1 && mousePos.x < GOOGLE_PLAY_LEADERBOARDS_BUTTON_X1 + GOOGLE_PLAY_LEADERBOARDS_BUTTON_WIDTH && mousePos.y > GOOGLE_PLAY_LEADERBOARDS_BUTTON_Y1 && mousePos.y < GOOGLE_PLAY_LEADERBOARDS_BUTTON_Y1 + GOOGLE_PLAY_LEADERBOARDS_BUTTON_HEIGHT) {
+                    if (button == Input.Buttons.LEFT) {
+                        //Google play leaderboards button pushed, open leaderboards intent if play services is not null
+                        startPlayServicesLeaderboardIntent();
                         return true;
                     }
                 } else if (mousePos.x > LOCAL_BUTTON_X1 && mousePos.x < LOCAL_BUTTON_ENDPOINT && mousePos.y > GLOBAL_AND_LOCAL_BUTTON_Y1 && mousePos.y < GLOBAL_AND_LOCAL_BUTTON_Y1 + GLOBAL_LOCAL_BUTTON_HEIGHT) {
@@ -555,15 +570,14 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
             table.add(new TextButton(score, skin)).row();
         }
         table.pack();
-        table.setTransform(true);  //clipping enabled
+        table.setTransform(true);
+        //table.setTransform(true);  //clipping enabled ... this setting makes scrolling not occur in uniform fashion
 
         table.setOrigin(400, 0);
         table.setScale(0.75f);
 
         final ScrollPane scroll = new ScrollPane(table, skin);
-        //scrollableTable.add(scroll).expand().fill();
-        scrollableTable.add(scroll).maxHeight(300).expand().fill();
-
+        scrollableTable.add(scroll).expand().fill();
 
 
         //stage.setDebugAll(true);

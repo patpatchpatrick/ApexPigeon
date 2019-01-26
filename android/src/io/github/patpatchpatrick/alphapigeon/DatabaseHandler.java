@@ -1,12 +1,10 @@
 package io.github.patpatchpatrick.alphapigeon;
 
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -101,7 +99,7 @@ public class DatabaseHandler {
         scoresCursor.close();
 
         //Send callback to game to display scores
-        mobileCallbacks.playerLocalScoresReceived(scoreStrings);
+        mobileCallbacks.requestedLocalScoresReceived(scoreStrings);
 
 
     }
