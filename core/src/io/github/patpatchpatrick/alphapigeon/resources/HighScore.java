@@ -5,17 +5,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import java.text.DecimalFormat;
-
-import javax.xml.crypto.Data;
-
-import sun.rmi.runtime.Log;
 
 
 public class HighScore {
@@ -64,13 +55,13 @@ public class HighScore {
 
     }
 
-    public static void updateLocalGameStatisticsData(DatabaseManager databaseManager){
+    public static void updateLocalGameStatisticsData(DatabaseAndPreferenceManager databaseAndPreferenceManager){
 
         //Update local game stats (high scores, total number of games, etc..) data for the user after a game is complete
         //Use the database manager to update local data
 
         //Get the current high score from the local  database/shared prefs of the users device
-        HighScore.currentHighScore = databaseManager.getHighScore();
+        HighScore.currentHighScore = databaseAndPreferenceManager.getHighScore();
 
         //If the recent game score is greater than the high score, that score becomes the new high score
         if (HighScore.currentScore  > HighScore.currentHighScore){
@@ -78,7 +69,7 @@ public class HighScore {
         }
 
         //Insert the game round data into the local database
-        databaseManager.insert(HighScore.currentHighScore, currentScore);
+        databaseAndPreferenceManager.insert(HighScore.currentHighScore, currentScore);
 
     }
 

@@ -3,7 +3,9 @@ package io.github.patpatchpatrick.alphapigeon;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.Gravity;
@@ -13,7 +15,7 @@ import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 
 import io.github.patpatchpatrick.alphapigeon.Screens.HighScoreScreen;
-import io.github.patpatchpatrick.alphapigeon.resources.DatabaseManager;
+import io.github.patpatchpatrick.alphapigeon.resources.DatabaseAndPreferenceManager;
 import io.github.patpatchpatrick.alphapigeon.resources.MobileCallbacks;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
 
@@ -44,7 +46,7 @@ import static com.google.android.gms.games.leaderboard.LeaderboardVariant.TIME_S
 import static com.google.android.gms.games.leaderboard.LeaderboardVariant.TIME_SPAN_DAILY;
 import static com.google.android.gms.games.leaderboard.LeaderboardVariant.TIME_SPAN_WEEKLY;
 
-public class AndroidLauncher extends AndroidApplication implements PlayServices, DatabaseManager {
+public class AndroidLauncher extends AndroidApplication implements PlayServices, DatabaseAndPreferenceManager {
 
     // Google Play Services Variables
     private GoogleSignInClient mGoogleSignInClient;
@@ -151,13 +153,6 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
     }
 
     @Override
-    public void onStartMethod() {
-        super.onStart();
-        //gameHelper.onStart(this); // This is similar method but I am using this if i wish to login to google play services
-        // from any other screen and not from splash screen of my code
-    }
-
-    @Override
     public void signIn() {
         signInSilently();
         if (signedInAccount != null) {
@@ -183,40 +178,10 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
     }
 
     @Override
-    public void rateGame() {
-
-    }
-
-    @Override
-    public void unlockAchievement(String str) {
-
-    }
-
-    @Override
     public void submitScore(long highScore) {
 
         Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this))
                 .submitScore((leaderboard), highScore);
-
-    }
-
-    @Override
-    public void submitLevel(int highLevel) {
-
-    }
-
-    @Override
-    public void showAchievement() {
-
-    }
-
-    @Override
-    public void showScore(String LeaderBoard) {
-
-    }
-
-    @Override
-    public void showLevel() {
 
     }
 
@@ -404,4 +369,75 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
     }
 
 
+    @Override
+    public void toggleMusicOnOff(Boolean isOn) {
+
+        // Update the settings preference
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String musicSettingPreference = getResources().getString(R.string.music_setting_pref);
+        sharedPreferences.edit().putBoolean(musicSettingPreference, isOn).commit();
+
+    }
+
+    @Override
+    public void toggleGameSoundsOnOff(Boolean isOn) {
+
+        // Update the settings preference
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String gameSoundsSettingPreference = getResources().getString(R.string.game_sounds_setting_pref);
+        sharedPreferences.edit().putBoolean(gameSoundsSettingPreference, isOn).commit();
+
+    }
+
+    @Override
+    public void toggleTouchControlsOnOff(Boolean isOn) {
+
+        // Update the settings preference
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String touchSettingPreference = getResources().getString(R.string.touch_setting_pref);
+        sharedPreferences.edit().putBoolean(touchSettingPreference, isOn).commit();
+
+    }
+
+    @Override
+    public void toggleAccelButtonOnOff(Boolean isOn) {
+
+        // Update the settings preference
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String accelSettingPreference = getResources().getString(R.string.accel_setting_pref);
+        sharedPreferences.edit().putBoolean(accelSettingPreference, isOn).commit();
+
+    }
+
+    @Override
+    public boolean isMusicOn() {
+        //Return settings preference
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String musicPreference = getResources().getString(R.string.music_setting_pref);
+        return sharedPreferences.getBoolean(musicPreference, true);
+    }
+
+    @Override
+    public boolean isGameSoundsOn() {
+        //Return settings preference
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String gameSoundsPreference = getResources().getString(R.string.game_sounds_setting_pref);
+        return sharedPreferences.getBoolean(gameSoundsPreference, true);
+    }
+
+    @Override
+    public boolean isTouchControlsOn() {
+        //Return settings preference
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String touchPreference = getResources().getString(R.string.touch_setting_pref);
+        return sharedPreferences.getBoolean(touchPreference, true);
+    }
+
+    @Override
+    public boolean isAccelButtonOn() {
+        //Return settings preference
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String accelPreference = getResources().getString(R.string.accel_setting_pref);
+        return sharedPreferences.getBoolean(accelPreference, true);
+    }
 }

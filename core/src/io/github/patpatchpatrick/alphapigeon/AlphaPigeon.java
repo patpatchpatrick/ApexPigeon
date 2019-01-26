@@ -5,26 +5,25 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import io.github.patpatchpatrick.alphapigeon.Screens.MainMenuScreen;
-import io.github.patpatchpatrick.alphapigeon.resources.DatabaseManager;
-import io.github.patpatchpatrick.alphapigeon.resources.MobileCallbacks;
+import io.github.patpatchpatrick.alphapigeon.resources.DatabaseAndPreferenceManager;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
 
 public class AlphaPigeon extends Game{
     public SpriteBatch batch;
     public BitmapFont font;
     private PlayServices playServices;
-    private DatabaseManager databaseManager;
+    private DatabaseAndPreferenceManager databaseAndPreferenceManager;
 
-    public AlphaPigeon(PlayServices playServices, DatabaseManager databaseManager){
+    public AlphaPigeon(PlayServices playServices, DatabaseAndPreferenceManager databaseAndPreferenceManager){
         //ANDROID CONSTRUCTOR FOR GAME
         this.playServices =  playServices;
-        this.databaseManager = databaseManager;
+        this.databaseAndPreferenceManager = databaseAndPreferenceManager;
     }
 
     public AlphaPigeon(){
         //DESKTOP CONSTRUCTOR FOR GAME
         this.playServices = null;
-        this.databaseManager = null;
+        this.databaseAndPreferenceManager = null;
     }
 
     @Override
@@ -32,7 +31,7 @@ public class AlphaPigeon extends Game{
 
         batch = new SpriteBatch();
         font = new BitmapFont();
-        this.setScreen(new MainMenuScreen(this, playServices, databaseManager));
+        this.setScreen(new MainMenuScreen(this, playServices, databaseAndPreferenceManager));
 
     }
 

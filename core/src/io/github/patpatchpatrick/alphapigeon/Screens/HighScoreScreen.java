@@ -22,7 +22,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import java.util.ArrayList;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
-import io.github.patpatchpatrick.alphapigeon.resources.DatabaseManager;
+import io.github.patpatchpatrick.alphapigeon.resources.DatabaseAndPreferenceManager;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.MobileCallbacks;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
@@ -33,7 +33,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
     private OrthographicCamera camera;
     private Viewport viewport;
     private PlayServices playServices;
-    private DatabaseManager databaseManager;
+    private DatabaseAndPreferenceManager databaseAndPreferenceManager;
     private InputProcessor inputProcessorScreen;
     // -- Input Multiplexer to handle both the scrollpane(stage) and screen input processors
     private InputMultiplexer inputMultiplexer = new InputMultiplexer();
@@ -113,11 +113,11 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
     private Boolean scrollPaneCreated = false;
 
 
-    public HighScoreScreen(AlphaPigeon game, PlayServices playServices, DatabaseManager databaseManager) {
+    public HighScoreScreen(AlphaPigeon game, PlayServices playServices, DatabaseAndPreferenceManager databaseAndPreferenceManager) {
 
         this.game = game;
         this.playServices = playServices;
-        this.databaseManager = databaseManager;
+        this.databaseAndPreferenceManager = databaseAndPreferenceManager;
         if (playServices != null) {
             playServices.setMobileCallbacks(this);
         }
@@ -278,7 +278,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
 
         //Get player centered high scores to initiate the high scores menu
 
-        if (databaseManager != null) {
+        if (databaseAndPreferenceManager != null) {
 
             requestScores();
 
@@ -317,8 +317,8 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
                 break;
             case LOCAL_BUTTON:
                 //Request player local scores from the mobile device database
-                if (databaseManager != null) {
-                    databaseManager.queryHighScores();
+                if (databaseAndPreferenceManager != null) {
+                    databaseAndPreferenceManager.queryHighScores();
                 }
                 break;
             default:
@@ -423,7 +423,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
                 if (mousePos.x > BACK_BUTTON_X1 && mousePos.x < BACK_BUTTON_X2 && mousePos.y > BACK_BUTTON_Y1 && mousePos.y < BACK_BUTTON_Y2) {
                     if (button == Input.Buttons.LEFT) {
                         dispose();
-                        game.setScreen(new MainMenuScreen(game, playServices, databaseManager));
+                        game.setScreen(new MainMenuScreen(game, playServices, databaseAndPreferenceManager));
                         return true;
                     }
                 } else if (mousePos.x > GOOGLE_PLAY_LEADERBOARDS_BUTTON_X1 && mousePos.x < GOOGLE_PLAY_LEADERBOARDS_BUTTON_X1 + GOOGLE_PLAY_LEADERBOARDS_BUTTON_WIDTH && mousePos.y > GOOGLE_PLAY_LEADERBOARDS_BUTTON_Y1 && mousePos.y < GOOGLE_PLAY_LEADERBOARDS_BUTTON_Y1 + GOOGLE_PLAY_LEADERBOARDS_BUTTON_HEIGHT) {

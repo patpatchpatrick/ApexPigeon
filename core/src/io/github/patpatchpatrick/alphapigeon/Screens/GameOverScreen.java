@@ -16,17 +16,16 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import java.text.DecimalFormat;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
-import io.github.patpatchpatrick.alphapigeon.resources.DatabaseManager;
+import io.github.patpatchpatrick.alphapigeon.resources.DatabaseAndPreferenceManager;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.HighScore;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
-import io.github.patpatchpatrick.alphapigeon.resources.Sounds;
 
 public class GameOverScreen implements Screen {
 
     private AlphaPigeon game;
     private PlayServices playServices;
-    private DatabaseManager databaseManager;
+    private DatabaseAndPreferenceManager databaseAndPreferenceManager;
     private OrthographicCamera camera;
     private Viewport viewport;
     private InputProcessor inputProcessor;
@@ -53,12 +52,12 @@ public class GameOverScreen implements Screen {
     private BitmapFont scoreFont;
     FreeTypeFontGenerator generator;
 
-    public GameOverScreen(AlphaPigeon game, PlayServices playServices, DatabaseManager databaseManager, HighScore highScore){
+    public GameOverScreen(AlphaPigeon game, PlayServices playServices, DatabaseAndPreferenceManager databaseAndPreferenceManager, HighScore highScore){
 
 
         this.game = game;
         this.playServices = playServices;
-        this.databaseManager = databaseManager;
+        this.databaseAndPreferenceManager = databaseAndPreferenceManager;
 
         // create the camera
         camera = new OrthographicCamera();
@@ -141,13 +140,13 @@ public class GameOverScreen implements Screen {
 
     private void handleLocalData(){
 
-        if (databaseManager != null){
+        if (databaseAndPreferenceManager != null){
 
             //Insert game data for the recent game into the local database/shared prefs
-           HighScore.updateLocalGameStatisticsData(databaseManager);
+           HighScore.updateLocalGameStatisticsData(databaseAndPreferenceManager);
 
             //Get the total number of games from the local database to display in the game over screen
-            totalNumGames = databaseManager.getTotalNumGames();
+            totalNumGames = databaseAndPreferenceManager.getTotalNumGames();
         }
 
 
@@ -186,7 +185,7 @@ public class GameOverScreen implements Screen {
                 if (mousePos.x > BACK_BUTTON_X1 && mousePos.x < BACK_BUTTON_X2 && mousePos.y > BACK_BUTTON_Y1 && mousePos.y < BACK_BUTTON_Y2) {
                     if (button == Input.Buttons.LEFT) {
                         dispose();
-                        game.setScreen(new MainMenuScreen(game, playServices, databaseManager));
+                        game.setScreen(new MainMenuScreen(game, playServices, databaseAndPreferenceManager));
                         return true;
                     }
                 }
