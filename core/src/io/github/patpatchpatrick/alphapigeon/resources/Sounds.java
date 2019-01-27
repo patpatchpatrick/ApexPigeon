@@ -6,8 +6,7 @@ import com.badlogic.gdx.audio.Sound;
 
 public class Sounds {
 
-    //OnOff
-    public static boolean backgroundMusicOn = true;
+    private static Boolean backgroundMusicInitialized = false;
 
     //Sounds
     public static Sound birdSound = Gdx.audio.newSound(Gdx.files.internal("sounds/birdSound.mp3"));
@@ -16,23 +15,24 @@ public class Sounds {
     public static Sound gameOverSound = Gdx.audio.newSound(Gdx.files.internal("sounds/gameOver.mp3"));
     public static Music backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("sounds/backgroundMusic.mp3"));
 
-    public static void initializeBackgroundMusic(){
-        setBackgroundMusic(backgroundMusicOn);
+    public static void initializeBackgroundMusic() {
+        //If background music has not been initialized, initialize it
+        if (!backgroundMusicInitialized) {
+            toggleBackgroundMusic(SettingsManager.musicSettingIsOn);
+        }
     }
 
-    public static void setBackgroundMusic(boolean musicOn){
+    public static void toggleBackgroundMusic(boolean musicOn) {
 
         //Turn background music on or off
 
-        if (musicOn){
-            backgroundMusicOn = true;
+        if (musicOn) {
             backgroundMusic.setLooping(true);
-            if (!backgroundMusic.isPlaying()){
+            if (!backgroundMusic.isPlaying()) {
                 backgroundMusic.play();
             }
         } else {
-            backgroundMusicOn = false;
-            if (backgroundMusic.isPlaying()){
+            if (backgroundMusic.isPlaying()) {
                 backgroundMusic.stop();
             }
         }

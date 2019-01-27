@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import io.github.patpatchpatrick.alphapigeon.Screens.MainMenuScreen;
 import io.github.patpatchpatrick.alphapigeon.resources.DatabaseAndPreferenceManager;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
+import io.github.patpatchpatrick.alphapigeon.resources.SettingsManager;
 
 public class AlphaPigeon extends Game{
     public SpriteBatch batch;
@@ -31,6 +32,8 @@ public class AlphaPigeon extends Game{
 
         batch = new SpriteBatch();
         font = new BitmapFont();
+        //Set the mobile device database and pref manager on the SettingsManager class
+        SettingsManager.databaseAndPreferenceManager = databaseAndPreferenceManager;
         this.setScreen(new MainMenuScreen(this, playServices, databaseAndPreferenceManager));
 
     }

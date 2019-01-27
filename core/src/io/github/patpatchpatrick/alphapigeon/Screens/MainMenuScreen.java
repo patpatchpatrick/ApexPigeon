@@ -21,6 +21,7 @@ import io.github.patpatchpatrick.alphapigeon.resources.DatabaseAndPreferenceMana
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.MobileCallbacks;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
+import io.github.patpatchpatrick.alphapigeon.resources.SettingsManager;
 import io.github.patpatchpatrick.alphapigeon.resources.Sounds;
 
 public class MainMenuScreen implements Screen {
@@ -123,8 +124,8 @@ public class MainMenuScreen implements Screen {
 
         createInputProcessor();
 
-        //Initialize background music after checking user current sound settings
-        checkCurrentSoundSettings();
+        //Initialize background music after updating user settings (retrieving settings from mobile device db/prefs)
+        SettingsManager.updateSettings();
         Sounds.initializeBackgroundMusic();
 
 
@@ -164,7 +165,7 @@ public class MainMenuScreen implements Screen {
         game.batch.draw(levelTwoCurrentFrame, levelTwoBirdXPosition, levelTwoBirdYPosition, 0, 0, LevelTwoBird.WIDTH, LevelTwoBird.HEIGHT, 1, 1, 0);
         game.batch.draw(levelTwoCurrentFrame, levelTwoBirdTwoXPosition, levelTwoBirdTwoYPosition, 0, 0, LevelTwoBird.WIDTH, LevelTwoBird.HEIGHT, 1, 1, 0);
         game.batch.draw(mainMenuLogoAndText, 0, 0, camera.viewportWidth, camera.viewportHeight);
-        if (Sounds.backgroundMusicOn){
+        if (SettingsManager.musicSettingIsOn){
             game.batch.draw(soundOnIcon, camera.viewportWidth - SOUND_ICON_WIDTH - 2, 2, SOUND_ICON_WIDTH, SOUND_ICON_HEIGHT);
         } else {
             game.batch.draw(soundOffIcon, camera.viewportWidth - SOUND_ICON_WIDTH - 2, 2, SOUND_ICON_WIDTH, SOUND_ICON_HEIGHT);
@@ -176,30 +177,6 @@ public class MainMenuScreen implements Screen {
         game.batch.end();
 
         update();
-
-
-    }
-
-    private void checkCurrentSoundSettings(){
-        if (databaseAndPreferenceManager != null){
-            Sounds.backgroundMusicOn = databaseAndPreferenceManager.isMusicOn();
-        }
-    }
-
-    private void toggleMusic(Boolean isOn){
-
-        //If the music setting changed, update the mobile device preferences and game sounds
-
-        if (Sounds.backgroundMusicOn != isOn && databaseAndPreferenceManager != null){
-
-            databaseAndPreferenceManager.toggleMusicOnOff(isOn);
-            Sounds.setBackgroundMusic(isOn);
-
-        }
-
-        if (databaseAndPreferenceManager == null){
-            Sounds.setBackgroundMusic(isOn);
-        }
 
 
     }
@@ -390,11 +367,11 @@ public class MainMenuScreen implements Screen {
                 } else if (mousePos.x > SOUND_BUTTON_X1 && mousePos.x < SOUND_BUTTON_X2 && mousePos.y > SOUND_BUTTON_Y1 && mousePos.y < SOUND_BUTTON_Y2){
                     if (button == Input.Buttons.LEFT) {
                         //Turn background music on or off
-                        if (Sounds.backgroundMusicOn){
-                            toggleMusic(false);
+                        if (SettingsManager.musicSettingIsOn){
+                            SettingsManager.toggleMusicSetting(false);
                             return true;
                         } else {
-                            toggleMusic(true);
+                            SettingsManager.toggleMusicSetting(true);
                             return true;
                         }
                     }

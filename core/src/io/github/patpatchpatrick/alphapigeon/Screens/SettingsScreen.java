@@ -15,6 +15,7 @@ import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.resources.DatabaseAndPreferenceManager;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
+import io.github.patpatchpatrick.alphapigeon.resources.SettingsManager;
 
 public class SettingsScreen implements Screen {
 
@@ -41,19 +42,15 @@ public class SettingsScreen implements Screen {
     //...Music Button
     private final float MUSIC_BUTTON_X1 = 38.3f;
     private final float MUSIC_BUTTON_Y1 = 32.5f;
-    private boolean musicButtonIsOn = true;
     //...Game Sounds Button
     private final float GAME_SOUNDS_BUTTON_X1 = 45.8f;
     private final float GAME_SOUNDS_BUTTON_Y1 = 25.7f;
-    private boolean gameSoundsButtonIsOn = true;
     //...Touch Button
     private final float TOUCH_BUTTON_X1 = 45.8f;
     private final float TOUCH_BUTTON_Y1 = 17.2f;
-    private boolean touchButtonIsOn = true;
     //...Accelerometer Button
     private final float ACCEL_BUTTON_X1 = 45.8f;
     private final float ACCEL_BUTTON_Y1 = 7.5f;
-    private boolean accelButtonIsOn = true;
 
 
 
@@ -82,8 +79,8 @@ public class SettingsScreen implements Screen {
         //Create input processor for user controls
         createInputProcessor();
 
-        //Check mobile device for the current settings selected by the user
-        getCurrentSettings();
+        //Get the local settings that the user has set from the mobile device database/preferences
+        SettingsManager.updateSettings();
 
     }
 
@@ -115,34 +112,19 @@ public class SettingsScreen implements Screen {
         game.batch.draw(settingsBackground, 0, 0, camera.viewportWidth, camera.viewportHeight);
 
         //Draw music button
-        game.batch.draw(drawOnOffButton(musicButtonIsOn), MUSIC_BUTTON_X1, MUSIC_BUTTON_Y1, ON_OFF_BUTTON_WIDTH, ON_OFF_BUTTON_HEIGHT);
+        game.batch.draw(drawOnOffButton(SettingsManager.musicSettingIsOn), MUSIC_BUTTON_X1, MUSIC_BUTTON_Y1, ON_OFF_BUTTON_WIDTH, ON_OFF_BUTTON_HEIGHT);
         //Draw game sounds button
-        game.batch.draw(drawOnOffButton(gameSoundsButtonIsOn), GAME_SOUNDS_BUTTON_X1, GAME_SOUNDS_BUTTON_Y1, ON_OFF_BUTTON_WIDTH, ON_OFF_BUTTON_HEIGHT);
+        game.batch.draw(drawOnOffButton(SettingsManager.gameSoundsSettingIsOn), GAME_SOUNDS_BUTTON_X1, GAME_SOUNDS_BUTTON_Y1, ON_OFF_BUTTON_WIDTH, ON_OFF_BUTTON_HEIGHT);
         //Draw touch button
-        game.batch.draw(drawOnOffButton(touchButtonIsOn), TOUCH_BUTTON_X1, TOUCH_BUTTON_Y1, ON_OFF_BUTTON_WIDTH, ON_OFF_BUTTON_HEIGHT);
+        game.batch.draw(drawOnOffButton(SettingsManager.touchSettingIsOn), TOUCH_BUTTON_X1, TOUCH_BUTTON_Y1, ON_OFF_BUTTON_WIDTH, ON_OFF_BUTTON_HEIGHT);
         //Draw accel button
-        game.batch.draw(drawOnOffButton(accelButtonIsOn), ACCEL_BUTTON_X1, ACCEL_BUTTON_Y1, ON_OFF_BUTTON_WIDTH, ON_OFF_BUTTON_HEIGHT);
+        game.batch.draw(drawOnOffButton(SettingsManager.accelerometerSettingIsOn), ACCEL_BUTTON_X1, ACCEL_BUTTON_Y1, ON_OFF_BUTTON_WIDTH, ON_OFF_BUTTON_HEIGHT);
 
         Gdx.input.setInputProcessor(inputProcessor);
 
         game.batch.end();
 
         update();
-
-    }
-
-    private void getCurrentSettings(){
-
-        //Fetch current settings from the mobile device database/preferences
-
-        if (databaseAndPreferenceManager != null){
-
-            musicButtonIsOn = databaseAndPreferenceManager.isMusicOn();
-            gameSoundsButtonIsOn = databaseAndPreferenceManager.isGameSoundsOn();
-            touchButtonIsOn = databaseAndPreferenceManager.isTouchControlsOn();
-            accelButtonIsOn = databaseAndPreferenceManager.isAccelButtonOn();
-
-        }
 
     }
 
@@ -161,51 +143,6 @@ public class SettingsScreen implements Screen {
         } else {
             return onOffButtonOffSelected;
         }
-
-    }
-
-    private void setMusicButtonOn(Boolean setOn){
-
-        //If the button changed, update the mobile device preferences
-
-        if (musicButtonIsOn != setOn && databaseAndPreferenceManager != null){
-            databaseAndPreferenceManager.toggleMusicOnOff(setOn);
-        }
-        musicButtonIsOn = setOn;
-
-
-    }
-
-    private void setGameSoundsButtonOn(Boolean setOn){
-
-        //If the button changed, update the mobile device preferences
-
-        if (gameSoundsButtonIsOn != setOn && databaseAndPreferenceManager != null){
-            databaseAndPreferenceManager.toggleGameSoundsOnOff(setOn);
-        }
-        gameSoundsButtonIsOn = setOn;
-
-    }
-
-    private void setTouchButtonOn(Boolean setOn){
-
-        //If the button changed, update the mobile device preferences
-
-        if (touchButtonIsOn != setOn && databaseAndPreferenceManager != null){
-            databaseAndPreferenceManager.toggleTouchControlsOnOff(setOn);
-        }
-        touchButtonIsOn = setOn;
-
-    }
-
-    private void setAccelButtonOn(Boolean setOn){
-
-        //If the button changed, update the mobile device preferences
-
-        if (accelButtonIsOn != setOn && databaseAndPreferenceManager != null){
-            databaseAndPreferenceManager.toggleAccelButtonOnOff(setOn);
-        }
-        accelButtonIsOn = setOn;
 
     }
 
@@ -272,11 +209,11 @@ public class SettingsScreen implements Screen {
                     if (button == Input.Buttons.LEFT) {
                         if (mousePos.x < MUSIC_BUTTON_X1 + ON_BUTTON_WIDTH){
                             //ON pushed
-                            setMusicButtonOn(true);
+                            SettingsManager.toggleMusicSetting(true);
                             return true;
                         } else  {
                             //OFF pushed
-                            setMusicButtonOn(false);
+                            SettingsManager.toggleMusicSetting(false);
                             return true;
                         }
                     }
@@ -285,11 +222,11 @@ public class SettingsScreen implements Screen {
                     if (button == Input.Buttons.LEFT) {
                         if (mousePos.x < GAME_SOUNDS_BUTTON_X1 + ON_BUTTON_WIDTH){
                             //ON pushed
-                            setGameSoundsButtonOn(true);
+                            SettingsManager.toggleGameSoundsSetting(true);
                             return true;
                         } else  {
                             //OFF pushed
-                            setGameSoundsButtonOn(false);
+                            SettingsManager.toggleGameSoundsSetting(false);
                             return true;
                         }
                     }
@@ -298,11 +235,11 @@ public class SettingsScreen implements Screen {
                     if (button == Input.Buttons.LEFT) {
                         if (mousePos.x < TOUCH_BUTTON_X1 + ON_BUTTON_WIDTH){
                             //ON pushed
-                            setTouchButtonOn(true);
+                            SettingsManager.toggleTouchSetting(true);
                             return true;
                         } else  {
                             //OFF pushed
-                            setTouchButtonOn(false);
+                            SettingsManager.toggleTouchSetting(false);
                             return true;
                         }
                     }
@@ -311,11 +248,11 @@ public class SettingsScreen implements Screen {
                     if (button == Input.Buttons.LEFT) {
                         if (mousePos.x < ACCEL_BUTTON_X1 + ON_BUTTON_WIDTH){
                             //ON pushed
-                            setAccelButtonOn(true);
+                            SettingsManager.toggleAccelerometerSetting(true);
                             return true;
                         } else  {
                             //OFF pushed
-                            setAccelButtonOn(false);
+                            SettingsManager.toggleAccelerometerSetting(false);
                             return true;
                         }
                     }
