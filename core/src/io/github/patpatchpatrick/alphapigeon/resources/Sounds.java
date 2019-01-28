@@ -29,6 +29,7 @@ public class Sounds {
         if (musicOn) {
             backgroundMusic.setLooping(true);
             if (!backgroundMusic.isPlaying()) {
+                backgroundMusic.setVolume(SettingsManager.musicVolume); //Set volume based on player settings
                 backgroundMusic.play();
             }
         } else {
@@ -37,6 +38,10 @@ public class Sounds {
             }
         }
 
+    }
+
+    public static void setBackgroundMusicVolume(float value){
+        backgroundMusic.setVolume(value);
     }
 
 }

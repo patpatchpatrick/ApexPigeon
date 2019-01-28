@@ -13,16 +13,29 @@ public class SettingsManager {
     public static boolean touchSettingIsOn = false;
     public static boolean accelerometerSettingIsOn = false;
 
+    //Floats for Sliders
+    public static float musicVolume = 0.5f;
+    public static float gameVolume = 0.5f;
+    public static float touchSensitivity = 0.5f;
+    public static float accelSensitivity = 0.5f;
+
     public static void updateSettings(){
 
         //Fetch current settings from the mobile device database/preferences
 
         if (databaseAndPreferenceManager != null){
 
+            //Buttons
             musicSettingIsOn = databaseAndPreferenceManager.isMusicOn();
             gameSoundsSettingIsOn = databaseAndPreferenceManager.isGameSoundsOn();
             touchSettingIsOn = databaseAndPreferenceManager.isTouchControlsOn();
             accelerometerSettingIsOn = databaseAndPreferenceManager.isAccelButtonOn();
+
+            //Sliders
+            musicVolume = databaseAndPreferenceManager.getMusicVolumeSliderValue();
+            gameVolume = databaseAndPreferenceManager.getGameVolumeSliderValue();
+            touchSensitivity = databaseAndPreferenceManager.getTouchSensitivitySliderValue();
+            accelSensitivity = databaseAndPreferenceManager.getAccelSensitivitySliderValue();
 
         }
 
@@ -37,7 +50,6 @@ public class SettingsManager {
             musicSettingIsOn = isOn;
             Sounds.toggleBackgroundMusic(isOn);
         }
-
     }
 
     public static void toggleGameSoundsSetting(Boolean isOn){
@@ -69,6 +81,51 @@ public class SettingsManager {
         if (accelerometerSettingIsOn != isOn && databaseAndPreferenceManager != null){
             databaseAndPreferenceManager.toggleAccelButtonOnOff(isOn);
             accelerometerSettingIsOn = isOn;
+        }
+
+    }
+
+    public static void toggleMusicVolumeSetting(float value){
+
+        //If the setting changed, update the mobile device preferences
+
+        if (musicVolume != value && databaseAndPreferenceManager != null){
+            databaseAndPreferenceManager.toggleMusicVolumeSlider(value);
+            musicVolume = value;
+            Sounds.setBackgroundMusicVolume(value);
+        }
+
+    }
+
+    public static void toggleGameVolumeSetting(float value){
+
+        //If the setting changed, update the mobile device preferences
+
+        if (gameVolume != value && databaseAndPreferenceManager != null){
+            databaseAndPreferenceManager.toggleGameVolumeSlider(value);
+            gameVolume = value;
+        }
+
+    }
+
+    public static void toggleTouchSensitivitySetting(float value){
+
+        //If the setting changed, update the mobile device preferences
+
+        if (touchSensitivity != value && databaseAndPreferenceManager != null){
+            databaseAndPreferenceManager.toggleTouchSensitivity(value);
+            touchSensitivity = value;
+        }
+
+    }
+
+    public static void toggleAccelSensitivitySetting(float value){
+
+        //If the setting changed, update the mobile device preferences
+
+        if (accelSensitivity != value && databaseAndPreferenceManager != null){
+            databaseAndPreferenceManager.toggleAccelSensitivity(value);
+            accelSensitivity = value;
         }
 
     }

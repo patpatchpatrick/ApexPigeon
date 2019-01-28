@@ -440,4 +440,76 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
         String accelPreference = getResources().getString(R.string.accel_setting_pref);
         return sharedPreferences.getBoolean(accelPreference, true);
     }
+
+    @Override
+    public void toggleMusicVolumeSlider(float value) {
+
+        // Update the settings preference
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String musicVolumeSettingPreference = getResources().getString(R.string.music_volume_setting_pref);
+        sharedPreferences.edit().putFloat(musicVolumeSettingPreference, value).commit();
+
+    }
+
+    @Override
+    public void toggleGameVolumeSlider(float value) {
+
+        // Update the settings preference
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String gameVolumeSettingPreference = getResources().getString(R.string.game_volume_setting_pref);
+        sharedPreferences.edit().putFloat(gameVolumeSettingPreference, value).commit();
+
+    }
+
+    @Override
+    public void toggleTouchSensitivity(float value) {
+
+        // Update the settings preference
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String touchSensitivitySettingPreference = getResources().getString(R.string.touch_sensitivity_setting_pref);
+        sharedPreferences.edit().putFloat(touchSensitivitySettingPreference, value).commit();
+
+    }
+
+    @Override
+    public void toggleAccelSensitivity(float value) {
+
+        // Update the settings preference
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String accelSensitivitySettingPreference = getResources().getString(R.string.accel_sensitivity_setting_pref);
+        sharedPreferences.edit().putFloat(accelSensitivitySettingPreference, value).commit();
+
+    }
+
+    @Override
+    public float getMusicVolumeSliderValue() {
+        //Return settings preference
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String musicVolPreference = getResources().getString(R.string.music_volume_setting_pref);
+        return sharedPreferences.getFloat(musicVolPreference, 0.5f);
+    }
+
+    @Override
+    public float getGameVolumeSliderValue() {
+        //Return settings preference
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String gameVolPreference = getResources().getString(R.string.game_volume_setting_pref);
+        return sharedPreferences.getFloat(gameVolPreference, 0.5f);
+    }
+
+    @Override
+    public float getTouchSensitivitySliderValue() {
+        //Return settings preference
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String touchSensitivityPreference = getResources().getString(R.string.touch_sensitivity_setting_pref);
+        return sharedPreferences.getFloat(touchSensitivityPreference, 0.5f);
+    }
+
+    @Override
+    public float getAccelSensitivitySliderValue() {
+        //Return settings preference
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String accelSensitivityPreference = getResources().getString(R.string.accel_sensitivity_setting_pref);
+        return sharedPreferences.getFloat(accelSensitivityPreference, 0.5f);
+    }
 }

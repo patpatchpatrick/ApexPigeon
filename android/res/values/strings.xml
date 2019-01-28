@@ -26,6 +26,10 @@
     <string name="game_sounds_setting_pref" >GameSounds</string>
     <string name="touch_setting_pref" >Touch</string>
     <string name="accel_setting_pref" >Accel</string>
+    <string name="music_volume_setting_pref" >MusicVol</string>
+    <string name="game_volume_setting_pref" >GameVol</string>
+    <string name="touch_sensitivity_setting_pref" >TouchSens</string>
+    <string name="accel_sensitivity_setting_pref" >AccelSens</string>
 
 
     <!-- Exception Error Message -->
