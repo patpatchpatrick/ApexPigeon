@@ -15,6 +15,7 @@ import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.ufoEnergyB
 import io.github.patpatchpatrick.alphapigeon.dodgeables.UFOs;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
+import io.github.patpatchpatrick.alphapigeon.resources.SettingsManager;
 
 public class UFO extends Dodgeable {
     private UFOs ufos;
@@ -81,7 +82,7 @@ public class UFO extends Dodgeable {
 
         //Play UFO Sound
         this.flyingSound = flyingSound;
-        this.flyingSound.loop();
+        this.flyingSound.loop(SettingsManager.gameVolume);
 
 
     }
@@ -101,7 +102,7 @@ public class UFO extends Dodgeable {
 
         //Play UFO Sound
         this.flyingSound = flyingSound;
-        this.flyingSound.loop();
+        this.flyingSound.loop(SettingsManager.gameVolume);
 
     }
 
@@ -119,7 +120,7 @@ public class UFO extends Dodgeable {
 
         //Play UFO Sound
         this.flyingSound = flyingSound;
-        this.flyingSound.loop();
+        this.flyingSound.loop(SettingsManager.gameVolume);
 
     }
 
@@ -143,7 +144,7 @@ public class UFO extends Dodgeable {
 
         //Play UFO Sound
         this.flyingSound = flyingSound;
-        this.flyingSound.loop();
+        this.flyingSound.loop(SettingsManager.gameVolume);
 
     }
 
@@ -167,7 +168,7 @@ public class UFO extends Dodgeable {
 
         //Play UFO Sound
         this.flyingSound = flyingSound;
-        this.flyingSound.loop();
+        this.flyingSound.loop(SettingsManager.gameVolume);
 
     }
 
@@ -190,7 +191,7 @@ public class UFO extends Dodgeable {
 
         //Play UFO Sound
         this.flyingSound = flyingSound;
-        this.flyingSound.loop();
+        this.flyingSound.loop(SettingsManager.gameVolume);
     }
 
     public void initStopInBottomLeftCorner(float direction, long timeToHold, Sound flyingSound){
@@ -212,7 +213,7 @@ public class UFO extends Dodgeable {
 
         //Play UFO Sound
         this.flyingSound = flyingSound;
-        this.flyingSound.loop();
+        this.flyingSound.loop(SettingsManager.gameVolume);
     }
 
     @Override

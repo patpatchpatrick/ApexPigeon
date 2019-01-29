@@ -33,12 +33,15 @@ public class AccelerometerController {
 
 
     public void processAccelerometerInput(){
-        if (accelerometerAvailable){
+        //If the accelerometer is available in the mobile device and is turned on in user settings
+        // process accelerometer user input
+        if (accelerometerAvailable && SettingsManager.accelerometerSettingIsOn){
             float accelX = Gdx.input.getAccelerometerX();
             float accelY = Gdx.input.getAccelerometerY();
 
-            float yForce = -accelX;
-            float xForce = accelY;
+            //Set accelerometer forces based on user touch sensitivity settings
+            float yForce = -accelX * 3 * SettingsManager.accelSensitivity;
+            float xForce = accelY * 3 * SettingsManager.accelSensitivity;
 
             pigeonBody.applyForceToCenter(xForce, yForce, true);
 

@@ -28,6 +28,7 @@ import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelTwoBi
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
+import io.github.patpatchpatrick.alphapigeon.resources.SettingsManager;
 
 public class AlienMissiles {
 
@@ -275,7 +276,7 @@ public class AlienMissiles {
         lastAlienMissileExplosionSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
 
         //play explosion sound
-        alienMissileExplosionSound.play();
+        alienMissileExplosionSound.play(SettingsManager.gameVolume);
 
     }
 
@@ -324,7 +325,7 @@ public class AlienMissiles {
         lastAlienMissileCornerExplosionSpawnTime = TimeUtils.nanoTime();
 
         //play explosion sound
-        alienMissileExplosionSound.play();
+        alienMissileExplosionSound.play(SettingsManager.gameVolume);
 
 
     }

@@ -12,6 +12,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
+import io.github.patpatchpatrick.alphapigeon.resources.SettingsManager;
 
 public class Meteor extends Dodgeable {
 
@@ -54,7 +55,7 @@ public class Meteor extends Dodgeable {
 
         //Play spawn sound
         this.meteorSound =  meteorSound;
-        this.meteorSound.play();
+        this.meteorSound.play(SettingsManager.gameVolume);
 
     }
 

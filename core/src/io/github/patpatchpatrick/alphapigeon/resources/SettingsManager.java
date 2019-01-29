@@ -8,12 +8,15 @@ public class SettingsManager {
     public static DatabaseAndPreferenceManager databaseAndPreferenceManager;
 
     //Booleans for Settings
-    public static boolean musicSettingIsOn = false;
-    public static boolean gameSoundsSettingIsOn = false;
-    public static boolean touchSettingIsOn = false;
-    public static boolean accelerometerSettingIsOn = false;
+    public static boolean musicSettingIsOn = true;
+    public static boolean gameSoundsSettingIsOn = true;
+    public static boolean touchSettingIsOn = true;
+    public static boolean accelerometerSettingIsOn = true;
 
     //Floats for Sliders
+    //--All slider values are between 0 and 1
+    public static final float MINIMUM_SLIDER_VALUE = 0f;
+    public static final float MAXIMUM_SLIDER_VALUE = 1f;
     public static float musicVolume = 0.5f;
     public static float gameVolume = 0.5f;
     public static float touchSensitivity = 0.5f;
@@ -36,6 +39,11 @@ public class SettingsManager {
             gameVolume = databaseAndPreferenceManager.getGameVolumeSliderValue();
             touchSensitivity = databaseAndPreferenceManager.getTouchSensitivitySliderValue();
             accelSensitivity = databaseAndPreferenceManager.getAccelSensitivitySliderValue();
+
+            //If the game sounds setting is off, set game volume to 0
+            if (!gameSoundsSettingIsOn){
+                gameVolume = 0;
+            }
 
         }
 

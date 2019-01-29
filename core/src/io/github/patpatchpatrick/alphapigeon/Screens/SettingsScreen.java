@@ -339,7 +339,7 @@ public class SettingsScreen implements Screen {
 
         //Create slider to control music volume
 
-        final Slider volumeSlider = new Slider(0f, 1f, 0.01f, false, skin);
+        final Slider volumeSlider = new Slider(SettingsManager.MINIMUM_SLIDER_VALUE, SettingsManager.MAXIMUM_SLIDER_VALUE, 0.01f, false, skin);
         //Set default value to be current value set by user (Settings Manager will get value from mobile device)
         volumeSlider.setValue(SettingsManager.musicVolume);
 
@@ -366,7 +366,7 @@ public class SettingsScreen implements Screen {
 
         //Create slider to control game (sound effects) volume
 
-        final Slider volumeSlider = new Slider(0f, 1f, 0.01f, false, skin);
+        final Slider volumeSlider = new Slider(SettingsManager.MINIMUM_SLIDER_VALUE, SettingsManager.MAXIMUM_SLIDER_VALUE, 0.01f, false, skin);
         //Set default value to be current value set by user (Settings Manager will get value from mobile device)
         volumeSlider.setValue(SettingsManager.gameVolume);
 
@@ -393,7 +393,7 @@ public class SettingsScreen implements Screen {
 
         //Create slider to control touch sensitivity
 
-        final Slider touchSlider = new Slider(0f, 1f, 0.01f, false, skin);
+        final Slider touchSlider = new Slider(SettingsManager.MINIMUM_SLIDER_VALUE, SettingsManager.MAXIMUM_SLIDER_VALUE, 0.01f, false, skin);
         //Set default value to be current value set by user (Settings Manager will get value from mobile device)
         touchSlider.setValue(SettingsManager.touchSensitivity);
 
@@ -420,7 +420,7 @@ public class SettingsScreen implements Screen {
 
         //Create slider to control touch sensitivity
 
-        final Slider accelSlider = new Slider(0f, 1f, 0.01f, false, skin);
+        final Slider accelSlider = new Slider(SettingsManager.MINIMUM_SLIDER_VALUE, SettingsManager.MAXIMUM_SLIDER_VALUE, 0.01f, false, skin);
         //Set default value to be current value set by user (Settings Manager will get value from mobile device)
         accelSlider.setValue(SettingsManager.accelSensitivity);
 

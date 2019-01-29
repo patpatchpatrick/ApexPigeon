@@ -25,6 +25,7 @@ import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.RocketExpl
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
+import io.github.patpatchpatrick.alphapigeon.resources.SettingsManager;
 
 public class Rockets {
 
@@ -181,7 +182,7 @@ public class Rockets {
         lastSpawnTimeByLevel.put(level, lastRocketSpawnTime);
 
         //Play rocket spawn sounds
-        rocketSpawnSound.play();
+        rocketSpawnSound.play(SettingsManager.gameVolume);
 
     }
 
@@ -198,7 +199,7 @@ public class Rockets {
         lastRocketExplosionSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
 
         //Play rocket explosion sound
-        rocketExplosionSound.play();
+        rocketExplosionSound.play(SettingsManager.gameVolume);
 
 
     }

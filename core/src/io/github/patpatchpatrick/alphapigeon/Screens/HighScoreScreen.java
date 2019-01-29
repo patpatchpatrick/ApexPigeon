@@ -113,6 +113,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
     private Stage stage;
     private FitViewport scrollPaneViewport;
     private Boolean scrollPaneCreated = false;
+    private Skin scrollableSkin;
 
 
     public HighScoreScreen(AlphaPigeon game, PlayServices playServices, DatabaseAndPreferenceManager databaseAndPreferenceManager) {
@@ -161,7 +162,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
         createInputProcessor();
 
         //REMOVE THIS!!!!
-        createTestScroll();
+        //createTestScroll();
 
 
     }
@@ -220,8 +221,6 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
         update();
 
 
-
-
     }
 
     private void createTestScroll() {
@@ -250,11 +249,11 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
 
     }
 
-    private void startPlayServicesLeaderboardIntent(){
+    private void startPlayServicesLeaderboardIntent() {
 
-         if (playServices != null){
-         playServices.showLeaderboard();
-         }
+        if (playServices != null) {
+            playServices.showLeaderboard();
+        }
 
     }
 
@@ -558,18 +557,26 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
 
     private void createScrollPane(ArrayList<String> scrollPaneScores) {
 
-        scrollPaneViewport = new FitViewport(800, 480);
+        if (!scrollPaneCreated) {
 
-        stage = new Stage(scrollPaneViewport);
-        Skin skin = new Skin(Gdx.files.internal("skin/uiskin.json"));
+            scrollPaneViewport = new FitViewport(800, 480);
+
+            stage = new Stage(scrollPaneViewport);
+            scrollableSkin = new Skin(Gdx.files.internal("skin/uiskin.json"));
+
+        } else {
+            stage.clear();
+        }
+
 
         Table scrollableTable = new Table();
         scrollableTable.setFillParent(true);
+
         stage.addActor(scrollableTable);
 
         Table table = new Table();
         for (String score : scrollPaneScores) {
-            table.add(new TextButton(score, skin)).row();
+            table.add(new TextButton(score, scrollableSkin)).row();
         }
         table.pack();
         table.setTransform(true);
@@ -579,7 +586,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
         table.setScale(0.75f);
 
 
-        final ScrollPane scroll = new ScrollPane(table, skin);
+        final ScrollPane scroll = new ScrollPane(table, scrollableSkin);
         scrollableTable.add(scroll).expand().fill();
 
 
@@ -587,10 +594,12 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
 
 
         //When stage is created, set input processor to be a multiplexer to look at both screen and stage controls
-        inputMultiplexer.addProcessor(inputProcessorScreen);
-        inputMultiplexer.addProcessor(stage);
+        if (!scrollPaneCreated) {
+            inputMultiplexer.addProcessor(inputProcessorScreen);
+            inputMultiplexer.addProcessor(stage);
 
-        Gdx.input.setInputProcessor(inputMultiplexer);
+            Gdx.input.setInputProcessor(inputMultiplexer);
+        }
 
         scrollPaneCreated = true;
     }

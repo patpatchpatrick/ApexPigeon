@@ -2,6 +2,8 @@ package io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects;
 
 import com.badlogic.gdx.audio.Sound;
 
+import io.github.patpatchpatrick.alphapigeon.resources.SettingsManager;
+
 public class EnergyBall implements MovingObject {
 
     //Energy ball that is created by UFOs before the laser energy beams projectiles are launched out of UFO
@@ -23,7 +25,7 @@ public class EnergyBall implements MovingObject {
         this.height = height;
         this.direction = direction;
         this.energyBallSound = energyBallSound;
-        this.energyBallSound.loop();
+        this.energyBallSound.loop(SettingsManager.gameVolume);
     }
 
     public void setEnergyBeamIsSpawned(Boolean energyBeamSpawned){

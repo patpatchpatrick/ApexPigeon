@@ -14,6 +14,7 @@ import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.UFO;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
+import io.github.patpatchpatrick.alphapigeon.resources.SettingsManager;
 
 public class UfoEnergyBeamDown extends UfoEnergyBeam {
 
@@ -75,7 +76,7 @@ public class UfoEnergyBeamDown extends UfoEnergyBeam {
 
         //Set and play the energy beam sound
         this.energyBeamSound = energyBeamSound;
-        this.energyBeamSound.loop();
+        this.energyBeamSound.loop(SettingsManager.gameVolume);
 
     }
 

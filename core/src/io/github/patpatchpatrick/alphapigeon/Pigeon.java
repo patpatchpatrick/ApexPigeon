@@ -22,6 +22,7 @@ import io.github.patpatchpatrick.alphapigeon.dodgeables.PowerUps;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
+import io.github.patpatchpatrick.alphapigeon.resources.SettingsManager;
 import io.github.patpatchpatrick.alphapigeon.resources.Sounds;
 
 public class Pigeon {
@@ -114,14 +115,14 @@ public class Pigeon {
             case PowerUps.POWER_UP_TYPE_SHIELD:
                 //Play powerUp sounds
                 this.currentPowerUp = PowerUps.POWER_UP_TYPE_SHIELD;
-                powerUpShieldSound.play();
+                powerUpShieldSound.play(SettingsManager.gameVolume);
                 break;
             case PowerUps.POWER_UP_TYPE_SKULL:
                 //Play powerUp sounds
                 this.currentPowerUp = PowerUps.POWER_UP_TYPE_SKULL;
                 //Kill all active dodgeables when a skull power up is grabbed
                 gameScreen.dodgeables.getPowerUps().killAllActiveDodgeables();
-                Sounds.powerUpSkullSound.play();
+                Sounds.powerUpSkullSound.play(SettingsManager.gameVolume);
                 break;
 
         }
@@ -144,7 +145,7 @@ public class Pigeon {
     }
 
     public void zapEnemy() {
-        powerUpShieldZapSound.play();
+        powerUpShieldZapSound.play(SettingsManager.gameVolume);
     }
 
     public int getPowerUpType() {
@@ -168,7 +169,7 @@ public class Pigeon {
                 final BodyData deleteObjectTwo = new BodyData(true);
 
                 //Play the teleport sound
-                teleportSound.play();
+                teleportSound.play(SettingsManager.gameVolume);
 
                 //Move the pigeon to the opposite teleport's location and then destroy both teleports
                 //This must be done using Runnable app.postRunnable so it occurs in the rendering thread which is currently locked

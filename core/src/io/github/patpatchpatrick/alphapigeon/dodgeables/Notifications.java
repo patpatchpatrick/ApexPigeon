@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBird;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
+import io.github.patpatchpatrick.alphapigeon.resources.SettingsManager;
 import io.github.patpatchpatrick.alphapigeon.resources.Sounds;
 
 public class Notifications {
@@ -184,7 +185,7 @@ public class Notifications {
                 lastExclamationMarkLeftSpawnTime = currentTime;
                 lastNotificationSpawnTime = currentTime;
                 notificationSpawned = true;
-                Sounds.notificationSound.play();
+                Sounds.notificationSound.play(SettingsManager.gameVolume);
 
 
             } else if (direction == Notifications.DIRECTION_BOTTOM) {
@@ -195,7 +196,7 @@ public class Notifications {
                 lastExclamationMarkBottomSpawnTime = currentTime;
                 lastNotificationSpawnTime = currentTime;
                 notificationSpawned = true;
-                Sounds.notificationSound.play();
+                Sounds.notificationSound.play(SettingsManager.gameVolume);
 
 
             } else if (direction == Notifications.DIRECTION_TOP) {
@@ -206,7 +207,7 @@ public class Notifications {
                 lastExclamationMarkTopSpawnTime = currentTime;
                 lastNotificationSpawnTime = currentTime;
                 notificationSpawned = true;
-                Sounds.notificationSound.play();
+                Sounds.notificationSound.play(SettingsManager.gameVolume);
 
             }
 

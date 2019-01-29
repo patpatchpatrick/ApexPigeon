@@ -33,6 +33,7 @@ import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.HighScore;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
 import io.github.patpatchpatrick.alphapigeon.resources.ScrollingBackground;
+import io.github.patpatchpatrick.alphapigeon.resources.SettingsManager;
 import io.github.patpatchpatrick.alphapigeon.resources.Sounds;
 
 public class GameScreen implements Screen {
@@ -64,7 +65,8 @@ public class GameScreen implements Screen {
     //Variables
     final float PIGEON_WIDTH = 10.0f;
     final float PIGEON_HEIGHT = 5.0f;
-    private final float PIGEON_INPUT_FORCE = 7.0f;
+    private final float PIGEON_KEY_INPUT_FORCE = 50.0f;
+    private final float PIGEON_TOUCH_INPUT_FORCE = 10.0f;
 
     public GameScreen(AlphaPigeon game, PlayServices playServices, DatabaseAndPreferenceManager databaseAndPreferenceManager) {
         this.game = game;
@@ -102,6 +104,9 @@ public class GameScreen implements Screen {
         // create contact listener to listen for if the Pigeon collides with another object
         // if the pigeon collides with another object, the game is over
         createContactListener();
+
+        //Get most recent updated user settings from mobile device db/prefs
+        SettingsManager.updateSettings();
 
     }
 
@@ -344,7 +349,7 @@ public class GameScreen implements Screen {
 
                         @Override
                         public void run() {
-                            Sounds.birdSound.play();
+                            Sounds.birdSound.play(SettingsManager.gameVolume);
                         }
                     });
                 }
@@ -404,7 +409,7 @@ public class GameScreen implements Screen {
 
             @Override
             public void run() {
-                Sounds.gameOverSound.play();
+                Sounds.gameOverSound.play(SettingsManager.gameVolume);
                 highScore.stopCounting();
                 for (Dodgeable dodgeable : dodgeables.activeDodgeables) {
                     dodgeable.reset();
@@ -428,24 +433,25 @@ public class GameScreen implements Screen {
             @Override
             public boolean keyDown(int keycode) {
 
-                {
+                //If the user has touch controls turned on, apply a force on the bird depending on which button is pushed
+                if (SettingsManager.touchSettingIsOn){
                     switch (keycode) {
                         case Input.Keys.LEFT:
-                            pigeonBody.applyForceToCenter(-PIGEON_INPUT_FORCE, 0,  true);
+                            pigeonBody.applyForceToCenter(-PIGEON_KEY_INPUT_FORCE * SettingsManager.touchSensitivity, 0, true);
                             break;
                         case Input.Keys.RIGHT:
-                            pigeonBody.applyForceToCenter(PIGEON_INPUT_FORCE, 0,  true);
+                            pigeonBody.applyForceToCenter(PIGEON_KEY_INPUT_FORCE * SettingsManager.touchSensitivity, 0, true);
                             break;
                         case Input.Keys.DOWN:
-                            pigeonBody.applyForceToCenter(0, -PIGEON_INPUT_FORCE,  true);
+                            pigeonBody.applyForceToCenter(0, -PIGEON_KEY_INPUT_FORCE * SettingsManager.touchSensitivity, true);
                             break;
                         case Input.Keys.UP:
-                            pigeonBody.applyForceToCenter(0, PIGEON_INPUT_FORCE,  true);
+                            pigeonBody.applyForceToCenter(0, PIGEON_KEY_INPUT_FORCE * SettingsManager.touchSensitivity, true);
                             break;
                     }
                     return true;
                 }
-
+                return false;
             }
 
             @Override
@@ -464,8 +470,11 @@ public class GameScreen implements Screen {
                 Vector3 mousePos = new Vector3(screenX, screenY, 0);
                 camera.unproject(mousePos);
 
-                if (button == Input.Buttons.LEFT) {
-                    pigeonBody.applyForceToCenter(0.3f * (mousePos.x - pigeonBody.getPosition().x), 0.3f * (mousePos.y - pigeonBody.getPosition().y), true);
+                //If the user has touch controls turned on, apply a force on the bird proportional to
+                //the distance from the bird that the user touched
+                if (SettingsManager.touchSettingIsOn && button == Input.Buttons.LEFT) {
+                    pigeonBody.applyForceToCenter(PIGEON_TOUCH_INPUT_FORCE * SettingsManager.touchSensitivity * (mousePos.x - pigeonBody.getPosition().x),
+                            PIGEON_TOUCH_INPUT_FORCE * SettingsManager.touchSensitivity * (mousePos.y - pigeonBody.getPosition().y), true);
                     return true;
                 }
 
