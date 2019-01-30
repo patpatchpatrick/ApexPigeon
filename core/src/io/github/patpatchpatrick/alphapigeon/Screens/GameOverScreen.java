@@ -20,6 +20,8 @@ import io.github.patpatchpatrick.alphapigeon.resources.DatabaseAndPreferenceMana
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.HighScore;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
+import io.github.patpatchpatrick.alphapigeon.resources.SettingsManager;
+import io.github.patpatchpatrick.alphapigeon.resources.Sounds;
 
 public class GameOverScreen implements Screen {
 
@@ -32,6 +34,7 @@ public class GameOverScreen implements Screen {
 
     //High Scores
     private float totalNumGames = 0;
+    private boolean newHighScoreEarned = false;
 
     //Variables
     private float gameOverDeltaTime;
@@ -39,6 +42,11 @@ public class GameOverScreen implements Screen {
 
     //Textures
     private Texture gameOverBackground;
+    private Texture newHighScoreTexture;
+    private final float NEW_HIGH_SCORE_TEXTURE_X1 = 13.0f;
+    private final float NEW_HIGH_SCORE_TEXTURE_Y1 = 10.7f;
+    private final float NEW_HIGH_SCORE_TEXTURE_WIDTH = 55.8f;
+    private final float NEW_HIGH_SCORE_TEXTURE_HEIGHT = 8.1f;
 
     //Button Dimensions
     private final float BACK_BUTTON_X1 = 1.8f;
@@ -52,7 +60,7 @@ public class GameOverScreen implements Screen {
     private BitmapFont scoreFont;
     FreeTypeFontGenerator generator;
 
-    public GameOverScreen(AlphaPigeon game, PlayServices playServices, DatabaseAndPreferenceManager databaseAndPreferenceManager, HighScore highScore){
+    public GameOverScreen(AlphaPigeon game, PlayServices playServices, DatabaseAndPreferenceManager databaseAndPreferenceManager, HighScore highScore) {
 
 
         this.game = game;
@@ -66,7 +74,8 @@ public class GameOverScreen implements Screen {
         //the aspect provided (worldWidth/worldHeight) will be kept
         viewport = new FitViewport(GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT, camera);
 
-        gameOverBackground = new Texture(Gdx.files.internal("textures/GameOverScreen.png"));
+        gameOverBackground = new Texture(Gdx.files.internal("textures/gameoverscreen/GameOverScreen.png"));
+        newHighScoreTexture = new Texture(Gdx.files.internal("textures/gameoverscreen/NewHighScore.png"));
 
         //Initialize font generator
         scoreBitmapFont = new BitmapFont();
@@ -86,12 +95,18 @@ public class GameOverScreen implements Screen {
 
         //Update the high currentScore string to be displayed
         DecimalFormat df = new DecimalFormat("#.##");
+        DecimalFormat tgf = new DecimalFormat("#");
         gameOverString = "Distance: " + df.format(highScore.currentScore) + " m"
-                + "\n High Score: " + HighScore.currentHighScore + "\n Total Games: " + totalNumGames;
+                + "\nHigh Score: " + df.format(HighScore.currentHighScore) + " m" + "\nTotal Games: " + tgf.format(totalNumGames);
 
         //Create input processor for user controls
         createInputProcessor();
+        Gdx.input.setInputProcessor(inputProcessor);
 
+        if (newHighScoreEarned && SettingsManager.gameSoundsSettingIsOn){
+            //If there is a new high score and the game sounds are enabled by user, play the new high score sound
+            Sounds.newHighScoreSound.loop(SettingsManager.gameVolume);
+        }
 
 
     }
@@ -119,10 +134,12 @@ public class GameOverScreen implements Screen {
         game.batch.begin();
 
         game.batch.draw(gameOverBackground, 0, 0, camera.viewportWidth, camera.viewportHeight);
-        scoreFont.draw(game.batch, gameOverString, 29, 30);
-
-
-        Gdx.input.setInputProcessor(inputProcessor);
+        scoreFont.draw(game.batch, gameOverString, 29, 27);
+        //If a new high score was achieved, draw the new high score texture (then when the back button is pushed,
+        //reset the newHighScoreEarned boolean to false
+        if (newHighScoreEarned) {
+            game.batch.draw(newHighScoreTexture, NEW_HIGH_SCORE_TEXTURE_X1, NEW_HIGH_SCORE_TEXTURE_Y1, NEW_HIGH_SCORE_TEXTURE_WIDTH, NEW_HIGH_SCORE_TEXTURE_HEIGHT);
+        }
 
         game.batch.end();
 
@@ -130,34 +147,33 @@ public class GameOverScreen implements Screen {
 
     }
 
-    private void handlePlayServices(){
+    private void handlePlayServices() {
 
         //Check if there is a new high score and if so, submit it to google play services
-        HighScore.submitNewHighScore(playServices);
+        //If there is a new high score, newHighScoreEarned is set to true
+        newHighScoreEarned = HighScore.submitNewHighScore(playServices);
 
 
     }
 
-    private void handleLocalData(){
+    private void handleLocalData() {
 
-        if (databaseAndPreferenceManager != null){
+        if (databaseAndPreferenceManager != null) {
 
             //Insert game data for the recent game into the local database/shared prefs
-           HighScore.updateLocalGameStatisticsData(databaseAndPreferenceManager);
+            HighScore.updateLocalGameStatisticsData(databaseAndPreferenceManager);
 
             //Get the total number of games from the local database to display in the game over screen
             totalNumGames = databaseAndPreferenceManager.getTotalNumGames();
         }
 
 
-
-
-
     }
 
-    private void update(){}
+    private void update() {
+    }
 
-    private void createInputProcessor(){
+    private void createInputProcessor() {
 
         inputProcessor = new InputProcessor() {
             @Override
@@ -184,6 +200,8 @@ public class GameOverScreen implements Screen {
                 //If the mouse is in bounds of the back button, go back to the main menu
                 if (mousePos.x > BACK_BUTTON_X1 && mousePos.x < BACK_BUTTON_X2 && mousePos.y > BACK_BUTTON_Y1 && mousePos.y < BACK_BUTTON_Y2) {
                     if (button == Input.Buttons.LEFT) {
+                        newHighScoreEarned = false; //Reset the high score
+                        Sounds.newHighScoreSound.stop(); //Stop playing the high score sound
                         dispose();
                         game.setScreen(new MainMenuScreen(game, playServices, databaseAndPreferenceManager));
                         return true;
@@ -214,6 +232,7 @@ public class GameOverScreen implements Screen {
             }
         };
 
+
     }
 
 
@@ -241,9 +260,9 @@ public class GameOverScreen implements Screen {
     public void dispose() {
 
         gameOverBackground.dispose();
+        newHighScoreTexture.dispose();
 
     }
-
 
 
 }

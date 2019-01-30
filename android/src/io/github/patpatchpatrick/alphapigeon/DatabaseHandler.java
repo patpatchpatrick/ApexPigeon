@@ -85,7 +85,7 @@ public class DatabaseHandler {
         while (scoresCursor.moveToNext()) {
             String scoreString = "";
 
-            scoreString += "\n" + i + ". " + df.format(scoresCursor.getFloat(scoresCursor.getColumnIndexOrThrow(ScoresEntry.COLUMN_SCORES_LAST_SCORE)));
+            scoreString += "\n " + i + ". " + df.format(scoresCursor.getFloat(scoresCursor.getColumnIndexOrThrow(ScoresEntry.COLUMN_SCORES_LAST_SCORE))) + " m ";
             scoreStrings.add(scoreString);
 
             i++;

@@ -78,7 +78,8 @@ public class HighScore {
         return currentHighScore == currentScore;
     }
 
-    public static void submitNewHighScore(PlayServices playServices){
+    public static boolean submitNewHighScore(PlayServices playServices){
+        //Submit high score to play services if there is a high score (and return true), otherwise return false
         if (newHighScore()){
             if (playServices != null){
                 //Format the currentScore for Google Play Services and submit the currentScore
@@ -87,7 +88,9 @@ public class HighScore {
                 long highScoreFormatted = (long)(currentScore * 100);
                 playServices.submitScore(highScoreFormatted);
             }
+            return true;
         }
+        return false;
     }
 
     public void dispose() {

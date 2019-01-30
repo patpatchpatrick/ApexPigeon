@@ -13,6 +13,7 @@ public class Sounds {
     public static Sound powerUpSkullSound = Gdx.audio.newSound(Gdx.files.internal("sounds/powerUpSkull.mp3"));
     public static Sound notificationSound = Gdx.audio.newSound(Gdx.files.internal("sounds/notification.mp3"));
     public static Sound gameOverSound = Gdx.audio.newSound(Gdx.files.internal("sounds/gameOver.mp3"));
+    public static Sound newHighScoreSound = Gdx.audio.newSound(Gdx.files.internal("sounds/newHighScore.mp3"));
     public static Music backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("sounds/backgroundMusic.mp3"));
 
     public static void initializeBackgroundMusic() {
