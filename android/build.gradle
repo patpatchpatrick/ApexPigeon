@@ -140,6 +140,6 @@ idea {
 }
 dependencies {
     
-        compile project(path: ':BaseGameUtils')
+        //compile project(path: ':BaseGameUtils')
 
 }
