@@ -468,7 +468,7 @@ public class GameScreen implements Screen {
             public boolean touchDown(int screenX, int screenY, int pointer, int button) {
                 //Get the mouse coordinates and unproject to the world coordinates
                 Vector3 mousePos = new Vector3(screenX, screenY, 0);
-                camera.unproject(mousePos);
+                camera.unproject(mousePos, viewport.getScreenX(), viewport.getScreenY(),  viewport.getScreenWidth(), viewport.getScreenHeight());
 
                 //If the user has touch controls turned on, apply a force on the bird proportional to
                 //the distance from the bird that the user touched

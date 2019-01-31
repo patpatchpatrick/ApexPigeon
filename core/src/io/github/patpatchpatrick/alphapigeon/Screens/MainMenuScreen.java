@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -30,6 +31,7 @@ public class MainMenuScreen implements Screen {
     private Viewport viewport;
     private Texture mainMenuBackground;
     private Texture mainMenuLogoAndText;
+    private Texture testTexture;
     private PlayServices playServices;
     private DatabaseAndPreferenceManager databaseAndPreferenceManager;
     private MobileCallbacks mobileCallbacks;
@@ -70,6 +72,10 @@ public class MainMenuScreen implements Screen {
     private final float SOUND_BUTTON_X2 = 80 - 2.8f;
     private final float SOUND_BUTTON_Y1 = 3f;
     private final float SOUND_BUTTON_Y2 = 8.5f;
+    private float resizedSoundX1;
+    private float resizedSoundY1;
+    Vector3 unprojectedSoundXY;
+    Vector3 unprojectedSoundXY2;
 
     //Animations
     //---LevelOneBird
@@ -113,12 +119,13 @@ public class MainMenuScreen implements Screen {
         mainMenuLogoAndText = new Texture(Gdx.files.internal("textures/MainMenuScreenTransparent.png"));
         soundOnIcon = new Texture(Gdx.files.internal("textures/icons/SoundOnIcon.png"));
         soundOffIcon = new Texture(Gdx.files.internal("textures/icons/SoundOffIcon.png"));
+        testTexture = new Texture(Gdx.files.internal("textures/testred.png"));
 
 
         initializeLevelOneBirdAnimation();
         initializeLevelTwoBirdAnimation();
 
-        if (playServices != null){
+        if (playServices != null) {
             playServices.signIn();
         }
 
@@ -165,10 +172,12 @@ public class MainMenuScreen implements Screen {
         game.batch.draw(levelTwoCurrentFrame, levelTwoBirdXPosition, levelTwoBirdYPosition, 0, 0, LevelTwoBird.WIDTH, LevelTwoBird.HEIGHT, 1, 1, 0);
         game.batch.draw(levelTwoCurrentFrame, levelTwoBirdTwoXPosition, levelTwoBirdTwoYPosition, 0, 0, LevelTwoBird.WIDTH, LevelTwoBird.HEIGHT, 1, 1, 0);
         game.batch.draw(mainMenuLogoAndText, 0, 0, camera.viewportWidth, camera.viewportHeight);
-        if (SettingsManager.musicSettingIsOn){
-            game.batch.draw(soundOnIcon, camera.viewportWidth - SOUND_ICON_WIDTH - 2, 2, SOUND_ICON_WIDTH, SOUND_ICON_HEIGHT);
+
+        //If sound is on, draw the sound on icon, otherwise draw sound off icon
+        if (SettingsManager.musicSettingIsOn) {
+            game.batch.draw(soundOnIcon, SOUND_BUTTON_X1, SOUND_BUTTON_Y1, SOUND_ICON_WIDTH, SOUND_ICON_HEIGHT);
         } else {
-            game.batch.draw(soundOffIcon, camera.viewportWidth - SOUND_ICON_WIDTH - 2, 2, SOUND_ICON_WIDTH, SOUND_ICON_HEIGHT);
+            game.batch.draw(soundOffIcon, SOUND_BUTTON_X1, SOUND_BUTTON_Y1, SOUND_ICON_WIDTH, SOUND_ICON_HEIGHT);
         }
 
 
@@ -186,6 +195,8 @@ public class MainMenuScreen implements Screen {
 
         //Update viewport to match screen size
         viewport.update(width, height, true);
+
+
 
     }
 
@@ -227,7 +238,7 @@ public class MainMenuScreen implements Screen {
         }
 
         if (!levelOneBirdTwoPositionSet) {
-            levelOneBirdTwoXPosition = 80 + 5*LevelOneBird.WIDTH;
+            levelOneBirdTwoXPosition = 80 + 5 * LevelOneBird.WIDTH;
             levelOneBirdTwoYPosition = MathUtils.random(0, camera.viewportHeight - LevelOneBird.HEIGHT);
             levelOneBirdTwoPositionSet = true;
         } else {
@@ -321,7 +332,7 @@ public class MainMenuScreen implements Screen {
 
     }
 
-    private void createInputProcessor(){
+    private void createInputProcessor() {
 
         inputProcessor = new InputProcessor() {
             @Override
@@ -343,7 +354,7 @@ public class MainMenuScreen implements Screen {
             public boolean touchDown(int screenX, int screenY, int pointer, int button) {
                 //Get the mouse coordinates and unproject to the world coordinates
                 Vector3 mousePos = new Vector3(screenX, screenY, 0);
-                camera.unproject(mousePos);
+                camera.unproject(mousePos, viewport.getScreenX(), viewport.getScreenY(),  viewport.getScreenWidth(), viewport.getScreenHeight());
 
                 //If the mouse is in bounds of any of the buttons on the screen and the buttons are clicked, open corresponding screen
                 if (mousePos.x > PLAY_BUTTON_X1 && mousePos.x < PLAY_BUTTON_X2 && mousePos.y > PLAY_BUTTON_Y1 && mousePos.y < PLAY_BUTTON_Y2) {
@@ -361,13 +372,14 @@ public class MainMenuScreen implements Screen {
                 } else if (mousePos.x > SETTINGS_BUTTON_X1 && mousePos.x < SETTINGS_BUTTON_X2 && mousePos.y > SETTINGS_BUTTON_Y1 && mousePos.y < SETTINGS_BUTTON_Y2) {
                     if (button == Input.Buttons.LEFT) {
                         dispose();
-                        game.setScreen(new SettingsScreen(game,  playServices, databaseAndPreferenceManager));
+                        game.setScreen(new SettingsScreen(game, playServices, databaseAndPreferenceManager));
                         return true;
                     }
-                } else if (mousePos.x > SOUND_BUTTON_X1 && mousePos.x < SOUND_BUTTON_X2 && mousePos.y > SOUND_BUTTON_Y1 && mousePos.y < SOUND_BUTTON_Y2){
+                } else if (mousePos.x > SOUND_BUTTON_X1 && mousePos.x < SOUND_BUTTON_X1 + SOUND_ICON_WIDTH &&
+                        mousePos.y > SOUND_BUTTON_Y1 && mousePos.y < SOUND_BUTTON_Y1 + SOUND_ICON_HEIGHT) {
                     if (button == Input.Buttons.LEFT) {
                         //Turn background music on or off
-                        if (SettingsManager.musicSettingIsOn){
+                        if (SettingsManager.musicSettingIsOn) {
                             SettingsManager.toggleMusicSetting(false);
                             return true;
                         } else {
@@ -401,4 +413,5 @@ public class MainMenuScreen implements Screen {
             }
         };
 
-}}
+    }
+}

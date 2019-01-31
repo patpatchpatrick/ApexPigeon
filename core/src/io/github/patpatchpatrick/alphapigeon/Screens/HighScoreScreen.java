@@ -332,7 +332,8 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
 
     @Override
     public void resize(int width, int height) {
-
+        //Update viewport to match screen size
+        viewport.update(width, height, true);
     }
 
     @Override
@@ -418,7 +419,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
             public boolean touchDown(int screenX, int screenY, int pointer, int button) {
                 //Get the mouse coordinates and unproject to the world coordinates
                 Vector3 mousePos = new Vector3(screenX, screenY, 0);
-                camera.unproject(mousePos);
+                camera.unproject(mousePos, viewport.getScreenX(), viewport.getScreenY(),  viewport.getScreenWidth(), viewport.getScreenHeight());
 
                 //If the mouse is in bounds of the back button, go back to the main menu
                 if (mousePos.x > BACK_BUTTON_X1 && mousePos.x < BACK_BUTTON_X2 && mousePos.y > BACK_BUTTON_Y1 && mousePos.y < BACK_BUTTON_Y2) {
