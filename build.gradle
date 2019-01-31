@@ -7,7 +7,7 @@ buildscript {
     }
     dependencies {
         classpath 'org.wisepersist:gwt-gradle-plugin:1.0.6'
-        classpath 'com.android.tools.build:gradle:3.2.0'
+        classpath 'com.android.tools.build:gradle:3.3.0'
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.5'
         
 
@@ -78,6 +78,7 @@ project(":android") {
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86_64"
         implementation 'com.google.android.gms:play-services-games:16.0.0'
         implementation "com.google.android.gms:play-services-auth:16.0.0"
+        implementation 'com.google.android.gms:play-services-ads:17.1.1'
         
     }
 }

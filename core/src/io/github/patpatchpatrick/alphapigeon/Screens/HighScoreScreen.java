@@ -161,6 +161,11 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
         //Create input processor for user controls
         createInputProcessor();
 
+        if (playServices != null){
+            //Hide ads on high scores screen
+            playServices.showAds(false);
+        }
+
         //REMOVE THIS!!!!
         //createTestScroll();
 

@@ -106,6 +106,11 @@ public class SettingsScreen implements Screen {
 
         initializeSliders();
 
+        if (playServices != null){
+            //Hide ads on settings screen
+            playServices.showAds(false);
+        }
+
     }
 
     @Override

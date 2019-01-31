@@ -127,6 +127,8 @@ public class MainMenuScreen implements Screen {
 
         if (playServices != null) {
             playServices.signIn();
+            //Show ads on main menu screen
+            playServices.showAds(true);
         }
 
         createInputProcessor();

@@ -5,11 +5,16 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.RelativeLayout;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
@@ -20,6 +25,10 @@ import io.github.patpatchpatrick.alphapigeon.resources.MobileCallbacks;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
 
 import com.badlogic.gdx.backends.android.AndroidGraphics;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -52,6 +61,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
     private GoogleSignInClient mGoogleSignInClient;
     private int RC_SIGN_IN = 1;
     private GoogleSignInAccount signedInAccount;
+
     // -- Leaderboard variables
     private static final int RC_LEADERBOARD_UI = 9004;
     private static final String leaderboard = "CgkIyYyG7qMKEAIQAQ";
@@ -62,22 +72,95 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
     //Database tools
     protected static ContentResolver contentResolver;
 
+    //Google ads
+    private AdView adView;
+    private final int SHOW_ADS = 1;
+    private final int HIDE_ADS = 0;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-        //config.useImmersiveMode = true;
+        //Set up config for Android App
         config.useCompass = false;
+        config.useImmersiveMode = true;
         useImmersiveMode(true);
-        initialize(new AlphaPigeon(this, this), config);
-        contentResolver = getContentResolver();
 
+        // Create the layout for the game/ads to share
+        RelativeLayout layout = new RelativeLayout(this);
+
+        // Set up Android for app initialization
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+
+        // Create view for libgdx
+        View gameView = initializeForView(new AlphaPigeon(this, this), config);
+
+        // Initialize mobile ads
+        MobileAds.initialize(this, getString(R.string.app_ad_id));
+
+        // Create and setup the AdMob view for the MainMenu Screen
+        adView = new AdView(this);
+        adView.setAdSize(AdSize.BANNER);
+
+        //TODO replace with real ad!
+        adView.setAdUnitId(getString(R.string.app_ad_testad_id)); // Initialize main menu banner ad
+
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adView.loadAd(adRequest);
+
+        // Add the libgdx view
+        layout.addView(gameView);
+
+        // Add the AdMob view
+        RelativeLayout.LayoutParams adParams =
+                new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+                        RelativeLayout.LayoutParams.WRAP_CONTENT);
+        adParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        adParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+
+        layout.addView(adView, adParams);
+
+        // Hook it all up
+        setContentView(layout);
+
+        // Get the content resolver for database
+        contentResolver = getContentResolver();
 
         // Create the client used to sign in to Google services.
         mGoogleSignInClient = GoogleSignIn.getClient(this,
                 new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN).build());
 
     }
+
+    protected Handler handler = new Handler()
+    {
+
+        //Handler to handle enabling and disabling ads on the UI thread
+        @Override
+        public void handleMessage(Message msg) {
+            switch(msg.what) {
+                case SHOW_ADS:
+                {
+                    //Set ads to visible and resume ad processes
+                    adView.setVisibility(View.VISIBLE);
+                    adView.resume();
+                    break;
+                }
+                case HIDE_ADS:
+                {
+                    //Set ads to invisible and pause ad processes
+                    adView.setVisibility(View.GONE);
+                    adView.pause();
+                    break;
+                }
+            }
+        }
+    };
 
 
     private void signInSilently() {
@@ -305,6 +388,12 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
         //Return false if the last signed in account is null
         return GoogleSignIn.getLastSignedInAccount(this) != null;
 
+    }
+
+    @Override
+    public void showAds(boolean show) {
+        //Send message to handler to show or hide ads
+        handler.sendEmptyMessage(show ? SHOW_ADS : HIDE_ADS);
     }
 
     @Override

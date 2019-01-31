@@ -108,6 +108,11 @@ public class GameOverScreen implements Screen {
             Sounds.newHighScoreSound.loop(SettingsManager.gameVolume);
         }
 
+        if (playServices != null){
+            //Hide ads on game over screen
+            playServices.showAds(false);
+        }
+
 
     }
 

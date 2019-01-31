@@ -108,6 +108,11 @@ public class GameScreen implements Screen {
         //Get most recent updated user settings from mobile device db/prefs
         SettingsManager.updateSettings();
 
+        if (playServices != null){
+            //Hide ads on game screen
+            playServices.showAds(false);
+        }
+
     }
 
     @Override
