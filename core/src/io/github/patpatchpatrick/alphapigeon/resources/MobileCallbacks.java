@@ -11,4 +11,6 @@ public interface MobileCallbacks {
 
     public void requestedLocalScoresReceived(ArrayList<String> localScores);
 
+    public void appResumed();
+
 }

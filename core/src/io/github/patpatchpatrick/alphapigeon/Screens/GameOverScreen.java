@@ -110,7 +110,7 @@ public class GameOverScreen implements Screen {
 
         if (playServices != null){
             //Hide ads on game over screen
-            playServices.showAds(false);
+            playServices.showBannerAds(false);
         }
 
 
@@ -205,6 +205,9 @@ public class GameOverScreen implements Screen {
                 //If the mouse is in bounds of the back button, go back to the main menu
                 if (mousePos.x > BACK_BUTTON_X1 && mousePos.x < BACK_BUTTON_X2 && mousePos.y > BACK_BUTTON_Y1 && mousePos.y < BACK_BUTTON_Y2) {
                     if (button == Input.Buttons.LEFT) {
+                        if (playServices != null){
+                            playServices.showOrLoadInterstitialAd();
+                        }
                         newHighScoreEarned = false; //Reset the high score
                         Sounds.newHighScoreSound.stop(); //Stop playing the high score sound
                         dispose();

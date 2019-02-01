@@ -34,8 +34,12 @@
 
     <!-- Google Ads -->
     <string name="app_ad_id" >ca-app-pub-9852829648923660~7977477428</string>
+    <!-- Banner Ads -->
     <string name="app_ad_main_menu_screen_id" >ca-app-pub-9852829648923660/8858603811</string>
-    <string name="app_ad_testad_id" >	ca-app-pub-3940256099942544/6300978111</string>
+    <string name="app_ad_testad_id" >ca-app-pub-3940256099942544/6300978111</string>
+    <!-- Interstitial Ads -->
+    <string name="app_ad_game_over_screen_id" >ca-app-pub-9852829648923660/4500502509</string>
+    <string name="app_ad_test_interstitial_ad_id" >ca-app-pub-3940256099942544/1033173712</string>
 
     <!-- Exception Error Message -->
     <string name="status_exception_error">%1$s (status %2$d). %3$s.</string>

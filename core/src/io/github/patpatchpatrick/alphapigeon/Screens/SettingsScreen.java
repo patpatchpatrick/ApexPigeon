@@ -19,13 +19,16 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import java.util.ArrayList;
+
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.resources.DatabaseAndPreferenceManager;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
+import io.github.patpatchpatrick.alphapigeon.resources.MobileCallbacks;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
 import io.github.patpatchpatrick.alphapigeon.resources.SettingsManager;
 
-public class SettingsScreen implements Screen {
+public class SettingsScreen implements Screen, MobileCallbacks {
 
     private AlphaPigeon game;
     private OrthographicCamera camera;
@@ -87,6 +90,12 @@ public class SettingsScreen implements Screen {
         this.playServices = playServices;
         this.databaseAndPreferenceManager = databaseAndPreferenceManager;
 
+        if (playServices != null){
+            //Set the current device mobile callbacks to include this screen specific interface so
+            // it can receive callbacks from the mobile device
+            playServices.setMobileCallbacks(this);
+        }
+
         // create the camera
         camera = new OrthographicCamera();
         camera.setToOrtho(false, GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT);
@@ -108,7 +117,7 @@ public class SettingsScreen implements Screen {
 
         if (playServices != null){
             //Hide ads on settings screen
-            playServices.showAds(false);
+            playServices.showBannerAds(false);
         }
 
     }
@@ -448,5 +457,32 @@ public class SettingsScreen implements Screen {
         table.setPosition(ACCEL_SENSITIVITY_SLIDER_X1, ACCEL_SENSITIVITY_SLIDER_Y1);
         stage.addActor(table);
 
+    }
+
+    @Override
+    public void requestedHighScoresReceived(ArrayList<String> playerCenteredHighScores) {
+
+    }
+
+    @Override
+    public void requestedLocalScoresReceived(ArrayList<String> localScores) {
+
+    }
+
+    @Override
+    public void appResumed() {
+        //Reload the screen when app is resumed to prevent scaling issues
+        resetScreen();
+    }
+
+    private void resetScreen(){
+        Gdx.app.postRunnable(new Runnable() {
+
+            @Override
+            public void run() {
+                dispose();
+                game.setScreen(new SettingsScreen(game, playServices, databaseAndPreferenceManager));
+            }
+        });
     }
 }

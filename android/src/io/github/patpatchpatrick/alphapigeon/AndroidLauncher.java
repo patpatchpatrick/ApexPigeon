@@ -25,9 +25,11 @@ import io.github.patpatchpatrick.alphapigeon.resources.MobileCallbacks;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
 
 import com.badlogic.gdx.backends.android.AndroidGraphics;
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -73,10 +75,11 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
     protected static ContentResolver contentResolver;
 
     //Google ads
-    private AdView adView;
-    private final int SHOW_ADS = 1;
-    private final int HIDE_ADS = 0;
-
+    private AdView bannerAdView; //AdView for Banner Ads
+    private final int SHOW_OR_LOAD_INTERSTITIAL_ADS = 2;
+    private final int SHOW_BANNER_ADS = 1;
+    private final int HIDE_BANNER_ADS = 0;
+    private InterstitialAd gameOverInterstitialAd;
 
 
     @Override
@@ -104,14 +107,25 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
         MobileAds.initialize(this, getString(R.string.app_ad_id));
 
         // Create and setup the AdMob view for the MainMenu Screen
-        adView = new AdView(this);
-        adView.setAdSize(AdSize.BANNER);
+        bannerAdView = new AdView(this);
+        bannerAdView.setAdSize(AdSize.BANNER);
 
         //TODO replace with real ad!
-        adView.setAdUnitId(getString(R.string.app_ad_testad_id)); // Initialize main menu banner ad
+        bannerAdView.setAdUnitId(getString(R.string.app_ad_testad_id)); // Initialize main menu banner ad
 
         AdRequest adRequest = new AdRequest.Builder().build();
-        adView.loadAd(adRequest);
+        bannerAdView.loadAd(adRequest);
+
+        //Create and load interstitial ad that plays after player loses game
+        gameOverInterstitialAd = new InterstitialAd(this);
+        gameOverInterstitialAd.setAdUnitId(getString(R.string.app_ad_test_interstitial_ad_id)); //TODO replace with real ad!
+        gameOverInterstitialAd.loadAd(new AdRequest.Builder().build());
+        gameOverInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                super.onAdClosed();
+            }
+        });
 
         // Add the libgdx view
         layout.addView(gameView);
@@ -123,7 +137,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
         adParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         adParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
 
-        layout.addView(adView, adParams);
+        layout.addView(bannerAdView, adParams);
 
         // Hook it all up
         setContentView(layout);
@@ -137,25 +151,32 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
 
     }
 
-    protected Handler handler = new Handler()
-    {
+    protected Handler handler = new Handler() {
 
         //Handler to handle enabling and disabling ads on the UI thread
         @Override
         public void handleMessage(Message msg) {
-            switch(msg.what) {
-                case SHOW_ADS:
-                {
-                    //Set ads to visible and resume ad processes
-                    adView.setVisibility(View.VISIBLE);
-                    adView.resume();
+            switch (msg.what) {
+                case SHOW_BANNER_ADS: {
+                    //Set banner ads to visible and resume ad processes
+                    bannerAdView.setVisibility(View.VISIBLE);
+                    bannerAdView.resume();
                     break;
                 }
-                case HIDE_ADS:
-                {
-                    //Set ads to invisible and pause ad processes
-                    adView.setVisibility(View.GONE);
-                    adView.pause();
+                case HIDE_BANNER_ADS: {
+                    //Set banner ads to invisible and pause ad processes
+                    bannerAdView.setVisibility(View.GONE);
+                    bannerAdView.pause();
+                    break;
+                }
+                case SHOW_OR_LOAD_INTERSTITIAL_ADS: {
+                    //Show or load an interstitial ad
+                    if (gameOverInterstitialAd.isLoaded()) {
+                        gameOverInterstitialAd.show();
+                    } else {
+                        AdRequest interstitialRequest = new AdRequest.Builder().build();
+                        gameOverInterstitialAd.loadAd(interstitialRequest);
+                    }
                     break;
                 }
             }
@@ -226,6 +247,13 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
         //When the app resumes, sign back in
         if (!isSignedIn()) {
             signInSilently();
+        }
+
+        //Callback to libgdx game to let it know that the android app has resumed
+        //The game will resize the screen appropriately, if this callback isn't used then there are
+        //issues with the game screen scaling incorrectly and being stretched
+        if (mobileCallbacks != null) {
+            mobileCallbacks.appResumed();
         }
     }
 
@@ -391,9 +419,15 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
     }
 
     @Override
-    public void showAds(boolean show) {
-        //Send message to handler to show or hide ads
-        handler.sendEmptyMessage(show ? SHOW_ADS : HIDE_ADS);
+    public void showBannerAds(boolean show) {
+        //Send message to handler to show or hide banner ads
+        handler.sendEmptyMessage(show ? SHOW_BANNER_ADS : HIDE_BANNER_ADS);
+    }
+
+    @Override
+    public void showOrLoadInterstitialAd() {
+        //Send message to handler to show or load interstitial ads
+        handler.sendEmptyMessage(SHOW_OR_LOAD_INTERSTITIAL_ADS);
     }
 
     @Override

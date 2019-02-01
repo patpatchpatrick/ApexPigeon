@@ -110,7 +110,7 @@ public class GameScreen implements Screen {
 
         if (playServices != null){
             //Hide ads on game screen
-            playServices.showAds(false);
+            playServices.showBannerAds(false);
         }
 
     }

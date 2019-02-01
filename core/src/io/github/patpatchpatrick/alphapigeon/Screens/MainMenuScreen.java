@@ -10,10 +10,11 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+
+import java.util.ArrayList;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBird;
@@ -24,8 +25,9 @@ import io.github.patpatchpatrick.alphapigeon.resources.MobileCallbacks;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
 import io.github.patpatchpatrick.alphapigeon.resources.SettingsManager;
 import io.github.patpatchpatrick.alphapigeon.resources.Sounds;
+import sun.rmi.runtime.Log;
 
-public class MainMenuScreen implements Screen {
+public class MainMenuScreen implements Screen, MobileCallbacks {
     private AlphaPigeon game;
     private OrthographicCamera camera;
     private Viewport viewport;
@@ -104,6 +106,10 @@ public class MainMenuScreen implements Screen {
         this.game = game;
         this.playServices = playServices;
         this.databaseAndPreferenceManager = databaseAndPreferenceManager;
+        //Set mobile callbacks on this screen to receive any callbacks from mobile device
+        if (playServices != null) {
+            playServices.setMobileCallbacks(this);
+        }
 
         //Initialize World
 
@@ -128,7 +134,7 @@ public class MainMenuScreen implements Screen {
         if (playServices != null) {
             playServices.signIn();
             //Show ads on main menu screen
-            playServices.showAds(true);
+            playServices.showBannerAds(true);
         }
 
         createInputProcessor();
@@ -194,6 +200,8 @@ public class MainMenuScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
+
+        Gdx.app.log("RESIZE", "W" + width + "H" + height);
 
         //Update viewport to match screen size
         viewport.update(width, height, true);
@@ -415,5 +423,33 @@ public class MainMenuScreen implements Screen {
             }
         };
 
+    }
+
+    @Override
+    public void requestedHighScoresReceived(ArrayList<String> playerCenteredHighScores) {
+
+    }
+
+    @Override
+    public void requestedLocalScoresReceived(ArrayList<String> localScores) {
+
+    }
+
+    @Override
+    public void appResumed() {
+        //When the app is resumed, reload the entire screen so that it is scaled appropriately
+        //If this isn't done, there is a bug in android where the screen is not scaled properly temporarily
+        resetScreen();
+    }
+
+    private void resetScreen(){
+        Gdx.app.postRunnable(new Runnable() {
+
+            @Override
+            public void run() {
+                dispose();
+                game.setScreen(new MainMenuScreen(game, playServices, databaseAndPreferenceManager));
+            }
+        });
     }
 }

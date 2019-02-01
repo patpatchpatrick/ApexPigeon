@@ -12,10 +12,8 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -163,7 +161,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
 
         if (playServices != null){
             //Hide ads on high scores screen
-            playServices.showAds(false);
+            playServices.showBannerAds(false);
         }
 
         //REMOVE THIS!!!!
@@ -402,6 +400,12 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
 
     }
 
+    @Override
+    public void appResumed() {
+        //Reset the screen when app is resumed to prevent screen scaling issues
+        resetScreen();
+    }
+
     private void createInputProcessor() {
 
         inputProcessorScreen = new InputProcessor() {
@@ -608,6 +612,17 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
         }
 
         scrollPaneCreated = true;
+    }
+
+    private void resetScreen(){
+        Gdx.app.postRunnable(new Runnable() {
+
+            @Override
+            public void run() {
+                dispose();
+                game.setScreen(new HighScoreScreen(game, playServices, databaseAndPreferenceManager));
+            }
+        });
     }
 
 }

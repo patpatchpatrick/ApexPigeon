@@ -14,7 +14,8 @@ public interface PlayServices {
     public void getPlayerCenteredScores();
     public void getTopScores(int scoreType);
     public boolean isSignedIn();
-    public void showAds(boolean show); //Enable or disable ads in mobile device
+    public void showBannerAds(boolean show); //Enable or disable banner ads in mobile device
+    public void showOrLoadInterstitialAd(); //Show or load interstitial ad
 
 
 
