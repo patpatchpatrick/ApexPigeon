@@ -79,6 +79,7 @@ project(":android") {
         implementation 'com.google.android.gms:play-services-games:16.0.0'
         implementation "com.google.android.gms:play-services-auth:16.0.0"
         implementation 'com.google.android.gms:play-services-ads:17.1.1'
+        implementation 'com.android.billingclient:billing:1.2'
         
     }
 }

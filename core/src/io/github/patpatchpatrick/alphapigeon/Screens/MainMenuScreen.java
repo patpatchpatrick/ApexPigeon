@@ -51,6 +51,12 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
     private Texture soundOffIcon;
     private final float SOUND_ICON_WIDTH = 8;
     private final float SOUND_ICON_HEIGHT = SOUND_ICON_WIDTH;
+    private Texture adRemoval;
+    private final float AD_REMOVAL_WIDTH = 9.5f;
+    private final float AD_REMOVAL_HEIGHT = 4.5f;
+    private final  float AD_REMOVAL_X2 = 80 - 1.8f;
+    private final float AD_REMOVAL_X1 = AD_REMOVAL_X2 - AD_REMOVAL_WIDTH;
+    private final float AD_REMOVAL_Y1 = 48f - AD_REMOVAL_HEIGHT - 3f;
 
     //Button Dimensions
     //--Play Button
@@ -125,7 +131,7 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
         mainMenuLogoAndText = new Texture(Gdx.files.internal("textures/MainMenuScreenTransparent.png"));
         soundOnIcon = new Texture(Gdx.files.internal("textures/icons/SoundOnIcon.png"));
         soundOffIcon = new Texture(Gdx.files.internal("textures/icons/SoundOffIcon.png"));
-        testTexture = new Texture(Gdx.files.internal("textures/testred.png"));
+        adRemoval = new Texture(Gdx.files.internal("textures/icons/AdRemoval.png"));
 
 
         initializeLevelOneBirdAnimation();
@@ -188,6 +194,8 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
             game.batch.draw(soundOffIcon, SOUND_BUTTON_X1, SOUND_BUTTON_Y1, SOUND_ICON_WIDTH, SOUND_ICON_HEIGHT);
         }
 
+        game.batch.draw(adRemoval, AD_REMOVAL_X1, AD_REMOVAL_Y1, AD_REMOVAL_WIDTH, AD_REMOVAL_HEIGHT);
+
 
         Gdx.input.setInputProcessor(inputProcessor);
 
@@ -231,6 +239,7 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
         levelOneBirdFlySheet.dispose();
         soundOnIcon.dispose();
         soundOffIcon.dispose();
+        adRemoval.dispose();
     }
 
     private void update() {
@@ -397,6 +406,13 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
                             return true;
                         }
                     }
+                } else if (mousePos.x > AD_REMOVAL_X1 && mousePos.x < AD_REMOVAL_X1 + AD_REMOVAL_WIDTH &&
+                        mousePos.y > AD_REMOVAL_Y1 && mousePos.y < AD_REMOVAL_Y1 + AD_REMOVAL_HEIGHT){
+                    if (button == Input.Buttons.LEFT) {
+                        //AD Removal Button Pushed
+                        removeAds();
+
+                    }
                 }
 
                 return false;
@@ -451,5 +467,19 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
                 game.setScreen(new MainMenuScreen(game, playServices, databaseAndPreferenceManager));
             }
         });
+    }
+
+    private void removeAds(){
+
+        Gdx.app.postRunnable(new Runnable() {
+
+            @Override
+            public void run() {
+                if (playServices != null){
+                    playServices.purchaseAdRemoval();
+                }
+            }
+        });
+
     }
 }

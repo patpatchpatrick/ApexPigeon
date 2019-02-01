@@ -7,6 +7,8 @@ public interface PlayServices {
     //--Set the mobile callbacks interface on the device.  This interface is used for the core class
     // -- to receive callbacks from the mobile device
     public void setMobileCallbacks(MobileCallbacks mobileCallbacks);
+
+    //Leaderboards
     public void signIn();
     public void signOut();
     public void submitScore(long highScore);
@@ -14,9 +16,13 @@ public interface PlayServices {
     public void getPlayerCenteredScores();
     public void getTopScores(int scoreType);
     public boolean isSignedIn();
+
+    //Ads
     public void showBannerAds(boolean show); //Enable or disable banner ads in mobile device
     public void showOrLoadInterstitialAd(); //Show or load interstitial ad
 
+    //Billing
+    public void purchaseAdRemoval();
 
 
 }

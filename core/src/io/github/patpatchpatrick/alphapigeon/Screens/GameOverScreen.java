@@ -206,6 +206,7 @@ public class GameOverScreen implements Screen {
                 if (mousePos.x > BACK_BUTTON_X1 && mousePos.x < BACK_BUTTON_X2 && mousePos.y > BACK_BUTTON_Y1 && mousePos.y < BACK_BUTTON_Y2) {
                     if (button == Input.Buttons.LEFT) {
                         if (playServices != null){
+                            //Show an interstitial ad when the back button is pushed from the game over screen
                             playServices.showOrLoadInterstitialAd();
                         }
                         newHighScoreEarned = false; //Reset the high score

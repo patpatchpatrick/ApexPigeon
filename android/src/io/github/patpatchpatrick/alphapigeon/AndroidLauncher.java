@@ -81,6 +81,10 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
     private final int HIDE_BANNER_ADS = 0;
     private InterstitialAd gameOverInterstitialAd;
 
+    //Google Billing
+    private InAppBilling mInAppBilling;
+    private final int PURCHASE_AD_REMOVAL = 3;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +94,9 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
         config.useCompass = false;
         config.useImmersiveMode = true;
         useImmersiveMode(true);
+
+        //Initialize In App Billing
+        mInAppBilling = new InAppBilling(this, this);
 
         // Create the layout for the game/ads to share
         RelativeLayout layout = new RelativeLayout(this);
@@ -177,6 +184,11 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
                         AdRequest interstitialRequest = new AdRequest.Builder().build();
                         gameOverInterstitialAd.loadAd(interstitialRequest);
                     }
+                    break;
+                }
+                case PURCHASE_AD_REMOVAL: {
+                    //Purchase ad removal
+                    mInAppBilling.launchAdRemovalPurchase();
                     break;
                 }
             }
@@ -428,6 +440,12 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
     public void showOrLoadInterstitialAd() {
         //Send message to handler to show or load interstitial ads
         handler.sendEmptyMessage(SHOW_OR_LOAD_INTERSTITIAL_ADS);
+    }
+
+    @Override
+    public void purchaseAdRemoval() {
+        //Send message to handler to purchase ad removal
+        handler.sendEmptyMessage(PURCHASE_AD_REMOVAL);
     }
 
     @Override
