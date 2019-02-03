@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.util.ArrayList;
@@ -25,7 +26,6 @@ import io.github.patpatchpatrick.alphapigeon.resources.MobileCallbacks;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
 import io.github.patpatchpatrick.alphapigeon.resources.SettingsManager;
 import io.github.patpatchpatrick.alphapigeon.resources.Sounds;
-import sun.rmi.runtime.Log;
 
 public class MainMenuScreen implements Screen, MobileCallbacks {
     private AlphaPigeon game;
@@ -54,7 +54,7 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
     private Texture adRemoval;
     private final float AD_REMOVAL_WIDTH = 9.5f;
     private final float AD_REMOVAL_HEIGHT = 4.5f;
-    private final  float AD_REMOVAL_X2 = 80 - 1.8f;
+    private final float AD_REMOVAL_X2 = 80 - 1.8f;
     private final float AD_REMOVAL_X1 = AD_REMOVAL_X2 - AD_REMOVAL_WIDTH;
     private final float AD_REMOVAL_Y1 = 48f - AD_REMOVAL_HEIGHT - 3f;
 
@@ -124,7 +124,14 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
         camera.setToOrtho(false, GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT);
         //the viewport object will handle camera's attributes
         //the aspect provided (worldWidth/worldHeight) will be kept
-        viewport = new FitViewport(GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT, camera);
+
+        //Set viewport to stretch or fit viewport depending on whether user has enabled full screen mode setting
+        if (SettingsManager.fullScreenModeIsOn){
+            viewport = new StretchViewport(GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT, camera);
+        } else {
+            viewport = new FitViewport(GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT, camera);
+        }
+
 
         // Load textures
         mainMenuBackground = new Texture(Gdx.files.internal("textures/MainMenuScreen.png"));
@@ -139,8 +146,6 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
 
         if (playServices != null) {
             playServices.signIn();
-            //Show ads on main menu screen
-            playServices.showBannerAds(true);
         }
 
         createInputProcessor();
@@ -148,6 +153,17 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
         //Initialize background music after updating user settings (retrieving settings from mobile device db/prefs)
         SettingsManager.updateSettings();
         Sounds.initializeBackgroundMusic();
+
+        if (playServices != null && !SettingsManager.adRemovalPurchased){
+            //Show ads on main menu screen
+            playServices.showBannerAds(true);
+        } else if (SettingsManager.adRemovalPurchased){
+            //If ad removal was purchased, do not show banner ads on the main menu screen
+            playServices.showBannerAds(false);
+        }
+
+
+        Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
 
 
     }
@@ -194,7 +210,10 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
             game.batch.draw(soundOffIcon, SOUND_BUTTON_X1, SOUND_BUTTON_Y1, SOUND_ICON_WIDTH, SOUND_ICON_HEIGHT);
         }
 
-        game.batch.draw(adRemoval, AD_REMOVAL_X1, AD_REMOVAL_Y1, AD_REMOVAL_WIDTH, AD_REMOVAL_HEIGHT);
+        //If ad removal is not purchased, draw the "Remove Ads" button
+        if (!SettingsManager.adRemovalPurchased) {
+            game.batch.draw(adRemoval, AD_REMOVAL_X1, AD_REMOVAL_Y1, AD_REMOVAL_WIDTH, AD_REMOVAL_HEIGHT);
+        }
 
 
         Gdx.input.setInputProcessor(inputProcessor);
@@ -213,7 +232,6 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
 
         //Update viewport to match screen size
         viewport.update(width, height, true);
-
 
 
     }
@@ -373,7 +391,7 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
             public boolean touchDown(int screenX, int screenY, int pointer, int button) {
                 //Get the mouse coordinates and unproject to the world coordinates
                 Vector3 mousePos = new Vector3(screenX, screenY, 0);
-                camera.unproject(mousePos, viewport.getScreenX(), viewport.getScreenY(),  viewport.getScreenWidth(), viewport.getScreenHeight());
+                camera.unproject(mousePos, viewport.getScreenX(), viewport.getScreenY(), viewport.getScreenWidth(), viewport.getScreenHeight());
 
                 //If the mouse is in bounds of any of the buttons on the screen and the buttons are clicked, open corresponding screen
                 if (mousePos.x > PLAY_BUTTON_X1 && mousePos.x < PLAY_BUTTON_X2 && mousePos.y > PLAY_BUTTON_Y1 && mousePos.y < PLAY_BUTTON_Y2) {
@@ -407,9 +425,10 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
                         }
                     }
                 } else if (mousePos.x > AD_REMOVAL_X1 && mousePos.x < AD_REMOVAL_X1 + AD_REMOVAL_WIDTH &&
-                        mousePos.y > AD_REMOVAL_Y1 && mousePos.y < AD_REMOVAL_Y1 + AD_REMOVAL_HEIGHT){
-                    if (button == Input.Buttons.LEFT) {
+                        mousePos.y > AD_REMOVAL_Y1 && mousePos.y < AD_REMOVAL_Y1 + AD_REMOVAL_HEIGHT) {
+                    if (button == Input.Buttons.LEFT && !SettingsManager.adRemovalPurchased) {
                         //AD Removal Button Pushed
+                        //If ads are already removed by user, nothing will happen
                         removeAds();
 
                     }
@@ -458,7 +477,7 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
         resetScreen();
     }
 
-    private void resetScreen(){
+    private void resetScreen() {
         Gdx.app.postRunnable(new Runnable() {
 
             @Override
@@ -469,13 +488,13 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
         });
     }
 
-    private void removeAds(){
+    private void removeAds() {
 
         Gdx.app.postRunnable(new Runnable() {
 
             @Override
             public void run() {
-                if (playServices != null){
+                if (playServices != null) {
                     playServices.purchaseAdRemoval();
                 }
             }

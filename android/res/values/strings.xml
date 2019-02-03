@@ -30,6 +30,9 @@
     <string name="game_volume_setting_pref" >GameVol</string>
     <string name="touch_sensitivity_setting_pref" >TouchSens</string>
     <string name="accel_sensitivity_setting_pref" >AccelSens</string>
+    <string name="full_screen_setting_pref" >FullScreen</string>
+    <!-- Billing Shared Prefs -->
+    <string name="ad_removal_purchase_pref" >AdRemovalPurchased</string>    <!-- Set to true if ad removal is purchased -->
 
 
     <!-- Google Ads -->

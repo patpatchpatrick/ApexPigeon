@@ -18,6 +18,7 @@ import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
@@ -84,7 +85,14 @@ public class GameScreen implements Screen {
         camera.setToOrtho(false, GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT);
         //the viewport object will handle camera's attributes
         //the aspect provided (worldWidth/worldHeight) will be kept
-        viewport = new FitViewport(GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT, camera);
+
+
+        //Set viewport to stretch or fit viewport depending on whether user has enabled full screen mode setting
+        if (SettingsManager.fullScreenModeIsOn){
+            viewport = new StretchViewport(GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT, camera);
+        } else {
+            viewport = new FitViewport(GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT, camera);
+        }
 
 
         // initialize game resources

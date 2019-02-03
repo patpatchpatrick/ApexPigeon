@@ -2,6 +2,8 @@ package io.github.patpatchpatrick.alphapigeon;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
@@ -70,7 +72,10 @@ public class InAppBilling implements PurchasesUpdatedListener {
             // Handle an error caused by a user cancelling the purchase flow.
             Log.d("Billing", "User Canceled" + responseCode);
         } else if (responseCode == BillingClient.BillingResponse.ITEM_ALREADY_OWNED) {
-            //Ensure that user is ad free
+            //Set user to be ad free in their shared preferences
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+            String adRemovalPurchasedPreference = mContext.getResources().getString(R.string.ad_removal_purchase_pref);
+            sharedPreferences.edit().putBoolean(adRemovalPurchasedPreference, true).commit();
         } else {
             Log.d("Billing", "Other code" + responseCode);
             // Handle any other error codes.
@@ -104,7 +109,10 @@ public class InAppBilling implements PurchasesUpdatedListener {
 
     private void handlePurchase(Purchase purchase) {
         if (purchase.getSku().equals(ITEM_SKU_ADREMOVAL)) {
-            //Set user to be ad free
+            //Set user to be ad free in their shared preferences
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+            String adRemovalPurchasedPreference = mContext.getResources().getString(R.string.ad_removal_purchase_pref);
+            sharedPreferences.edit().putBoolean(adRemovalPurchasedPreference, true).commit();
         }
     }
 
@@ -117,6 +125,15 @@ public class InAppBilling implements PurchasesUpdatedListener {
                 .setType(BillingClient.SkuType.INAPP)
                 .build();
         int responseCode = mBillingClient.launchBillingFlow(mActivity, flowParams);
+
+    }
+
+    public boolean isAdRemovalPurchased(){
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+        String adRemovalPurchasedPreference = mContext.getResources().getString(R.string.ad_removal_purchase_pref);
+        return sharedPreferences.getBoolean(adRemovalPurchasedPreference, false);
+
 
     }
 

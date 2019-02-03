@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.text.DecimalFormat;
@@ -72,7 +73,14 @@ public class GameOverScreen implements Screen {
         camera.setToOrtho(false, GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT);
         //the viewport object will handle camera's attributes
         //the aspect provided (worldWidth/worldHeight) will be kept
-        viewport = new FitViewport(GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT, camera);
+
+
+        //Set viewport to stretch or fit viewport depending on whether user has enabled full screen mode setting
+        if (SettingsManager.fullScreenModeIsOn){
+            viewport = new StretchViewport(GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT, camera);
+        } else {
+            viewport = new FitViewport(GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT, camera);
+        }
 
         gameOverBackground = new Texture(Gdx.files.internal("textures/gameoverscreen/GameOverScreen.png"));
         newHighScoreTexture = new Texture(Gdx.files.internal("textures/gameoverscreen/NewHighScore.png"));
@@ -102,6 +110,9 @@ public class GameOverScreen implements Screen {
         //Create input processor for user controls
         createInputProcessor();
         Gdx.input.setInputProcessor(inputProcessor);
+
+        //Refresh user settings from shared preferences of mobile device
+        SettingsManager.updateSettings();
 
         if (newHighScoreEarned && SettingsManager.gameSoundsSettingIsOn){
             //If there is a new high score and the game sounds are enabled by user, play the new high score sound
@@ -205,8 +216,9 @@ public class GameOverScreen implements Screen {
                 //If the mouse is in bounds of the back button, go back to the main menu
                 if (mousePos.x > BACK_BUTTON_X1 && mousePos.x < BACK_BUTTON_X2 && mousePos.y > BACK_BUTTON_Y1 && mousePos.y < BACK_BUTTON_Y2) {
                     if (button == Input.Buttons.LEFT) {
-                        if (playServices != null){
+                        if (playServices != null && !SettingsManager.adRemovalPurchased){
                             //Show an interstitial ad when the back button is pushed from the game over screen
+                            //Do not show the ad if ad removal was purchased by the user
                             playServices.showOrLoadInterstitialAd();
                         }
                         newHighScoreEarned = false; //Reset the high score

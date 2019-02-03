@@ -623,6 +623,16 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
     }
 
     @Override
+    public void toggleFullScreenMode(boolean isOn) {
+
+        // Update the settings preference
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String fullScreenSettingPreference = getResources().getString(R.string.full_screen_setting_pref);
+        sharedPreferences.edit().putBoolean(fullScreenSettingPreference, isOn).commit();
+
+    }
+
+    @Override
     public float getMusicVolumeSliderValue() {
         //Return settings preference
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -652,5 +662,18 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String accelSensitivityPreference = getResources().getString(R.string.accel_sensitivity_setting_pref);
         return sharedPreferences.getFloat(accelSensitivityPreference, 0.5f);
+    }
+
+    @Override
+    public boolean isFullScreenModeOn() {
+        //Return settings preference
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String fullScreenPreference = getResources().getString(R.string.full_screen_setting_pref);
+        return sharedPreferences.getBoolean(fullScreenPreference, false);
+    }
+
+    @Override
+    public boolean getAdRemovalPurchasedValue() {
+        return mInAppBilling.isAdRemovalPurchased();
     }
 }

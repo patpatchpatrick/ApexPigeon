@@ -31,6 +31,8 @@ public interface DatabaseAndPreferenceManager {
 
     public boolean isAccelButtonOn();
 
+    public boolean isFullScreenModeOn();
+
     //SETTINGS METHODS
     //--Sliders
 
@@ -42,6 +44,8 @@ public interface DatabaseAndPreferenceManager {
 
     public void toggleAccelSensitivity(float value);
 
+    public void toggleFullScreenMode(boolean isOn);
+
     public float getMusicVolumeSliderValue();
 
     public float getGameVolumeSliderValue();
@@ -49,6 +53,8 @@ public interface DatabaseAndPreferenceManager {
     public float getTouchSensitivitySliderValue();
 
     public float getAccelSensitivitySliderValue();
+
+    public boolean getAdRemovalPurchasedValue();
 
 
 

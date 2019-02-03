@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.util.ArrayList;
@@ -78,6 +79,15 @@ public class SettingsScreen implements Screen, MobileCallbacks {
     private final float ACCEL_BUTTON_X1 = 45.8f;
     private final float ACCEL_BUTTON_Y1 = 6.5f;
 
+    //...Full Screen Button
+    private Texture fullScreenHeader;
+    private final float FULL_SCREEN_HEADER_X1 = 61.7f;
+    private final float FULL_SCREEN_HEADER_Y1 = 22.7f;
+    private final float FULL_SCREEN_HEADER_WIDTH = 14.5f;
+    private final float FULL_SCREEN_HEADER_HEIGHT = 2.2f;
+    private final float FULL_SCREEN_BUTTON_X1 = 63.1f;
+    private final float FULL_SCREEN_BUTTON_Y1 = 17.7f;
+
 
     //Button Dimensions
     private final float BACK_BUTTON_X1 = 1.8f;
@@ -90,7 +100,7 @@ public class SettingsScreen implements Screen, MobileCallbacks {
         this.playServices = playServices;
         this.databaseAndPreferenceManager = databaseAndPreferenceManager;
 
-        if (playServices != null){
+        if (playServices != null) {
             //Set the current device mobile callbacks to include this screen specific interface so
             // it can receive callbacks from the mobile device
             playServices.setMobileCallbacks(this);
@@ -101,11 +111,19 @@ public class SettingsScreen implements Screen, MobileCallbacks {
         camera.setToOrtho(false, GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT);
         //the viewport object will handle camera's attributes
         //the aspect provided (worldWidth/worldHeight) will be kept
-        viewport = new FitViewport(GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT, camera);
+
+        //Set viewport to stretch or fit viewport depending on whether user has enabled full screen mode setting
+        if (SettingsManager.fullScreenModeIsOn) {
+            viewport = new StretchViewport(GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT, camera);
+        } else {
+            viewport = new FitViewport(GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT, camera);
+        }
 
         settingsBackground = new Texture(Gdx.files.internal("textures/settingsscreen/SettingsScreen.png"));
         onOffButtonOnSelected = new Texture(Gdx.files.internal("textures/settingsscreen/OnOffButtonOnSelected.png"));
         onOffButtonOffSelected = new Texture(Gdx.files.internal("textures/settingsscreen/OnOffButtonOffSelected.png"));
+        fullScreenHeader = new Texture(Gdx.files.internal("textures/settingsscreen/FullScreenHeader.png"));
+
 
         //Create input processor for user controls
         createInputProcessor();
@@ -115,7 +133,7 @@ public class SettingsScreen implements Screen, MobileCallbacks {
 
         initializeSliders();
 
-        if (playServices != null){
+        if (playServices != null) {
             //Hide ads on settings screen
             playServices.showBannerAds(false);
         }
@@ -157,6 +175,9 @@ public class SettingsScreen implements Screen, MobileCallbacks {
         game.batch.draw(drawOnOffButton(SettingsManager.touchSettingIsOn), TOUCH_BUTTON_X1, TOUCH_BUTTON_Y1, ON_OFF_BUTTON_WIDTH, ON_OFF_BUTTON_HEIGHT);
         //Draw accel button
         game.batch.draw(drawOnOffButton(SettingsManager.accelerometerSettingIsOn), ACCEL_BUTTON_X1, ACCEL_BUTTON_Y1, ON_OFF_BUTTON_WIDTH, ON_OFF_BUTTON_HEIGHT);
+        //Draw full screen button
+        game.batch.draw(fullScreenHeader, FULL_SCREEN_HEADER_X1, FULL_SCREEN_HEADER_Y1, FULL_SCREEN_HEADER_WIDTH, FULL_SCREEN_HEADER_HEIGHT);
+        game.batch.draw(drawOnOffButton(SettingsManager.fullScreenModeIsOn), FULL_SCREEN_BUTTON_X1, FULL_SCREEN_BUTTON_Y1, ON_OFF_BUTTON_WIDTH, ON_OFF_BUTTON_HEIGHT);
 
 
         game.batch.end();
@@ -215,6 +236,9 @@ public class SettingsScreen implements Screen, MobileCallbacks {
     public void dispose() {
 
         settingsBackground.dispose();
+        fullScreenHeader.dispose();
+        onOffButtonOffSelected.dispose();
+        onOffButtonOnSelected.dispose();
 
     }
 
@@ -240,7 +264,7 @@ public class SettingsScreen implements Screen, MobileCallbacks {
             public boolean touchDown(int screenX, int screenY, int pointer, int button) {
                 //Get the mouse coordinates and unproject to the world coordinates
                 Vector3 mousePos = new Vector3(screenX, screenY, 0);
-                camera.unproject(mousePos, viewport.getScreenX(), viewport.getScreenY(),  viewport.getScreenWidth(), viewport.getScreenHeight());
+                camera.unproject(mousePos, viewport.getScreenX(), viewport.getScreenY(), viewport.getScreenWidth(), viewport.getScreenHeight());
 
                 //If the mouse is in bounds of the back button, go back to the main menu
                 if (mousePos.x > BACK_BUTTON_X1 && mousePos.x < BACK_BUTTON_X2 && mousePos.y > BACK_BUTTON_Y1 && mousePos.y < BACK_BUTTON_Y2) {
@@ -301,6 +325,19 @@ public class SettingsScreen implements Screen, MobileCallbacks {
                             return true;
                         }
                     }
+                } else if (mousePos.x > FULL_SCREEN_BUTTON_X1 && mousePos.x < FULL_SCREEN_BUTTON_X1 + ON_OFF_BUTTON_WIDTH && mousePos.y > FULL_SCREEN_BUTTON_Y1 && mousePos.y < FULL_SCREEN_BUTTON_Y1 + ON_OFF_BUTTON_HEIGHT) {
+                    // Full screen button pushed
+                    if (button == Input.Buttons.LEFT) {
+                        if (mousePos.x < FULL_SCREEN_BUTTON_X1 + ON_BUTTON_WIDTH) {
+                            //ON pushed
+                            SettingsManager.toggleFullScreenSetting(true);
+                            return true;
+                        } else {
+                            //OFF pushed
+                            SettingsManager.toggleFullScreenSetting(false);
+                            return true;
+                        }
+                    }
                 }
 
                 return false;
@@ -351,7 +388,7 @@ public class SettingsScreen implements Screen, MobileCallbacks {
 
     }
 
-    private void createMusicVolumeSlider(Skin skin){
+    private void createMusicVolumeSlider(Skin skin) {
 
         //Create slider to control music volume
 
@@ -367,7 +404,7 @@ public class SettingsScreen implements Screen, MobileCallbacks {
             }
         });
 
-        Container<Slider> container=new Container<Slider>(volumeSlider);
+        Container<Slider> container = new Container<Slider>(volumeSlider);
         container.setTransform(true);   // for enabling scaling and rotation
         container.setScale(1);  //scale according to your requirement
 
@@ -378,7 +415,7 @@ public class SettingsScreen implements Screen, MobileCallbacks {
 
     }
 
-    private void createGameVolumeSlider(Skin skin){
+    private void createGameVolumeSlider(Skin skin) {
 
         //Create slider to control game (sound effects) volume
 
@@ -394,7 +431,7 @@ public class SettingsScreen implements Screen, MobileCallbacks {
             }
         });
 
-        Container<Slider> container=new Container<Slider>(volumeSlider);
+        Container<Slider> container = new Container<Slider>(volumeSlider);
         container.setTransform(true);   // for enabling scaling and rotation
         container.setScale(1);  //scale according to your requirement
 
@@ -405,7 +442,7 @@ public class SettingsScreen implements Screen, MobileCallbacks {
 
     }
 
-    private void createTouchSensitivitySlider(Skin skin){
+    private void createTouchSensitivitySlider(Skin skin) {
 
         //Create slider to control touch sensitivity
 
@@ -421,7 +458,7 @@ public class SettingsScreen implements Screen, MobileCallbacks {
             }
         });
 
-        Container<Slider> container=new Container<Slider>(touchSlider);
+        Container<Slider> container = new Container<Slider>(touchSlider);
         container.setTransform(true);   // for enabling scaling and rotation
         container.setScale(1);  //scale according to your requirement
 
@@ -432,7 +469,7 @@ public class SettingsScreen implements Screen, MobileCallbacks {
 
     }
 
-    private void createAccelSensitivitySlider(Skin skin){
+    private void createAccelSensitivitySlider(Skin skin) {
 
         //Create slider to control touch sensitivity
 
@@ -448,7 +485,7 @@ public class SettingsScreen implements Screen, MobileCallbacks {
             }
         });
 
-        Container<Slider> container=new Container<Slider>(accelSlider);
+        Container<Slider> container = new Container<Slider>(accelSlider);
         container.setTransform(true);   // for enabling scaling and rotation
         container.setScale(1);  //scale according to your requirement
 
@@ -475,7 +512,7 @@ public class SettingsScreen implements Screen, MobileCallbacks {
         resetScreen();
     }
 
-    private void resetScreen(){
+    private void resetScreen() {
         Gdx.app.postRunnable(new Runnable() {
 
             @Override

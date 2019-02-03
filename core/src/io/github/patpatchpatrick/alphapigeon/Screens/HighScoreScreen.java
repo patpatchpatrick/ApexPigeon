@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ import io.github.patpatchpatrick.alphapigeon.resources.DatabaseAndPreferenceMana
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.MobileCallbacks;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
+import io.github.patpatchpatrick.alphapigeon.resources.SettingsManager;
 
 public class HighScoreScreen implements Screen, MobileCallbacks {
 
@@ -109,7 +111,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
 
     //ScrollPane
     private Stage stage;
-    private FitViewport scrollPaneViewport;
+    private Viewport scrollPaneViewport;
     private Boolean scrollPaneCreated = false;
     private Skin scrollableSkin;
 
@@ -128,7 +130,14 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
         camera.setToOrtho(false, GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT);
         //the viewport object will handle camera's attributes
         //the aspect provided (worldWidth/worldHeight) will be kept
-        viewport = new FitViewport(GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT, camera);
+
+
+        //Set viewport to stretch or fit viewport depending on whether user has enabled full screen mode setting
+        if (SettingsManager.fullScreenModeIsOn){
+            viewport = new StretchViewport(GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT, camera);
+        } else {
+            viewport = new FitViewport(GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT, camera);
+        }
 
         highScoreBackground = new Texture(Gdx.files.internal("textures/highscoresscreen/HighScoresScreen.png"));
         backButton = new Texture(Gdx.files.internal("textures/BackArrow.png"));
@@ -569,7 +578,13 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
 
         if (!scrollPaneCreated) {
 
-            scrollPaneViewport = new FitViewport(800, 480);
+            //Set the scrollpane viewport to be stretch or fit depending no whether user has enabled full screen mode
+            if (SettingsManager.fullScreenModeIsOn){
+                scrollPaneViewport = new StretchViewport(800, 480);
+            } else {
+                scrollPaneViewport = new FitViewport(800, 480);
+            }
+
 
             stage = new Stage(scrollPaneViewport);
             scrollableSkin = new Skin(Gdx.files.internal("skin/uiskin.json"));

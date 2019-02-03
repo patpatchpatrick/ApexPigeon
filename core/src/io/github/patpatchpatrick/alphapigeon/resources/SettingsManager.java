@@ -12,6 +12,8 @@ public class SettingsManager {
     public static boolean gameSoundsSettingIsOn = true;
     public static boolean touchSettingIsOn = true;
     public static boolean accelerometerSettingIsOn = true;
+    public static boolean adRemovalPurchased = false; //Setting for if user has purchased ad removal
+    public static boolean fullScreenModeIsOn = false;
 
     //Floats for Sliders
     //--All slider values are between 0 and 1
@@ -33,12 +35,16 @@ public class SettingsManager {
             gameSoundsSettingIsOn = databaseAndPreferenceManager.isGameSoundsOn();
             touchSettingIsOn = databaseAndPreferenceManager.isTouchControlsOn();
             accelerometerSettingIsOn = databaseAndPreferenceManager.isAccelButtonOn();
+            fullScreenModeIsOn = databaseAndPreferenceManager.isFullScreenModeOn();
 
             //Sliders
             musicVolume = databaseAndPreferenceManager.getMusicVolumeSliderValue();
             gameVolume = databaseAndPreferenceManager.getGameVolumeSliderValue();
             touchSensitivity = databaseAndPreferenceManager.getTouchSensitivitySliderValue();
             accelSensitivity = databaseAndPreferenceManager.getAccelSensitivitySliderValue();
+
+            //Billing Settings
+            adRemovalPurchased = databaseAndPreferenceManager.getAdRemovalPurchasedValue();
 
             //If the game sounds setting is off, set game volume to 0
             if (!gameSoundsSettingIsOn){
@@ -134,6 +140,17 @@ public class SettingsManager {
         if (accelSensitivity != value && databaseAndPreferenceManager != null){
             databaseAndPreferenceManager.toggleAccelSensitivity(value);
             accelSensitivity = value;
+        }
+
+    }
+
+    public static void toggleFullScreenSetting(boolean isOn){
+
+        //If the setting changed, update the mobile device preferences
+
+        if (fullScreenModeIsOn != isOn && databaseAndPreferenceManager != null){
+            databaseAndPreferenceManager.toggleFullScreenMode(isOn);
+            fullScreenModeIsOn = isOn;
         }
 
     }
