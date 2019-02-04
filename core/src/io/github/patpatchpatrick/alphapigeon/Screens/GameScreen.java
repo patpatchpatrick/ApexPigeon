@@ -143,6 +143,9 @@ public class GameScreen implements Screen {
         // tell the camera to update its matrices
         camera.update();
 
+        //Update method called before rendering
+        update();
+
         //debugRenderer.render(world, camera.combined);
         // tell the SpriteBatch to render in the
         // coordinate system specified by the camera
@@ -158,9 +161,6 @@ public class GameScreen implements Screen {
         if (gameIsOver) {
             gameOver();
         }
-
-        //Update method called after rendering
-        update();
 
 
     }

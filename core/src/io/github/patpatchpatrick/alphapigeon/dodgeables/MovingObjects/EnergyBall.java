@@ -17,6 +17,15 @@ public class EnergyBall implements MovingObject {
     private boolean energyBeamIsSpawned = false;
     private Sound energyBallSound;
 
+    //Variables to track the energy ball positions and positions of the beam associated with the energy ball
+    //These are all updated in the UFOs class update method
+    public float energyBeamXPosition = 0;
+    public float energyBeamYPosition = 0;
+    public float energyBeamXScale = 1;
+    public float energyBallXPosition = 0;
+    public float energyBallYPosition = 0;
+    public float energyBeamRotation = 0;
+
     public EnergyBall() {
     }
 

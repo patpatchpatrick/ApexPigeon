@@ -125,6 +125,9 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
         //the viewport object will handle camera's attributes
         //the aspect provided (worldWidth/worldHeight) will be kept
 
+        //Update/refresh the user settings from mobile device shared preferences
+        SettingsManager.updateSettings();
+
         //Set viewport to stretch or fit viewport depending on whether user has enabled full screen mode setting
         if (SettingsManager.fullScreenModeIsOn){
             viewport = new StretchViewport(GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT, camera);
@@ -151,7 +154,6 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
         createInputProcessor();
 
         //Initialize background music after updating user settings (retrieving settings from mobile device db/prefs)
-        SettingsManager.updateSettings();
         Sounds.initializeBackgroundMusic();
 
         if (playServices != null && !SettingsManager.adRemovalPurchased){

@@ -159,52 +159,16 @@ public class UFOs {
                     //Render all energy balls associated with the UFO
                     for (EnergyBall energyBall : ufo.energyBalls) {
 
-                        float energyBallWidth = energyBall.getWidth();
-                        float energyBallHeight = energyBall.getHeight();
-                        float energyBallDirection = energyBall.getDirection();
                         Boolean energyBallIsCharged = energyBall.isCharged();
                         Boolean energyBallAnimationIsComplete = energyBall.animationIsComplete();
-
-
-                        //Get positions of UFOs and EnergyBeams relative to UFOs
-                        float ufoXPosition = ufo.getPosition().x;
-                        float ufoYPosition = ufo.getPosition().y + UFO_HEIGHT / 2;
-                        float energyBeamXPosition = 0;
-                        float energyBeamYPosition = ufoYPosition - ENERGY_BEAM_HEIGHT / 2;
-                        float energyBeamXScale = 1;
-                        float energyBallXPosition = 0;
-                        float energyBallYPosition = ufoYPosition - energyBallHeight / 2;
-                        float energyBeamRotation = 0;
-
-
-                        if (energyBallDirection == ENERGY_BEAM_LEFT) {
-                            energyBallXPosition = ufoXPosition - energyBallWidth;
-                            energyBeamXPosition = ufoXPosition - ENERGY_BEAM_WIDTH;
-                        } else if (energyBallDirection == ENERGY_BEAM_RIGHT) {
-                            energyBallXPosition = ufoXPosition + UFO_WIDTH + 1f - (0.88f) * energyBallWidth;
-                            energyBeamXPosition = ufoXPosition + UFO_WIDTH;
-                            energyBeamXScale = -1;
-                        } else if (energyBallDirection == ENERGY_BEAM_DOWN) {
-                            energyBallXPosition = ufoXPosition + 8f - (0.94f) * energyBallWidth;
-                            energyBallYPosition = ufoYPosition - UFO_WIDTH / 4 - (0.6f) * energyBallHeight;
-                            energyBeamXPosition = ufoXPosition - 32f;
-                            energyBeamYPosition = ufoYPosition - 62f;
-                            energyBeamRotation = 90;
-                        } else if (energyBallDirection == ENERGY_BEAM_UP) {
-                            energyBallXPosition = ufoXPosition + 8f - (0.94f) * energyBallWidth;
-                            energyBallYPosition = ufoYPosition - UFO_WIDTH / 4 - (0.4f) * energyBallHeight + UFO_HEIGHT - 6f;
-                            energyBeamXPosition = ufoXPosition - 33f;
-                            energyBeamYPosition = ufoYPosition - 63f + ENERGY_BEAM_VERTICAL_HEIGHT + UFO_HEIGHT / 2;
-                            energyBeamRotation = -90;
-                        }
 
                         // If the energy ball is not fully charged, render it using its current width and height
                         // If the ball is fully charged, render the energy ball to beam transition animation
                         // If the transition animation is complete, render the energy beam
                         if (!energyBallIsCharged) {
-                            batch.draw(energyBallCurrentFrame, energyBallXPosition, energyBallYPosition, 0, 0, energyBallWidth, energyBallHeight, 1, 1, 0);
+                            batch.draw(energyBallCurrentFrame, energyBall.energyBallXPosition, energyBall.energyBallYPosition, 0, 0, energyBall.getWidth(), energyBall.getHeight(), 1, 1, 0);
                         } else if (!energyBallAnimationIsComplete) {
-                            batch.draw(energyBeamCurrentFrame, energyBeamXPosition, energyBeamYPosition, ENERGY_BEAM_WIDTH / 2, ENERGY_BEAM_HEIGHT / 2, ENERGY_BEAM_WIDTH, ENERGY_BEAM_HEIGHT, energyBeamXScale, 1, energyBeamRotation);
+                            batch.draw(energyBeamCurrentFrame, energyBall.energyBeamXPosition, energyBall.energyBeamYPosition, ENERGY_BEAM_WIDTH / 2, ENERGY_BEAM_HEIGHT / 2, ENERGY_BEAM_WIDTH, ENERGY_BEAM_HEIGHT, energyBall.energyBeamXScale, 1, energyBall.energyBeamRotation);
                         }
 
                     }
@@ -305,6 +269,7 @@ public class UFOs {
 
         long currentTimeInMillis = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
 
+
         //Update all ufos
         //If the ufo is spawned long enough... create an energy ball that will ultimately turn
         //into an energy beam when it is fully charged
@@ -344,6 +309,7 @@ public class UFOs {
                 }
             }
 
+
             //EVALUATE IF UFOS NEED TO BE HELD
             if (ufo.stopInCenterOfScreen && !ufo.isHeld && ufo.getPosition().x < camera.viewportWidth / 2 - ufo.WIDTH / 2) {
                 //If ufo is set to stop in center of the screen and the x position is equal to center of screen,
@@ -372,6 +338,64 @@ public class UFOs {
             }
 
         }
+
+        // Update the positions of the active energy balls/beams to match the active UFO positions
+        // Ensure that the energy ball and energy beam animations move with the UFO
+        for (UFO renderedUfos : activeUFOs) {
+            if (renderedUfos.alive) {
+                if (renderedUfos.energyBallIsSpawned) {
+
+                    //Update positions for all energy balls associated with the UFO
+                    for (EnergyBall energyBall : renderedUfos.energyBalls) {
+
+                        float energyBallWidth = energyBall.getWidth();
+                        float energyBallHeight = energyBall.getHeight();
+                        float energyBallDirection = energyBall.getDirection();
+
+                        //Get positions of UFOs and EnergyBeams relative to UFOs
+                        float ufoXPosition = renderedUfos.getPosition().x;
+                        float ufoYPosition = renderedUfos.getPosition().y + UFO_HEIGHT / 2;
+                        energyBall.energyBallXPosition = 0;
+                        energyBall.energyBallYPosition = ufoYPosition - ENERGY_BEAM_HEIGHT / 2;
+                        energyBall.energyBeamXScale = 1;
+                        energyBall.energyBallXPosition = 0;
+                        energyBall.energyBallYPosition = ufoYPosition - energyBallHeight / 2;
+                        energyBall.energyBeamRotation = 0;
+
+                        //Set the energy ball and beam position, scale and rotation to match the UFO
+                        //So that the rendered animations stay aligned as the UFO moves
+                        if (energyBallDirection == ENERGY_BEAM_LEFT) {
+                            energyBall.energyBallXPosition = ufoXPosition - energyBallWidth;
+                            energyBall.energyBeamXPosition = ufoXPosition - ENERGY_BEAM_WIDTH;
+                            energyBall.energyBeamYPosition = ufoYPosition - 20f;
+                        } else if (energyBallDirection == ENERGY_BEAM_RIGHT) {
+                            energyBall.energyBallXPosition = ufoXPosition + UFO_WIDTH + 1f - (0.88f) * energyBallWidth;
+                            energyBall.energyBeamXPosition = ufoXPosition + UFO_WIDTH;
+                            energyBall.energyBeamYPosition = ufoYPosition - 20f;
+                            energyBall.energyBeamXScale = -1;
+                        } else if (energyBallDirection == ENERGY_BEAM_DOWN) {
+                            energyBall.energyBallXPosition = ufoXPosition + 8f - (0.94f) * energyBallWidth;
+                            energyBall.energyBallYPosition = ufoYPosition - UFO_WIDTH / 4 - (0.6f) * energyBallHeight;
+                            energyBall.energyBeamXPosition = ufoXPosition - 32f;
+                            energyBall.energyBeamYPosition = ufoYPosition - 62f;
+                            energyBall.energyBeamRotation = 90;
+                        } else if (energyBallDirection == ENERGY_BEAM_UP) {
+                            energyBall.energyBallXPosition = ufoXPosition + 8f - (0.94f) * energyBallWidth;
+                            energyBall.energyBallYPosition = ufoYPosition - UFO_WIDTH / 4 - (0.4f) * energyBallHeight + UFO_HEIGHT - 6f;
+                            energyBall.energyBeamXPosition = ufoXPosition - 33f;
+                            energyBall.energyBeamYPosition = ufoYPosition - 63f + ENERGY_BEAM_VERTICAL_HEIGHT + UFO_HEIGHT / 2;
+                            energyBall.energyBeamRotation = -90;
+                        }
+
+                    }
+                }
+            } else {
+                activeUFOs.removeValue(renderedUfos, false);
+                dodgeables.activeDodgeables.removeValue(renderedUfos, false);
+            }
+        }
+
+
 
         //REMOVE OFF SCREEN UFOs
         for (UFO ufo : activeUFOs) {
