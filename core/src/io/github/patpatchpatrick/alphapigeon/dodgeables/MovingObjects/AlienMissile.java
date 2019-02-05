@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.levels.Gameplay;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
@@ -51,7 +52,7 @@ public class AlienMissile extends Dodgeable {
         this.alive = true;
 
         BodyData missileData = new BodyData(false);
-        missileData.setSpawnTime(TimeUtils.nanoTime() / GameVariables.MILLION_SCALE);
+        missileData.setSpawnTime(Gameplay.totalGameTime);
         dodgeableBody.setUserData(missileData);
 
     }
@@ -65,7 +66,7 @@ public class AlienMissile extends Dodgeable {
         this.alive = true;
 
         BodyData missileData = new BodyData(false);
-        missileData.setSpawnTime(TimeUtils.nanoTime() / GameVariables.MILLION_SCALE);
+        missileData.setSpawnTime(Gameplay.totalGameTime);
         dodgeableBody.setUserData(missileData);
 
     }
@@ -79,7 +80,7 @@ public class AlienMissile extends Dodgeable {
         this.alive = true;
 
         BodyData missileData = new BodyData(false);
-        missileData.setSpawnTime(TimeUtils.nanoTime() / GameVariables.MILLION_SCALE);
+        missileData.setSpawnTime(Gameplay.totalGameTime);
         dodgeableBody.setUserData(missileData);
 
     }
@@ -93,7 +94,7 @@ public class AlienMissile extends Dodgeable {
         this.alive = true;
 
         BodyData missileData = new BodyData(false);
-        missileData.setSpawnTime(TimeUtils.nanoTime() / GameVariables.MILLION_SCALE);
+        missileData.setSpawnTime(Gameplay.totalGameTime);
         dodgeableBody.setUserData(missileData);
 
     }

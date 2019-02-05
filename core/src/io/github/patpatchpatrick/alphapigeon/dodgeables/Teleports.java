@@ -20,6 +20,7 @@ import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Dodgeable;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBird;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelTwoBird;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Teleport;
+import io.github.patpatchpatrick.alphapigeon.levels.Gameplay;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
@@ -39,7 +40,7 @@ public class Teleports {
     private final Pool<Teleport> teleportsPool;
     private Animation<TextureRegion> teleportAnimation;
     private Texture teleportSheet;
-    private long lastTeleportSpawnTime;
+    private float lastTeleportSpawnTime;
 
     public Teleports(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables){
 
@@ -122,7 +123,7 @@ public class Teleports {
         teleportTwo.setOppositeTeleportData(teleportTwoData);
 
         //keep track of time the teleport shield was spawned
-        lastTeleportSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        lastTeleportSpawnTime = Gameplay.totalGameTime;
 
     }
 
@@ -153,7 +154,7 @@ public class Teleports {
 
     }
 
-    public long getLastTeleportSpawnTime(){
+    public float getLastTeleportSpawnTime(){
         return lastTeleportSpawnTime;
     }
 

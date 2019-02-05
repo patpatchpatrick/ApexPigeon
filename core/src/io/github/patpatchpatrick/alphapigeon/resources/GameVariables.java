@@ -6,9 +6,6 @@ public class GameVariables {
     public static final float WORLD_WIDTH = 80;
     public static final float WORLD_HEIGHT = 48;
 
-    //Scales
-    public static final long MILLION_SCALE = 1000000;
-
     //Pigeon Variables
         // The pigeon's speed in m/s
         // This speed slowly accelerated as the game progresses

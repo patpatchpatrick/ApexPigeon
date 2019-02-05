@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBird;
+import io.github.patpatchpatrick.alphapigeon.levels.Gameplay;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.SettingsManager;
 import io.github.patpatchpatrick.alphapigeon.resources.Sounds;
@@ -128,19 +129,19 @@ public class Notifications {
 
         private OrthographicCamera camera;
 
-        public static final float DURATION = 2500f;
+        public static final float DURATION = 2.5f; //seconds
 
-        private static long lastNotificationSpawnTime;
+        private static float lastNotificationSpawnTime;
         public static boolean notificationSpawned = false;
 
         public static boolean exclamationMarkLeftSpawned = false;
-        private static long lastExclamationMarkLeftSpawnTime;
+        private static float lastExclamationMarkLeftSpawnTime;
 
         public static boolean exclamationMarkTopSpawned = false;
-        private static long lastExclamationMarkTopSpawnTime;
+        private static float lastExclamationMarkTopSpawnTime;
 
         public static boolean exclamationMarkBottomSpawned = false;
-        private static long lastExclamationMarkBottomSpawnTime;
+        private static float lastExclamationMarkBottomSpawnTime;
 
         //Render variables
         protected final float HEIGHT = 5f;
@@ -155,7 +156,7 @@ public class Notifications {
 
         public void update() {
 
-            long currentTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+            float currentTime = Gameplay.totalGameTime;
             // If the exclamation mark display duration has passed, stop showing the exclamation mark
             // (i.e. set the spawned boolean to false)
             Boolean anExclamationMarkIsSpawned = exclamationMarkLeftSpawned || exclamationMarkBottomSpawned || exclamationMarkTopSpawned;
@@ -181,7 +182,7 @@ public class Notifications {
 
                 exclamationMarkLeftSpawned = true;
                 //keep track of time the exclamation mark was spawned
-                long currentTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+                float currentTime = Gameplay.totalGameTime;
                 lastExclamationMarkLeftSpawnTime = currentTime;
                 lastNotificationSpawnTime = currentTime;
                 notificationSpawned = true;
@@ -192,7 +193,7 @@ public class Notifications {
 
                 exclamationMarkBottomSpawned = true;
                 //keep track of time the exclamation mark was spawned
-                long currentTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+                float currentTime = Gameplay.totalGameTime;
                 lastExclamationMarkBottomSpawnTime = currentTime;
                 lastNotificationSpawnTime = currentTime;
                 notificationSpawned = true;
@@ -203,7 +204,7 @@ public class Notifications {
 
                 exclamationMarkTopSpawned = true;
                 //keep track of time the exclamation mark was spawned
-                long currentTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+                float currentTime = Gameplay.totalGameTime;
                 lastExclamationMarkTopSpawnTime = currentTime;
                 lastNotificationSpawnTime = currentTime;
                 notificationSpawned = true;
@@ -215,7 +216,7 @@ public class Notifications {
 
         public static boolean notificationIsComplete() {
             //If Exclamation Mark notification duration has passed, return true.
-            long currentTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+            float currentTime = Gameplay.totalGameTime;
             if (currentTime - lastNotificationSpawnTime > ExclamationMark.DURATION) {
                 return true;
             }

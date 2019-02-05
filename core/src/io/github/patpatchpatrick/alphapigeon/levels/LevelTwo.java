@@ -16,15 +16,16 @@ public class LevelTwo extends Level {
 
     //RANDOM WAVE VARIABLES
     // Level Two consists of "EASY" waves of dodgeables that occur randomly
+    // Durations are all in seconds
     public final static int TOTAL_NUMBER_OF_WAVES = 4;
     private final float RANDOM_WAVE_UFO = 1f;
-    private final float RANDOM_WAVE_UFO_SPAWN_DURATION = 10000;
+    private final float RANDOM_WAVE_UFO_SPAWN_DURATION = 10f;
     private final float RANDOM_WAVE_ALIEN_MISSILE = 2f;
-    private final float RANDOM_WAVE_ALIEN_MISSILE_SPAWN_DURATION = 2500;
+    private final float RANDOM_WAVE_ALIEN_MISSILE_SPAWN_DURATION = 2.5f;
     private final float RANDOM_WAVE_ROCKETS = 3f;
-    private final float RANDOM_WAVE_ROCKETS_SPAWN_DURATION = 4000;
-    private final float RANDOM_WAVE_L1BIRD_SPAWN_DURATION = 2000;
-    private final float RANDOM_WAVE_L2BIRD_SPAWN_DURATION = 2000;
+    private final float RANDOM_WAVE_ROCKETS_SPAWN_DURATION = 4f;
+    private final float RANDOM_WAVE_L1BIRD_SPAWN_DURATION = 2f;
+    private final float RANDOM_WAVE_L2BIRD_SPAWN_DURATION = 2f;
     private final float RANDOM_WAVE_VERT_BIRD_LINE = 4f;
     private boolean randomWaveVertBirdLineSpawned = false;
 
@@ -32,10 +33,9 @@ public class LevelTwo extends Level {
         super(dodgeables);
     }
 
-    public boolean run(boolean runRandomWave, float waveNumber, float totalGameTime, long currentTimeInMillis, float powerUpShieldInterval, boolean useStandardDuration) {
+    public boolean run(boolean runRandomWave, float waveNumber, float totalGameTime, float powerUpShieldInterval, boolean useStandardDuration) {
 
         this.totalGameTime = totalGameTime;
-        this.currentTimeInMillis = currentTimeInMillis;
         this.powerUpShieldInterval = powerUpShieldInterval;
 
         //Manually run a wave
@@ -46,10 +46,11 @@ public class LevelTwo extends Level {
                 // If you are running a random wave, override the manually inputted wave number with a random number
                 waveToRun = MathUtils.random(1, TOTAL_NUMBER_OF_WAVES);
             } else {
+                // If manually running a wave, use the manually inputted wave number as the wave to run
                 waveToRun = waveNumber;
             }
             //Save the time the last random wave was started
-            lastWaveStartTime = currentTimeInMillis;
+            lastWaveStartTime = totalGameTime;
             waveIsInitiated = true;
             return false;
         } else if (waveToRun == RANDOM_WAVE_UFO) {
@@ -84,7 +85,7 @@ public class LevelTwo extends Level {
 
         spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
 
-        if (currentTimeInMillis - ufos.getLastUfoSpawnTime(2) > RANDOM_WAVE_UFO_SPAWN_DURATION) {
+        if (totalGameTime - ufos.getLastUfoSpawnTime(2) > RANDOM_WAVE_UFO_SPAWN_DURATION) {
             ufos.spawnUfo(ufos.ENERGY_BEAM_RANDOM, 2);
         }
 
@@ -99,7 +100,7 @@ public class LevelTwo extends Level {
 
         spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
 
-        if (currentTimeInMillis - alienMissiles.getLastAlienMissileSpawnTime(2) > RANDOM_WAVE_ALIEN_MISSILE_SPAWN_DURATION) {
+        if (totalGameTime - alienMissiles.getLastAlienMissileSpawnTime(2) > RANDOM_WAVE_ALIEN_MISSILE_SPAWN_DURATION) {
             alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_LEFTWARD, 2);
         }
 
@@ -114,10 +115,10 @@ public class LevelTwo extends Level {
 
         spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
 
-        if (currentTimeInMillis - PowerUps.lastpowerUpShieldSpawnTime > powerUpShieldInterval) {
+        if (totalGameTime - PowerUps.lastpowerUpShieldSpawnTime > powerUpShieldInterval) {
             powerUps.spawnPowerUp(PowerUps.POWER_UP_TYPE_SHIELD);
         }
-        if (currentTimeInMillis - rockets.getLastRocketSpawnTime(2) > RANDOM_WAVE_ROCKETS_SPAWN_DURATION) {
+        if (totalGameTime - rockets.getLastRocketSpawnTime(2) > RANDOM_WAVE_ROCKETS_SPAWN_DURATION) {
             rockets.spawnRocket(2);
         }
 

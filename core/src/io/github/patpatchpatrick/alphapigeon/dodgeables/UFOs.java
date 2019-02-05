@@ -24,6 +24,7 @@ import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.ufoEnergyB
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.ufoEnergyBeam.UfoEnergyBeamLeft;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.ufoEnergyBeam.UfoEnergyBeamRight;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.ufoEnergyBeam.UfoEnergyBeamUp;
+import io.github.patpatchpatrick.alphapigeon.levels.Gameplay;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
@@ -41,8 +42,8 @@ public class UFOs {
     private Texture ufoSheet;
     private final float UFO_WIDTH = 15f;
     private final float UFO_HEIGHT = UFO_WIDTH;
-    private long lastUfoSpawnTime;
-    private HashMap<Float, Long> lastSpawnTimeByLevel = new HashMap<Float, Long>();
+    private float lastUfoSpawnTime;
+    private HashMap<Float, Float> lastSpawnTimeByLevel = new HashMap<Float, Float>();
 
     //UFO tracking variables
 
@@ -52,6 +53,7 @@ public class UFOs {
     private Texture energyBallSheet;
     private final float ENERGY_BALL_INITIAL_WIDTH = 5f;
     private final float ENERGY_BALL_INITIAL_HEIGHT = ENERGY_BALL_INITIAL_WIDTH / 2;
+    private final float ENERGY_BALL_TIME_BEFORE_SPAWN  = 5f; //seconds
 
     //UFO Energy Beam variables
     private final Array<UfoEnergyBeamLeft> activeEnergyBeamLefts = new Array<UfoEnergyBeamLeft>();
@@ -267,7 +269,7 @@ public class UFOs {
 
     public void update(float stateTime) {
 
-        long currentTimeInMillis = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        float currentTimeInMillis = Gameplay.totalGameTime;
 
 
         //Update all ufos
@@ -277,8 +279,8 @@ public class UFOs {
         //After the energy ball width matches the beam width, it is fully charged and ready spawn an energy beam object
         for (UFO ufo : activeUFOs) {
             if (!ufo.energyBallIsSpawned) {
-                if (currentTimeInMillis - ufo.spawnTime > 5000) {
-                    //Spawn an energy ball after a set amount of time if it is not spawned
+                if (currentTimeInMillis - ufo.spawnTime > ENERGY_BALL_TIME_BEFORE_SPAWN) {
+                    //Spawn an energy ball after a set amount of time (seconds) if it is not spawned
                     spawnEnergyBalls(ufo);
                 }
             } else {
@@ -517,7 +519,7 @@ public class UFOs {
 
 
         //keep track of time the ufo was spawned
-        lastUfoSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        lastUfoSpawnTime = Gameplay.totalGameTime;
         lastSpawnTimeByLevel.put(level, lastUfoSpawnTime);
 
     }
@@ -535,7 +537,7 @@ public class UFOs {
 
 
         //keep track of time the ufo was spawned
-        lastUfoSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        lastUfoSpawnTime = Gameplay.totalGameTime;
         lastSpawnTimeByLevel.put(level, lastUfoSpawnTime);
 
     }
@@ -552,11 +554,11 @@ public class UFOs {
 
 
         //keep track of time the ufo was spawned
-        lastUfoSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        lastUfoSpawnTime = Gameplay.totalGameTime;
         lastSpawnTimeByLevel.put(level, lastUfoSpawnTime);
     }
 
-    public void spawnStopInCenterUfo(float direction, long timeToHoldInCenter, float level) {
+    public void spawnStopInCenterUfo(float direction, float timeToHoldInCenter, float level) {
 
 
         // Spawn(obtain) a new UFO from the UFO pool and add to list of active UFOs
@@ -569,12 +571,12 @@ public class UFOs {
 
 
         //keep track of time the ufo was spawned
-        lastUfoSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        lastUfoSpawnTime = Gameplay.totalGameTime;
         lastSpawnTimeByLevel.put(level, lastUfoSpawnTime);
 
     }
 
-    public void spawnStopInRightCenterUfo(float direction, long timeToHoldInRightCenter, float level) {
+    public void spawnStopInRightCenterUfo(float direction, float timeToHoldInRightCenter, float level) {
 
 
         // Spawn(obtain) a new UFO from the UFO pool and add to list of active UFOs
@@ -588,12 +590,12 @@ public class UFOs {
 
 
         //keep track of time the ufo was spawned
-        lastUfoSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        lastUfoSpawnTime = Gameplay.totalGameTime;
         lastSpawnTimeByLevel.put(level, lastUfoSpawnTime);
 
     }
 
-    public void spawnTopRightCornerUfo(float direction, long timeToHold, float level){
+    public void spawnTopRightCornerUfo(float direction, float timeToHold, float level){
 
         // Spawn(obtain) a new UFO from the UFO pool and add to list of active UFOs
         // StopInCorner Ufos stop in the corner of the screen for a certain amount of time
@@ -605,12 +607,12 @@ public class UFOs {
 
 
         //keep track of time the ufo was spawned
-        lastUfoSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        lastUfoSpawnTime = Gameplay.totalGameTime;
         lastSpawnTimeByLevel.put(level, lastUfoSpawnTime);
 
     }
 
-    public void spawnBottomLeftCornerUfo(float direction, long timeToHold, float level){
+    public void spawnBottomLeftCornerUfo(float direction, float timeToHold, float level){
 
         // Spawn(obtain) a new UFO from the UFO pool and add to list of active UFOs
         // StopInCorner Ufos stop in the corner of the screen for a certain amount of time
@@ -622,7 +624,7 @@ public class UFOs {
 
 
         //keep track of time the ufo was spawned
-        lastUfoSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        lastUfoSpawnTime = Gameplay.totalGameTime;
         lastSpawnTimeByLevel.put(level, lastUfoSpawnTime);
 
     }

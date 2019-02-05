@@ -21,6 +21,7 @@ import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Dodgeable;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBird;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelTwoBird;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Meteor;
+import io.github.patpatchpatrick.alphapigeon.levels.Gameplay;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
@@ -36,7 +37,7 @@ public class Meteors {
     private final Pool<Meteor> meteorsPool;
     private Texture meteorTextureSpriteSheet;
     private Animation<TextureRegion> meteorAnimation;
-    private long lastMeteorSpawnTime;
+    private float lastMeteorSpawnTime;
     private final float METEOR_WIDTH = 80f;
     private final float METEOR_HEIGHT = METEOR_WIDTH / 2;
 
@@ -100,7 +101,7 @@ public class Meteors {
         dodgeables.activeDodgeables.add(meteor);
 
         //keep track of time the meteor was spawned
-        lastMeteorSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        lastMeteorSpawnTime = Gameplay.totalGameTime;
 
 
     }
@@ -138,7 +139,7 @@ public class Meteors {
 
     }
 
-    public long getLastMeteorSpawnTime(){
+    public float getLastMeteorSpawnTime(){
         return lastMeteorSpawnTime;
     }
 

@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.levels.Gameplay;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
@@ -52,7 +53,7 @@ public class AlienMissileCorner extends Dodgeable {
         //Set the time the corner was spawned on the corner body.  This is used in the update method
         //to destroy the missile explosion body after a set amount of time
         BodyData alienCornerData = new BodyData(false);
-        alienCornerData.setSpawnTime(TimeUtils.nanoTime()/GameVariables.MILLION_SCALE);
+        alienCornerData.setSpawnTime(Gameplay.totalGameTime);
         dodgeableBody.setUserData(alienCornerData);
 
     }
@@ -67,7 +68,7 @@ public class AlienMissileCorner extends Dodgeable {
         //Set the time the corner was spawned on the corner body.  This is used in the update method
         //to destroy the missile explosion body after a set amount of time
         BodyData alienCornerData = new BodyData(false);
-        alienCornerData.setSpawnTime(TimeUtils.nanoTime()/GameVariables.MILLION_SCALE);
+        alienCornerData.setSpawnTime(Gameplay.totalGameTime);
         dodgeableBody.setUserData(alienCornerData);
 
 
@@ -83,7 +84,7 @@ public class AlienMissileCorner extends Dodgeable {
         //Set the time the corner was spawned on the corner body.  This is used in the update method
         //to destroy the missile explosion body after a set amount of time
         BodyData alienCornerData = new BodyData(false);
-        alienCornerData.setSpawnTime(TimeUtils.nanoTime()/GameVariables.MILLION_SCALE);
+        alienCornerData.setSpawnTime(Gameplay.totalGameTime);
         dodgeableBody.setUserData(alienCornerData);
 
 
@@ -99,7 +100,7 @@ public class AlienMissileCorner extends Dodgeable {
         //Set the time the corner was spawned on the corner body.  This is used in the update method
         //to destroy the missile explosion body after a set amount of time
         BodyData alienCornerData = new BodyData(false);
-        alienCornerData.setSpawnTime(TimeUtils.nanoTime()/GameVariables.MILLION_SCALE);
+        alienCornerData.setSpawnTime(Gameplay.totalGameTime);
         dodgeableBody.setUserData(alienCornerData);
 
     }

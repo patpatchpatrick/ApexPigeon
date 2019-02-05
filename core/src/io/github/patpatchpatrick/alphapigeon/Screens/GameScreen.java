@@ -155,6 +155,7 @@ public class GameScreen implements Screen {
 
         // update the state time
         // if game is paused, there is no change in time
+        // statetime and delta time use units of seconds, the primary time unit used in this game
         deltaTime = state == State.PAUSE ? 0 : Gdx.graphics.getDeltaTime();
         stateTime += deltaTime;
 

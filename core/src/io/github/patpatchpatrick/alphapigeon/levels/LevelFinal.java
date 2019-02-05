@@ -35,10 +35,9 @@ public class LevelFinal extends Level {
         this.levelFour = levelFour;
     }
 
-    public void run(float totalGameTime, long currentTimeInMillis, float powerUpShieldInterval) {
+    public void run(float totalGameTime, float powerUpShieldInterval) {
 
         this.totalGameTime = totalGameTime;
-        this.currentTimeInMillis = currentTimeInMillis;
         this.powerUpShieldInterval = powerUpShieldInterval;
 
         if (!waveIsInitiated) {
@@ -55,7 +54,7 @@ public class LevelFinal extends Level {
             randomWaveOne = determineRandomWavesToRun(randomWaveOneLevel);
             randomWaveTwo = determineRandomWavesToRun(randomWaveTwoLevel);
             //Save the time the last random wave was started
-            lastWaveStartTime = currentTimeInMillis;
+            lastWaveStartTime = totalGameTime;
             waveIsInitiated = true;
         } else {
             runWave();
@@ -107,7 +106,7 @@ public class LevelFinal extends Level {
             waveIsInitiated = false;
         }
 
-        if (currentTimeInMillis - PowerUps.lastpowerUpShieldSpawnTime > powerUpShieldInterval) {
+        if (totalGameTime - PowerUps.lastpowerUpShieldSpawnTime > powerUpShieldInterval) {
             powerUps.spawnPowerUp(PowerUps.POWER_UP_TYPE_SHIELD);
             powerUps.spawnPowerUp(PowerUps.POWER_UP_TYPE_SKULL);
         }
@@ -121,12 +120,12 @@ public class LevelFinal extends Level {
 
         if (level == 2){
             //Level 2 waves need to be specified to use the standard duration because the duration for level 2 waves change to be longer on the final level
-            return levelTwo.run(false, wave, this.totalGameTime, this.currentTimeInMillis, this.powerUpShieldInterval, true);
+            return levelTwo.run(false, wave, this.totalGameTime, this.powerUpShieldInterval, true);
         } else if (level == 3){
-            return levelThree.run(false, wave, this.totalGameTime, this.currentTimeInMillis, this.powerUpShieldInterval, true);
+            return levelThree.run(false, wave, this.totalGameTime, this.powerUpShieldInterval, true);
         } else {
             //Level 4 waves need to be specified to use the standard duration because the duration for some level 3 waves change on the final level
-            return levelFour.run(false, wave, this.totalGameTime, this.currentTimeInMillis, this.powerUpShieldInterval, true);
+            return levelFour.run(false, wave, this.totalGameTime, this.powerUpShieldInterval, true);
         }
 
     }

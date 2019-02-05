@@ -19,12 +19,14 @@ import com.badlogic.gdx.utils.TimeUtils;
 import java.util.HashMap;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.Screens.GameScreen;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.AlienMissile;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.AlienMissileCorner;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.AlienMissileCornerExplosion;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.AlienMissileExplosion;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBird;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelTwoBird;
+import io.github.patpatchpatrick.alphapigeon.levels.Gameplay;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
@@ -42,8 +44,8 @@ public class AlienMissiles {
     private final Pool<AlienMissile> alienMissilePool;
     private Animation<TextureRegion> alienMissileAnimation;
     private Texture alienMissileSheet;
-    private long lastAlienMissileSpawnTime;
-    private HashMap<Float, Long> lastSpawnTimeByLevel = new HashMap<Float, Long>();
+    private float lastAlienMissileSpawnTime;
+    private HashMap<Float, Float> lastSpawnTimeByLevel = new HashMap<Float, Float>();
     public final float SPAWN_DIRECTION_LEFTWARD = 0f;
     public final float SPAWN_DIRECTION_UPWARD = 1f;
     public final float SPAWN_DIRECTION_RIGHTWARD = 2f;
@@ -55,21 +57,20 @@ public class AlienMissiles {
     private Array<Body> alienMissileExplosionArray = new Array<Body>();
     private Animation<TextureRegion> alienMissileExplosionAnimation;
     private Texture alienMissileExplosionSheet;
-    private long lastAlienMissileExplosionSpawnTime;
+    private float lastAlienMissileExplosionSpawnTime;
 
     //Alien Missile Corner variables
     private final Array<AlienMissileCorner> activeAlienMissileCorners = new Array<AlienMissileCorner>();
     private final Pool<AlienMissileCorner> alienMissileCornersPool;
     private Animation<TextureRegion> alienMissileCornerAnimation;
     private Texture alienMissileCornerSheet;
-    private long lastAlienMissileCornerSpawnTime;
-    private final float ALIEN_MISSILE_CORNER_EXPLOSION_FUSE_TIME = 1000;
+    private float lastAlienMissileCornerSpawnTime;
+    private final float ALIEN_MISSILE_CORNER_EXPLOSION_FUSE_TIME = 1f;  //seconds
 
     //Alien Missile Corner Explosion variables
     private final Array<AlienMissileCornerExplosion> activeAlienMissileCornerExplosions = new Array<AlienMissileCornerExplosion>();
     private final Pool<AlienMissileCornerExplosion> alienMissileCornerExplosionsPool;
     private Animation<TextureRegion> alienMissileCornerExplosionAnimation;
-    private long lastAlienMissileCornerExplosionSpawnTime;
 
     //Sounds
     private Sound alienMissileExplosionSound = Gdx.audio.newSound(Gdx.files.internal("sounds/alienMissileExplosion.mp3"));
@@ -165,7 +166,7 @@ public class AlienMissiles {
 
     public void update(){
 
-        long currentTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        float currentTime = Gameplay.totalGameTime;
 
         // Alien Missile
         // If missiles are spawned , explode them after a set amount of time.
@@ -174,8 +175,8 @@ public class AlienMissiles {
         for (AlienMissile alienMissile : activeAlienMissiles){
             BodyData missileData = (BodyData) alienMissile.dodgeableBody.getUserData();
             if (missileData != null) {
-                long missileSpawnTime = missileData.getSpawnTime();
-                if (currentTime - missileSpawnTime > 2000) {
+                float missileSpawnTime = missileData.getSpawnTime();
+                if (currentTime - missileSpawnTime > 2) {
                     missileData.setFlaggedForDelete(true);
                     spawnAlienMissileExplosion(alienMissile.getPosition().x + alienMissile.WIDTH/2, alienMissile.getPosition().y + alienMissile.HEIGHT/2);
                     spawnAlienMissileCorners(alienMissile.getPosition().x, alienMissile.getPosition().y);
@@ -192,8 +193,8 @@ public class AlienMissiles {
         for (AlienMissileExplosion alienMissileExplosion : activeAlienMissileExplosions){
             BodyData missileExplosionData = (BodyData) alienMissileExplosion.dodgeableBody.getUserData();
             if (missileExplosionData != null) {
-                long missileExplosionSpawnTime = missileExplosionData.getSpawnTime();
-                if (currentTime - missileExplosionSpawnTime > 500) {
+                float missileExplosionSpawnTime = missileExplosionData.getSpawnTime();
+                if (currentTime - missileExplosionSpawnTime > 0.5f) {
                     missileExplosionData.setFlaggedForDelete(true);
                 }
             } else {
@@ -208,7 +209,7 @@ public class AlienMissiles {
         for (AlienMissileCorner alienMissileCorner : activeAlienMissileCorners){
             BodyData missileData = (BodyData) alienMissileCorner.dodgeableBody.getUserData();
             if (missileData != null) {
-                long missileSpawnTime = missileData.getSpawnTime();
+                float missileSpawnTime = missileData.getSpawnTime();
                 if (currentTime - missileSpawnTime > ALIEN_MISSILE_CORNER_EXPLOSION_FUSE_TIME) {
                     missileData.setFlaggedForDelete(true);
                     spawnAlienMissileCornerExplosions(alienMissileCorner.getPosition().x, alienMissileCorner.getPosition().y);
@@ -225,8 +226,8 @@ public class AlienMissiles {
         for (AlienMissileCornerExplosion alienMissileCornerExplosion : activeAlienMissileCornerExplosions){
             BodyData missileExplosionData = (BodyData) alienMissileCornerExplosion.dodgeableBody.getUserData();
             if (missileExplosionData != null) {
-                long missileExplosionSpawnTime = missileExplosionData.getSpawnTime();
-                if (currentTime - missileExplosionSpawnTime > 500) {
+                float missileExplosionSpawnTime = missileExplosionData.getSpawnTime();
+                if (currentTime - missileExplosionSpawnTime > 0.5f) {
                     missileExplosionData.setFlaggedForDelete(true);
                 }
             } else {
@@ -258,7 +259,7 @@ public class AlienMissiles {
         dodgeables.activeDodgeables.add(alienMissile);
 
         //keep track of time the bird was spawned
-        lastAlienMissileSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        lastAlienMissileSpawnTime = Gameplay.totalGameTime;
         lastSpawnTimeByLevel.put(level, lastAlienMissileSpawnTime);
 
     }
@@ -273,7 +274,7 @@ public class AlienMissiles {
         dodgeables.activeDodgeables.add(alienMissileExplosion);
 
         //keep track of time the missile was spawned
-        lastAlienMissileExplosionSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        lastAlienMissileExplosionSpawnTime = Gameplay.totalGameTime;
 
         //play explosion sound
         alienMissileExplosionSound.play(SettingsManager.gameVolume);
@@ -314,15 +315,12 @@ public class AlienMissiles {
 
     public void spawnAlienMissileCornerExplosions(float explosionPositionX, float explosionPositionY){
 
-        // Spawn(obtain) a new alien missile corner explosionfrom the alien missile corner explosion pool and add to list of active alien missile explosions
+        // Spawn(obtain) a new alien missile corner explosion from the alien missile corner explosion pool and add to list of active alien missile explosions
 
         AlienMissileCornerExplosion alienMissileCornerExplosion = alienMissileCornerExplosionsPool.obtain();
         alienMissileCornerExplosion.init(explosionPositionX, explosionPositionY);
         activeAlienMissileCornerExplosions.add(alienMissileCornerExplosion);
         dodgeables.activeDodgeables.add(alienMissileCornerExplosion);
-
-        //keep track of time the missile was spawned
-        lastAlienMissileCornerExplosionSpawnTime = TimeUtils.nanoTime();
 
         //play explosion sound
         alienMissileExplosionSound.play(SettingsManager.gameVolume);

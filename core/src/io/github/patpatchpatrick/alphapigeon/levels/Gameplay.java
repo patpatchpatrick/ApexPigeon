@@ -27,8 +27,7 @@ public class Gameplay extends Level {
     //GAME TIMES
     private boolean gamePlayInitiated = false;
     private float startTime = 0f;
-    private float totalGameTime;
-    private long currentTimeInMillis;
+    public static float totalGameTime; //USED TO KEEP TRACK OF TOTAL GAME TIME.. PRIMARY TIME VARIABLE USED IN LEVELS AND DODGEABLES
     private float powerUpShieldInterval;
 
     //Class to control the gameplay of the game
@@ -40,17 +39,14 @@ public class Gameplay extends Level {
         levelThree = new LevelThree(dodgeables);
         levelFour = new LevelFour(dodgeables);
         levelFinal = new LevelFinal(dodgeables, levelOne, levelTwo, levelThree, levelFour);
-
-        startTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
-
-
     }
 
 
     public void render(float stateTime, SpriteBatch batch) {
 
         // Render all the dodgeable objects
-        this.dodgeables.render(stateTime, batch);
+        // Use the total game time so that the dodgeables stay in sync with the levels (both use totalGameTime)
+        this.dodgeables.render(totalGameTime, batch);
 
     }
 
@@ -74,7 +70,6 @@ public class Gameplay extends Level {
 
         // Method to keep track of how much time has passed and which level to run
 
-        currentTimeInMillis = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
         totalGameTime = stateTime - startTime;
         powerUpShieldInterval = powerUps.getPowerUpShieldIntervalTime();
 
@@ -82,23 +77,23 @@ public class Gameplay extends Level {
 
         if (totalGameTime > LEVEL_ONE_START_TIME && totalGameTime <= LEVEL_ONE_END_TIME) {
 
-            levelOne.run(totalGameTime, currentTimeInMillis, powerUpShieldInterval);
+            levelOne.run(totalGameTime, powerUpShieldInterval);
 
         } else if (totalGameTime > LEVEL_TWO_START_TIME && totalGameTime <= LEVEL_TWO_END_TIME){
 
-            levelTwo.run(true, NO_WAVE, totalGameTime, currentTimeInMillis, powerUpShieldInterval, false);
+            levelTwo.run(true, NO_WAVE, totalGameTime, powerUpShieldInterval, false);
 
         } else if (totalGameTime > LEVEL_THREE_START_TIME & totalGameTime <= LEVEL_THREE_END_TIME){
 
-            levelThree.run(true, NO_WAVE, totalGameTime,  currentTimeInMillis, powerUpShieldInterval, false);
+            levelThree.run(true, NO_WAVE, totalGameTime, powerUpShieldInterval, false);
 
         } else if (totalGameTime > LEVEL_FOUR_START_TIME & totalGameTime <= LEVEL_FOUR_END_TIME){
 
-            levelFour.run(true, NO_WAVE, totalGameTime, currentTimeInMillis, powerUpShieldInterval, false);
+            levelFour.run(true, NO_WAVE, totalGameTime, powerUpShieldInterval, false);
 
         } else if (totalGameTime > LEVEL_FINAL_START_TIME){
 
-            levelFinal.run(totalGameTime, currentTimeInMillis, powerUpShieldInterval);
+            levelFinal.run(totalGameTime, powerUpShieldInterval);
         }
 
 

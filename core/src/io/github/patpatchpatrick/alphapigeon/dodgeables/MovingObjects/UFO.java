@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.ufoEnergyBeam.UfoEnergyBeam;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.UFOs;
+import io.github.patpatchpatrick.alphapigeon.levels.Gameplay;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.SettingsManager;
@@ -32,12 +33,12 @@ public class UFO extends Dodgeable {
     public boolean stopInRightCenterOfScreen = false;
     public boolean stopInTopRightCornerOfScreen = false;
     public boolean stopInBottomLeftCornerOfScreen = false;
-    public long timeToHold = 0;
+    public float timeToHold = 0;
 
     //Sound associated with UFO
     private Sound flyingSound;
 
-    public long spawnTime;
+    public float spawnTime;
     //Energy balls associated with UFO
     public Array<EnergyBall> energyBalls = new Array<EnergyBall>();
     //Energy beams associated with UFO
@@ -78,7 +79,7 @@ public class UFO extends Dodgeable {
         this.alive = true;
 
         //keep track of time the ufo was spawned
-        spawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        spawnTime = Gameplay.totalGameTime;
 
         //Play UFO Sound
         this.flyingSound = flyingSound;
@@ -98,7 +99,7 @@ public class UFO extends Dodgeable {
         this.alive = true;
 
         //keep track of time the ufo was spawned
-        spawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        spawnTime = Gameplay.totalGameTime;
 
         //Play UFO Sound
         this.flyingSound = flyingSound;
@@ -116,7 +117,7 @@ public class UFO extends Dodgeable {
         this.alive = true;
 
         //keep track of time the ufo was spawned
-        spawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        spawnTime = Gameplay.totalGameTime;
 
         //Play UFO Sound
         this.flyingSound = flyingSound;
@@ -124,7 +125,7 @@ public class UFO extends Dodgeable {
 
     }
 
-    public void initStopInCenter(float direction, long timeToHoldInCenter, Sound flyingSound) {
+    public void initStopInCenter(float direction, float timeToHoldInCenter, Sound flyingSound) {
 
         //This version of the UFO will stop in the center of the screen for a specified period of time
 
@@ -137,7 +138,7 @@ public class UFO extends Dodgeable {
         this.alive = true;
 
         //keep track of time the ufo was spawned
-        spawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        spawnTime = Gameplay.totalGameTime;
 
         this.stopInCenterOfScreen = true;
         this.timeToHold = timeToHoldInCenter;
@@ -148,7 +149,7 @@ public class UFO extends Dodgeable {
 
     }
 
-    public void initStopInRightCenter(float direction, long timeToHoldInCenter, Sound flyingSound) {
+    public void initStopInRightCenter(float direction, float timeToHoldInCenter, Sound flyingSound) {
 
         //This version of the UFO will stop in the center of the screen for a specified period of time
 
@@ -161,7 +162,7 @@ public class UFO extends Dodgeable {
         this.alive = true;
 
         //keep track of time the ufo was spawned
-        spawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        spawnTime = Gameplay.totalGameTime;
 
         this.stopInRightCenterOfScreen = true;
         this.timeToHold = timeToHoldInCenter;
@@ -172,7 +173,7 @@ public class UFO extends Dodgeable {
 
     }
 
-    public void initStopInTopRightCorner(float direction, long timeToHold, Sound flyingSound){
+    public void initStopInTopRightCorner(float direction, float timeToHold, Sound flyingSound){
         //This version of the UFO will stop in the right corner of the screen for a specified period of time
 
         //Set the direction which the energy beams associated with the UFO should fire
@@ -184,7 +185,7 @@ public class UFO extends Dodgeable {
         this.alive = true;
 
         //keep track of time the ufo was spawned
-        spawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        spawnTime = Gameplay.totalGameTime;
 
         this.stopInTopRightCornerOfScreen = true;
         this.timeToHold = timeToHold;
@@ -194,7 +195,7 @@ public class UFO extends Dodgeable {
         this.flyingSound.loop(SettingsManager.gameVolume);
     }
 
-    public void initStopInBottomLeftCorner(float direction, long timeToHold, Sound flyingSound){
+    public void initStopInBottomLeftCorner(float direction, float timeToHold, Sound flyingSound){
         //This version of the UFO will stop in the bottom left corner of the screen for a specified period of time
 
         //Set the direction which the energy beams associated with the UFO should fire
@@ -206,7 +207,7 @@ public class UFO extends Dodgeable {
         this.alive = true;
 
         //keep track of time the ufo was spawned
-        spawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        spawnTime = Gameplay.totalGameTime;
 
         this.stopInBottomLeftCornerOfScreen = true;
         this.timeToHold = timeToHold;
@@ -220,7 +221,7 @@ public class UFO extends Dodgeable {
     public void checkIfCanBeUnheld() {
         super.checkIfCanBeUnheld();
 
-        long currentTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        float currentTime = Gameplay.totalGameTime;
         if (this.timeHoldWillBeReleased <= currentTime){
             this.stopInCenterOfScreen = false;
             this.stopInRightCenterOfScreen = false;

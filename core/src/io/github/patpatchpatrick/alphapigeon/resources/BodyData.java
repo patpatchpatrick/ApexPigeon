@@ -13,7 +13,7 @@ public class BodyData {
 
     private Boolean flaggedForDelete;
 
-    private long spawnTime = 9999;
+    private float spawnTime = 9999f;
 
     //TELEPORT DATA
     private Teleport oppositeTeleport;
@@ -46,11 +46,11 @@ public class BodyData {
         this.flaggedForDelete = flaggedForDelete;
     }
 
-    public void setSpawnTime(long spawnTime) {
+    public void setSpawnTime(float spawnTime) {
         this.spawnTime = spawnTime;
     }
 
-    public long getSpawnTime() {
+    public float getSpawnTime() {
         return this.spawnTime;
     }
 

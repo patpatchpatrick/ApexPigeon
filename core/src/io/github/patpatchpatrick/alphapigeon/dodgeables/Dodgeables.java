@@ -84,18 +84,18 @@ public class Dodgeables {
     }
 
 
-    public void render(float stateTime, SpriteBatch batch) {
+    public void render(float totalGameTime, SpriteBatch batch) {
 
         //Render all dodgeable classes
 
-        birds.render(stateTime, batch);
-        rockets.render(stateTime, batch);
-        alienMissiles.render(stateTime, batch);
-        teleports.render(stateTime, batch);
-        powerUps.render(stateTime, batch);
-        meteors.render(stateTime, batch);
-        ufos.render(stateTime, batch);
-        notifications.render(stateTime, batch);
+        birds.render(totalGameTime, batch);
+        rockets.render(totalGameTime, batch);
+        alienMissiles.render(totalGameTime, batch);
+        teleports.render(totalGameTime, batch);
+        powerUps.render(totalGameTime, batch);
+        meteors.render(totalGameTime, batch);
+        ufos.render(totalGameTime, batch);
+        notifications.render(totalGameTime, batch);
 
 
     }

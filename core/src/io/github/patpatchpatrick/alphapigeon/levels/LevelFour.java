@@ -1,11 +1,13 @@
 package io.github.patpatchpatrick.alphapigeon.levels;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Notifications;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Notifications.ExclamationMark;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Teleports;
+import sun.rmi.runtime.Log;
 
 public class LevelFour extends Level {
 
@@ -15,26 +17,27 @@ public class LevelFour extends Level {
     // that are randomly selected
 
     //RANDOM WAVE VARIABLES
+    //Durations are all in seconds
     public final static int TOTAL_NUMBER_OF_WAVES = 6;
     private final float RANDOM_WAVE_TELEPORT_MADNESS = 1f;
-    private final float RANDOM_WAVE_TELEPORT_MADNESS_L1BIRD_DURATION = 700f;
-    private final float RANDOM_WAVE_TELEPORT_SPAWN_DURATION = 4000f;
-    private final float RANDOM_WAVE_TELEPORT_MADNESS_TOTAL_TIME = 15000f;
+    private final float RANDOM_WAVE_TELEPORT_MADNESS_L1BIRD_DURATION = 0.7f;
+    private final float RANDOM_WAVE_TELEPORT_SPAWN_DURATION = 4f;
+    private final float RANDOM_WAVE_TELEPORT_MADNESS_TOTAL_TIME = 15f;
     private final float RANDOM_WAVE_ALIEN_MISSILE_MADNESS = 2f;
-    private final float RANDOM_WAVE_ALIEN_MISSILE_SPAWN_DURATION = 5000f;
+    private final float RANDOM_WAVE_ALIEN_MISSILE_SPAWN_DURATION = 5f;
     private final float RANDOM_WAVE_UFOS_IN_CORNERS = 3f;
-    private final float RANDOM_WAVE_UFOS_IN_CORNERS_BIRD_DURATION = 2000f;
+    private final float RANDOM_WAVE_UFOS_IN_CORNERS_BIRD_DURATION = 2f;
     private boolean randomWaveCornerUfosAreSpawned = false;
     private final float RANDOM_WAVE_ROCKET_MADNESS = 4f;
-    private final float RANDOM_WAVE_ROCKET_MADNESS_L1BIRD_DURATION = 800f;
-    private final float RANDOM_WAVE_ROCKET_MADNESS_SPAWN_DURATION = 800f;
+    private final float RANDOM_WAVE_ROCKET_MADNESS_L1BIRD_DURATION = 0.8f;
+    private final float RANDOM_WAVE_ROCKET_MADNESS_SPAWN_DURATION = 0.8f;
     private final float RANDOM_WAVE_BIRD_MADNESS = 5f;
-    private final float RANDOM_WAVE_BIRD_MADNESS_L1BIRD_DURATION = 1600f;
-    private final float RANDOM_WAVE_BIRD_MADNESS_L2BIRD_DURATION = 3200f;
+    private final float RANDOM_WAVE_BIRD_MADNESS_L1BIRD_DURATION = 1.6f;
+    private final float RANDOM_WAVE_BIRD_MADNESS_L2BIRD_DURATION = 3.2f;
     private final float RANDOM_WAVE_UFO_MAZE = 6f;
-    private final float RANDOM_WAVE_UFO_MAZE_SPAWN_DURATION = 7500f;
-    private final float RANDOM_WAVE_UFO_MAZE_L1BIRD_DURATION = 2000f;
-    private final float RANDOM_WAVE_UFO_MAZE_L2BIRD_DURATION = 2000f;
+    private final float RANDOM_WAVE_UFO_MAZE_SPAWN_DURATION = 7.5f;
+    private final float RANDOM_WAVE_UFO_MAZE_L1BIRD_DURATION = 2f;
+    private final float RANDOM_WAVE_UFO_MAZE_L2BIRD_DURATION = 2f;
     private float randomWaveUfoMazeBeamDirection = ufos.ENERGY_BEAM_DOWN;
 
 
@@ -42,13 +45,10 @@ public class LevelFour extends Level {
         super(dodgeables);
     }
 
-    public boolean run(boolean runRandomWave, float waveNumber, float totalGameTime, long currentTimeInMillis, float powerUpShieldInterval, boolean useStandardDuration) {
+    public boolean run(boolean runRandomWave, float waveNumber, float totalGameTime, float powerUpShieldInterval, boolean useStandardDuration) {
 
         this.totalGameTime = totalGameTime;
-        this.currentTimeInMillis = currentTimeInMillis;
         this.powerUpShieldInterval = powerUpShieldInterval;
-
-        float waveToRun = waveNumber;
 
         //Manually run a wave
         // Return true if wave is complete
@@ -57,22 +57,25 @@ public class LevelFour extends Level {
             if (runRandomWave){
                 // If you are running a random wave, override the manually inputted wave number with a random number
                 waveToRun = MathUtils.random(1, TOTAL_NUMBER_OF_WAVES);
+            } else {
+                // If manually running a wave, waveToRun is the manually inputted wave numebr
+                waveToRun = waveNumber;
             }
             //Save the time the last random wave was started
-            lastWaveStartTime = currentTimeInMillis;
+            lastWaveStartTime = totalGameTime;
             waveIsInitiated = true;
             return false;
-        } else if (waveNumber == RANDOM_WAVE_TELEPORT_MADNESS) {
+        } else if (waveToRun == RANDOM_WAVE_TELEPORT_MADNESS) {
             return runRandomWaveTeleportMadness();
-        } else if (waveNumber == RANDOM_WAVE_ALIEN_MISSILE_MADNESS) {
+        } else if (waveToRun == RANDOM_WAVE_ALIEN_MISSILE_MADNESS) {
             return runRandomWaveAlienMissileMadness();
-        } else if (waveNumber == RANDOM_WAVE_UFOS_IN_CORNERS) {
+        } else if (waveToRun == RANDOM_WAVE_UFOS_IN_CORNERS) {
             return runRandomWaveUFOsInCorners();
-        } else if (waveNumber == RANDOM_WAVE_ROCKET_MADNESS) {
+        } else if (waveToRun == RANDOM_WAVE_ROCKET_MADNESS) {
             return runRandomWaveRocketMadness();
-        } else if (waveNumber == RANDOM_WAVE_BIRD_MADNESS) {
+        } else if (waveToRun == RANDOM_WAVE_BIRD_MADNESS) {
             return runRandomWaveBirdMadness();
-        } else if (waveNumber == RANDOM_WAVE_UFO_MAZE) {
+        } else if (waveToRun == RANDOM_WAVE_UFO_MAZE) {
             return runRandomWaveUfoMaze(useStandardDuration);
         } else {
             return false;
@@ -103,7 +106,7 @@ public class LevelFour extends Level {
         // Spawn loads of teleports at random heights and level one birds
         spawnBirds(RANDOM_WAVE_TELEPORT_MADNESS_L1BIRD_DURATION, 100000);
 
-        if (currentTimeInMillis - teleports.getLastTeleportSpawnTime() > RANDOM_WAVE_TELEPORT_SPAWN_DURATION) {
+        if (totalGameTime - teleports.getLastTeleportSpawnTime() > RANDOM_WAVE_TELEPORT_SPAWN_DURATION) {
             teleports.spawnTeleports(Teleports.VERT_POSITION_RANDOM);
         }
 
@@ -124,7 +127,7 @@ public class LevelFour extends Level {
         if (ExclamationMark.notificationIsComplete()) {
             //If notification has finished displaying,
             // Spawn loads of alien missiles
-            if (currentTimeInMillis - alienMissiles.getLastAlienMissileSpawnTime(4) > RANDOM_WAVE_ALIEN_MISSILE_SPAWN_DURATION) {
+            if (totalGameTime - alienMissiles.getLastAlienMissileSpawnTime(4) > RANDOM_WAVE_ALIEN_MISSILE_SPAWN_DURATION) {
                 alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_LEFTWARD, 4);
                 alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_UPWARD, 4);
                 alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_RIGHTWARD, 4);
@@ -174,7 +177,7 @@ public class LevelFour extends Level {
 
         spawnBirds(RANDOM_WAVE_ROCKET_MADNESS_L1BIRD_DURATION, 100000);
 
-        if (currentTimeInMillis - rockets.getLastRocketSpawnTime(4) > RANDOM_WAVE_ROCKET_MADNESS_SPAWN_DURATION) {
+        if (totalGameTime - rockets.getLastRocketSpawnTime(4) > RANDOM_WAVE_ROCKET_MADNESS_SPAWN_DURATION) {
             rockets.spawnRocket(4);
         }
 
@@ -193,7 +196,7 @@ public class LevelFour extends Level {
 
         spawnBirds(RANDOM_WAVE_UFO_MAZE_L1BIRD_DURATION, RANDOM_WAVE_UFO_MAZE_L2BIRD_DURATION);
 
-        if (currentTimeInMillis - ufos.getLastUfoSpawnTime(4) > RANDOM_WAVE_UFO_MAZE_SPAWN_DURATION) {
+        if (totalGameTime - ufos.getLastUfoSpawnTime(4) > RANDOM_WAVE_UFO_MAZE_SPAWN_DURATION) {
             if (randomWaveUfoMazeBeamDirection == ufos.ENERGY_BEAM_DOWN) {
                 ufos.spawnStopInRightCenterUfo(randomWaveUfoMazeBeamDirection,  6, 4);
                 randomWaveUfoMazeBeamDirection = ufos.ENERGY_BEAM_UP;

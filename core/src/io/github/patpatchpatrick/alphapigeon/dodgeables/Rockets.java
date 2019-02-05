@@ -22,6 +22,7 @@ import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBird;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Rocket;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.RocketExplosion;
+import io.github.patpatchpatrick.alphapigeon.levels.Gameplay;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
@@ -39,16 +40,17 @@ public class Rockets {
     private final Pool<Rocket> rocketPool;
     private Animation<TextureRegion> rocketAnimation;
     private Texture rocketSheet;
-    private long lastRocketSpawnTime;
-    private HashMap<Float, Long> lastSpawnTimeByLevel = new HashMap<Float, Long>();
+    private float lastRocketSpawnTime;
+    private HashMap<Float, Float> lastSpawnTimeByLevel = new HashMap<Float, Float>();
+    private final float ROCKET_ACCELERATION_TIME = 0.5f; //seconds
 
     //Rocket explosion variables
     private final Array<RocketExplosion> activeRocketExplosions = new Array<RocketExplosion>();
     private final Pool<RocketExplosion> rocketExplosionPool;
     private Animation<TextureRegion> rocketExplosionAnimation;
     private Texture rocketExplosionSheet;
-    private final float EXPLOSION_DURATION = 500;
-    private long lastRocketExplosionSpawnTime;
+    private final float EXPLOSION_DURATION = 0.5f; //seconds
+    private float lastRocketExplosionSpawnTime;
 
     //Sounds
     private Sound rocketSpawnSound = Gdx.audio.newSound(Gdx.files.internal("sounds/rocketSpawn.wav"));
@@ -109,13 +111,13 @@ public class Rockets {
 
     public void update() {
 
-        long currentTimeInMillis = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        float currentTimeInMillis = Gameplay.totalGameTime;
 
         // ROCKETS
         // If rockets are spawned , accelerate them.  The X force is constant and the Y force
         // is stored on the rocket body data.  Y force depends on where the rocket was spawned (see spawnRockets method)
         // If data is null on the rocket, delete the rocket
-        if (currentTimeInMillis - lastRocketSpawnTime > 500) {
+        if (currentTimeInMillis - lastRocketSpawnTime > ROCKET_ACCELERATION_TIME) {
             for (Rocket rocket : activeRockets) {
                 float forceX = -1f;
                 BodyData rocketData = (BodyData) rocket.dodgeableBody.getUserData();
@@ -135,7 +137,7 @@ public class Rockets {
         for (RocketExplosion rocketExplosion : activeRocketExplosions) {
             BodyData rocketExplosionData = (BodyData) rocketExplosion.dodgeableBody.getUserData();
             if (rocketExplosionData != null) {
-                long rocketExplosionSpawnTime = rocketExplosionData.getSpawnTime();
+                float rocketExplosionSpawnTime = rocketExplosionData.getSpawnTime();
                 if (currentTimeInMillis - rocketExplosionSpawnTime > EXPLOSION_DURATION) {
                     rocketExplosionData.setFlaggedForDelete(true);
                 }
@@ -179,7 +181,7 @@ public class Rockets {
         dodgeables.activeDodgeables.add(rocket);
 
         //keep track of time the rocket was spawned
-        lastRocketSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        lastRocketSpawnTime = Gameplay.totalGameTime;
         lastSpawnTimeByLevel.put(level, lastRocketSpawnTime);
 
         //Play rocket spawn sounds
@@ -197,7 +199,7 @@ public class Rockets {
         dodgeables.activeDodgeables.add(rocketExplosion);
 
         //keep track of time the rocket explosion was spawned
-        lastRocketExplosionSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        lastRocketExplosionSpawnTime = Gameplay.totalGameTime;
 
         //Play rocket explosion sound
         rocketExplosionSound.play(SettingsManager.gameVolume);
@@ -266,7 +268,7 @@ public class Rockets {
 
     }
 
-    public long getLastRocketSpawnTime(float level) {
+    public float getLastRocketSpawnTime(float level) {
 
         //Return the last spawn time for a given level
 

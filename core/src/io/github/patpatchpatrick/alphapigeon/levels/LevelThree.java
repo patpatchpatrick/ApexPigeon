@@ -16,24 +16,25 @@ public class LevelThree extends Level {
 
     //RANDOM WAVE VARIABLES
     // Level Three consists of "MEDIUM" difficulty waves of dodgeables that occur randomly
+    // Durations are all in seconds
     public final static int TOTAL_NUMBER_OF_WAVES = 6;
     private final float RANDOM_WAVE_UFO_HORIZONTAL = 1f;
     private boolean randomWaveHorizUfoSpawned = false;
     private final float RANDOM_WAVE_UFO_VERTICAL = 2f;
     private boolean randomWaveVertUfoSpawned = false;
     private final float RANDOM_WAVE_METEORS = 3f;
-    private final float RANDOM_WAVE_METEORS_SPAWN_DURATION = 2000f;
+    private final float RANDOM_WAVE_METEORS_SPAWN_DURATION = 2f;
     private final float RANDOM_WAVE_MISSILES = 4f;
-    private final float RANDOM_WAVE_MISSILES_SPAWN_DURATION = 2000f;
+    private final float RANDOM_WAVE_MISSILES_SPAWN_DURATION = 2f;
     private final float RANDOM_WAVE_UFO_CENTER = 5f;
     private boolean randomWaveCenterUfoSpawned = false;
     private final float RANDOM_WAVE_VERT_UFO_TELEPORT = 6f;
     private boolean randomWaveVertTeleUfoSpawned = false;
     private boolean randomWaveVertTeleUfoTeleportsSpawned = false;
-    private long randomWaveVerTeleUfoTimeUfoSpawned = 999999999;
-    private final float RANDOM_WAVE_VERT_UFO_TELEPORT_TIME_BEFORE_TELE_SPAWN = 12000f;
-    private final float RANDOM_WAVE_L1BIRD_SPAWN_DURATION = 2000;
-    private final float RANDOM_WAVE_L2BIRD_SPAWN_DURATION = 2000;
+    private float randomWaveVerTeleUfoTimeUfoSpawned = 999999999f;
+    private final float RANDOM_WAVE_VERT_UFO_TELEPORT_TIME_BEFORE_TELE_SPAWN = 12f;
+    private final float RANDOM_WAVE_L1BIRD_SPAWN_DURATION = 2f;
+    private final float RANDOM_WAVE_L2BIRD_SPAWN_DURATION = 2f;
 
 
     public LevelThree(Dodgeables dodgeables) {
@@ -41,13 +42,10 @@ public class LevelThree extends Level {
     }
 
 
-    public boolean run(boolean runRandomWave, float waveNumber, float totalGameTime, long currentTimeInMillis, float powerUpShieldInterval, boolean useStandardDuration) {
+    public boolean run(boolean runRandomWave, float waveNumber, float totalGameTime, float powerUpShieldInterval, boolean useStandardDuration) {
 
         this.totalGameTime = totalGameTime;
-        this.currentTimeInMillis = currentTimeInMillis;
         this.powerUpShieldInterval = powerUpShieldInterval;
-
-        float waveToRun = waveNumber;
 
         //Manually run a wave
         // Return true if wave is complete
@@ -56,22 +54,25 @@ public class LevelThree extends Level {
             if (runRandomWave){
                 // If you are running a random wave, override the manually inputted wave number with a random number
                 waveToRun = MathUtils.random(1, TOTAL_NUMBER_OF_WAVES);
+            } else {
+                // If manually running a wave, the wave to run should be the manually inputted wave number
+                waveToRun = waveNumber;
             }
             //Save the time the last random wave was started
-            lastWaveStartTime = currentTimeInMillis;
+            lastWaveStartTime = totalGameTime;
             waveIsInitiated = true;
             return false;
-        } else if (waveNumber == RANDOM_WAVE_UFO_HORIZONTAL) {
+        } else if (waveToRun == RANDOM_WAVE_UFO_HORIZONTAL) {
             return runRandomWaveHorizontalUFO();
-        } else if (waveNumber == RANDOM_WAVE_UFO_VERTICAL) {
+        } else if (waveToRun == RANDOM_WAVE_UFO_VERTICAL) {
             return runRandomWaveVerticalUFO();
-        } else if (waveNumber == RANDOM_WAVE_METEORS) {
+        } else if (waveToRun == RANDOM_WAVE_METEORS) {
             return runRandomWaveMeteors();
-        } else if (waveNumber == RANDOM_WAVE_MISSILES) {
+        } else if (waveToRun == RANDOM_WAVE_MISSILES) {
             return runRandomWaveMissiles();
-        } else if (waveNumber == RANDOM_WAVE_UFO_CENTER) {
+        } else if (waveToRun == RANDOM_WAVE_UFO_CENTER) {
             return runRandomWaveCenterUFO();
-        } else if (waveNumber == RANDOM_WAVE_VERT_UFO_TELEPORT) {
+        } else if (waveToRun == RANDOM_WAVE_VERT_UFO_TELEPORT) {
             return runRandomWaveVerticalUFOAndTeleport();
         } else {
             return false;
@@ -142,10 +143,10 @@ public class LevelThree extends Level {
 
         spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
 
-        if (currentTimeInMillis - rockets.getLastRocketSpawnTime(3) > RANDOM_WAVE_MISSILES_SPAWN_DURATION) {
+        if (totalGameTime - rockets.getLastRocketSpawnTime(3) > RANDOM_WAVE_MISSILES_SPAWN_DURATION) {
             rockets.spawnRocket(3);
         }
-        if (currentTimeInMillis - alienMissiles.getLastAlienMissileSpawnTime(3) > RANDOM_WAVE_MISSILES_SPAWN_DURATION) {
+        if (totalGameTime - alienMissiles.getLastAlienMissileSpawnTime(3) > RANDOM_WAVE_MISSILES_SPAWN_DURATION) {
             alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_LEFTWARD, 3);
         }
 
@@ -163,7 +164,7 @@ public class LevelThree extends Level {
         if (ExclamationMark.notificationIsComplete()) {
             //If notification has finished displaying,
             // Spawn meteors coming from the top of the screen
-            if (currentTimeInMillis - meteors.getLastMeteorSpawnTime() > RANDOM_WAVE_METEORS_SPAWN_DURATION) {
+            if (totalGameTime - meteors.getLastMeteorSpawnTime() > RANDOM_WAVE_METEORS_SPAWN_DURATION) {
                 //Spawn meteors
                 meteors.spawnMeteor();
             }
@@ -202,12 +203,12 @@ public class LevelThree extends Level {
             //line of energy beams (i.e. a top and bottom beam) that must be jumped over using a teleport
             // The ufo stops at the right of the screen for 6 seconds to let the power beam generate before moving
             ufos.spawnStopInRightCenterUfo(ufos.ENERGY_BEAM_VERTICAL_DIRECTIONS, 6, 3);
-            randomWaveVerTeleUfoTimeUfoSpawned = currentTimeInMillis;
+            randomWaveVerTeleUfoTimeUfoSpawned = totalGameTime;
             randomWaveVertTeleUfoSpawned = true;
 
         }
 
-        if (!randomWaveVertTeleUfoTeleportsSpawned && currentTimeInMillis - randomWaveVerTeleUfoTimeUfoSpawned > RANDOM_WAVE_VERT_UFO_TELEPORT_TIME_BEFORE_TELE_SPAWN) {
+        if (!randomWaveVertTeleUfoTeleportsSpawned && totalGameTime - randomWaveVerTeleUfoTimeUfoSpawned > RANDOM_WAVE_VERT_UFO_TELEPORT_TIME_BEFORE_TELE_SPAWN) {
             //If time before when the teleport should spawn has passed and teleports haven't spawned yet
             // , spawn teleports that can be used by the player to dodge the energy beam
             teleports.spawnTeleports(30);

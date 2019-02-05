@@ -20,6 +20,7 @@ import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Dodgeable;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBird;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelTwoBird;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.PowerUp;
+import io.github.patpatchpatrick.alphapigeon.levels.Gameplay;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
@@ -44,17 +45,17 @@ public class PowerUps {
     //PowerUp Shield variables
     private Animation<TextureRegion> powerUpShieldAnimation;
     private Texture powerUpShieldSheet;
-    public static long lastpowerUpShieldSpawnTime;
+    public static float lastpowerUpShieldSpawnTime;
 
     //PowerUp Skull variables
     private Animation<TextureRegion> powerUpSkullAnimation;
     private Texture powerUpSkullSheet;
-    public static long lastpowerUpSkullSpawnTime;
+    public static float lastpowerUpSkullSpawnTime;
 
 
     //Shield intervals between spawns
-    private final float SHIELD_INITIAL_SPAWN_INTERVAL_START_RANGE = 20000;
-    private final float SHIELD_INITIAL_SPAWN_INTERVAL_END_RANGE = 60000;
+    private final float SHIELD_INITIAL_SPAWN_INTERVAL_START_RANGE = 20; //seconds
+    private final float SHIELD_INITIAL_SPAWN_INTERVAL_END_RANGE = 60; //seconds
     private float shieldRandomSpawnInterval;
 
     public PowerUps(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables) {
@@ -134,10 +135,10 @@ public class PowerUps {
         //keep track of time the PowerUp was spawned
         switch (powerUpType) {
             case POWER_UP_TYPE_SHIELD:
-                lastpowerUpShieldSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+                lastpowerUpShieldSpawnTime = Gameplay.totalGameTime;
                 break;
             case POWER_UP_TYPE_SKULL:
-                lastpowerUpSkullSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+                lastpowerUpSkullSpawnTime = Gameplay.totalGameTime;
                 break;
         }
 

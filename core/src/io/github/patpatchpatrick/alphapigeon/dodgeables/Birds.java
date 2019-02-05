@@ -22,6 +22,7 @@ import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBi
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBirdReverse;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelTwoBird;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelTwoBirdReverse;
+import io.github.patpatchpatrick.alphapigeon.levels.Gameplay;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
@@ -40,13 +41,13 @@ public class Birds {
     private final Pool<LevelOneBird> levelOneBirdPool;
     private Animation<TextureRegion> levelOneBirdAnimation;
     private Texture levelOneBirdFlySheet;
-    private long lastLevelOneBirdSpawnTime;
+    private float lastLevelOneBirdSpawnTime;
 
 
     //Level One Bird (Reverse) variables
     private final Array<LevelOneBirdReverse> activeLevelOneBirdReverses = new Array<LevelOneBirdReverse>();
     private final Pool<LevelOneBirdReverse> levelOneBirdReversePool;
-    private long lastLevelOneBirdReverseSpawnTime;
+    private float lastLevelOneBirdReverseSpawnTime;
 
 
     //Level Two Bird variables
@@ -54,13 +55,13 @@ public class Birds {
     private final Pool<LevelTwoBird> levelTwoBirdPool;
     private Animation<TextureRegion> levelTwoBirdAnimation;
     private Texture levelTwoBirdFlySheet;
-    private long lastLevelTwoBirdSpawnTime;
+    private float lastLevelTwoBirdSpawnTime;
 
 
     //Level Two Bird (Reverse) variables
     private final Array<LevelTwoBirdReverse> activeLevelTwoBirdReverses = new Array<LevelTwoBirdReverse>();
     private final Pool<LevelTwoBirdReverse> levelTwoBirdReversePool;
-    private long lastLevelTwoBirdReverseSpawnTime;
+    private float lastLevelTwoBirdReverseSpawnTime;
 
 
 
@@ -206,7 +207,8 @@ public class Birds {
         dodgeables.activeDodgeables.add(levelOneBird);
 
         //keep track of time the bird was spawned
-        lastLevelOneBirdSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        lastLevelOneBirdSpawnTime = Gameplay.totalGameTime;
+        Gdx.app.log("BIRDSPAWNTIME", "" + lastLevelOneBirdSpawnTime);
 
     }
 
@@ -220,7 +222,7 @@ public class Birds {
         dodgeables.activeDodgeables.add(levelOneBirdReverse);
 
         //keep track of time the bird was spawned
-        lastLevelOneBirdReverseSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        lastLevelOneBirdReverseSpawnTime = Gameplay.totalGameTime;
 
     }
 
@@ -234,7 +236,7 @@ public class Birds {
         dodgeables.activeDodgeables.add(levelTwoBird);
 
         //keep track of time the bird was spawned
-        lastLevelTwoBirdSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        lastLevelTwoBirdSpawnTime = Gameplay.totalGameTime;
     }
 
     public void spawnLevelTwoBirdReverse(float totalGameTime) {
@@ -247,7 +249,7 @@ public class Birds {
         dodgeables.activeDodgeables.add(levelTwoBirdReverse);
 
         //keep track of time the bird was spawned
-        lastLevelTwoBirdReverseSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        lastLevelTwoBirdReverseSpawnTime = Gameplay.totalGameTime;
 
 
     }
@@ -271,7 +273,7 @@ public class Birds {
 
 
         //keep track of time the bird was spawned
-        lastLevelOneBirdSpawnTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        lastLevelOneBirdSpawnTime = Gameplay.totalGameTime;
 
 
     }

@@ -26,33 +26,32 @@ public abstract class Level {
     protected boolean waveIsInitiated = false;
     protected final float NO_WAVE = 0f;
     protected float waveToRun;
-    protected long lastWaveStartTime = 0;
-    protected final float RANDOM_WAVE_STANDARD_DURATION = 30000f;
-    protected final float RANDOM_WAVE_SHORT_DURATION = 15000f;
-    protected final float RANDOM_WAVE_LONG_DURATION = 60000f;
+    protected float lastWaveStartTime = 0f;
+    protected final float RANDOM_WAVE_STANDARD_DURATION = 30f;
+    protected final float RANDOM_WAVE_SHORT_DURATION = 15f;
+    protected final float RANDOM_WAVE_LONG_DURATION = 60f;
 
     // GAME TIMES
     protected float startTime = 0f;
     protected float totalGameTime;
-    protected long currentTimeInMillis;
     protected float powerUpShieldInterval;
 
-    //LEVEL TIMES in milliseconds
+    //LEVEL TIMES in seconds
     protected final float LEVEL_ONE_START_TIME = 0f;
     //L1W1 is only level 1 birds,  L1W2 is level 1 and 2 birds
-    //Start time should be 0f and end time should be 40000f
-    protected final float LEVEL_ONE_WAVE_1 = 20000f;
-    protected final float LEVEL_ONE_END_TIME = 100000f;
+    //Start time should be 0f and end time should be 40f
+    protected final float LEVEL_ONE_WAVE_1 = 20f;
+    protected final float LEVEL_ONE_END_TIME = 0f;
     //L2 is "easy" difficulty
-    //End time should be 120000f
+    //End time should be 120f
     protected final float LEVEL_TWO_START_TIME = LEVEL_ONE_END_TIME;
-    protected final float LEVEL_TWO_END_TIME = 2f;
+    protected final float LEVEL_TWO_END_TIME = 0f;
     //L3 is "medium" difficulty
-    //End time shoudl be 180000f
+    //End time shoudl be 180f
     protected final float LEVEL_THREE_START_TIME = LEVEL_TWO_END_TIME;
-    protected final float LEVEL_THREE_END_TIME = 6f;
+    protected final float LEVEL_THREE_END_TIME = 1f;
     //L4 is "hard" difficulty
-    //End time should be 260000f
+    //End time should be 260f
     protected final float LEVEL_FOUR_START_TIME = LEVEL_THREE_END_TIME;
     protected final float LEVEL_FOUR_END_TIME = 7f;
     //Level Final is "insane" difficulty.  It is a continuous level and the last level of the game
@@ -79,10 +78,10 @@ public abstract class Level {
         //Method shared by all of the levels
         //Spawns level one and level two birds based on inputted spawn durations
 
-        if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() > levelOneBirdSpawnDuration) {
+        if (totalGameTime - birds.getLastLevelOneBirdSpawnTime() > levelOneBirdSpawnDuration) {
             birds.spawnLevelOneBird(totalGameTime);
         }
-        if (currentTimeInMillis - birds.getLastLevelTwoBirdSpawnTime() > levelTwoBirdSpawnDuration) {
+        if (totalGameTime - birds.getLastLevelTwoBirdSpawnTime() > levelTwoBirdSpawnDuration) {
             birds.spawnLevelTwoBird(totalGameTime);
         }
 
@@ -92,10 +91,10 @@ public abstract class Level {
         //Method shared by all of the levels
         //Spawns level one and level two birds based on inputted spawn durations
         //Birds are spawned flying in reverse direction
-        if (currentTimeInMillis - birds.getLastLevelOneReverseBirdSpawnTime() > levelOneBirdSpawnDuration) {
+        if (totalGameTime - birds.getLastLevelOneReverseBirdSpawnTime() > levelOneBirdSpawnDuration) {
             birds.spawnLevelOneBirdReverse(totalGameTime);
         }
-        if (currentTimeInMillis - birds.getLastLevelTwoReverseBirdSpawnTime() > levelTwoBirdSpawnDuration) {
+        if (totalGameTime - birds.getLastLevelTwoReverseBirdSpawnTime() > levelTwoBirdSpawnDuration) {
             birds.spawnLevelTwoBirdReverse(totalGameTime);
         }
     }
@@ -104,7 +103,7 @@ public abstract class Level {
         //Check if a wave is complete, if so, mark randomWaveInitiated as false so that a new random
         // wave will be run
         // Return true if random wave is complete
-        if (currentTimeInMillis - lastWaveStartTime > randomWaveDuration) {
+        if (totalGameTime - lastWaveStartTime > randomWaveDuration) {
             waveIsInitiated = false;
             return true;
         }

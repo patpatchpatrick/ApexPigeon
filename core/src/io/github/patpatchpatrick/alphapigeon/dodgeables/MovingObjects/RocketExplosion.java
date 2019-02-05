@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.levels.Gameplay;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
@@ -54,7 +55,7 @@ public class RocketExplosion extends Dodgeable {
         //Set the time the rocket was exploded on the rocket.  This is used in the update method
         //to destroy the rocket explosion after a set amount of time
         BodyData rocketExplosionData = new BodyData(false);
-        rocketExplosionData.setSpawnTime(TimeUtils.nanoTime() / GameVariables.MILLION_SCALE);
+        rocketExplosionData.setSpawnTime(Gameplay.totalGameTime);
         dodgeableBody.setUserData(rocketExplosionData);
 
     }

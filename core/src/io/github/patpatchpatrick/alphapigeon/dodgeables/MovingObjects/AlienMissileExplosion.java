@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.levels.Gameplay;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
@@ -52,7 +53,7 @@ public class AlienMissileExplosion extends Dodgeable {
         //Set the time the missile was exploded on the missile explosion  body.  This is used in the update method
         //to destroy the missile explosion body after a set amount of time
         BodyData alienMissileExplosionData = new BodyData(false);
-        alienMissileExplosionData.setSpawnTime(TimeUtils.nanoTime()/GameVariables.MILLION_SCALE);
+        alienMissileExplosionData.setSpawnTime(Gameplay.totalGameTime);
         dodgeableBody.setUserData(alienMissileExplosionData);
 
     }

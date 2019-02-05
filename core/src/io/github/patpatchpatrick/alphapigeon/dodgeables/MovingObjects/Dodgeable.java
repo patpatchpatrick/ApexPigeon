@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+import io.github.patpatchpatrick.alphapigeon.levels.Gameplay;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
@@ -33,7 +34,7 @@ public abstract class Dodgeable implements Pool.Poolable {
     // Hold the object for a set amount of time (seconds)
     // After allotted time, apply a force to the object if necessary.
     public boolean isHeld = false;
-    protected long timeHoldWillBeReleased = 0;
+    protected float timeHoldWillBeReleased = 0;
     protected float forceXApplyAfterHold = 0f;
     protected float forceYApplyAfterHold = 0f;
 
@@ -71,7 +72,7 @@ public abstract class Dodgeable implements Pool.Poolable {
         return true;
     }
 
-    public void holdPosition(long numberOfSeconds, float forceXToApplyAfterHold, float forceYToApplyAfterHold){
+    public void holdPosition(float numberOfSeconds, float forceXToApplyAfterHold, float forceYToApplyAfterHold){
         //Hold the dodgeables position for a certain number of seconds and afterwards
         // apply a given force to it
         this.forceXApplyAfterHold = forceXToApplyAfterHold;
@@ -81,9 +82,9 @@ public abstract class Dodgeable implements Pool.Poolable {
         Vector2 vel = new Vector2(0f, 0f);
         dodgeableBody.setLinearVelocity(vel);
 
-        // Set times for when hold should be initiated and be released in milliseconds
-        long currentTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
-        this.timeHoldWillBeReleased = currentTime + numberOfSeconds * 1000;
+        // Set times for when hold should be initiated and be released in seconds
+        float currentTime = Gameplay.totalGameTime;
+        this.timeHoldWillBeReleased = currentTime + numberOfSeconds;
         this.isHeld = true;
     }
 
@@ -92,7 +93,7 @@ public abstract class Dodgeable implements Pool.Poolable {
         // If the currentTime is past the time that the hold will be released, release the hold
         // and apply the given force
 
-        long currentTime = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
+        float currentTime = Gameplay.totalGameTime;
         if (this.timeHoldWillBeReleased <= currentTime){
             this.dodgeableBody.applyForceToCenter(this.forceXApplyAfterHold, this.forceYApplyAfterHold,true);
             this.isHeld = false;
