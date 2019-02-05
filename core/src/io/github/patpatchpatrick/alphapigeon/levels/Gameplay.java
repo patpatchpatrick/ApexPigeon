@@ -1,5 +1,6 @@
 package io.github.patpatchpatrick.alphapigeon.levels;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.TimeUtils;
 
@@ -24,6 +25,7 @@ public class Gameplay extends Level {
     private LevelFinal levelFinal;
 
     //GAME TIMES
+    private boolean gamePlayInitiated = false;
     private float startTime = 0f;
     private float totalGameTime;
     private long currentTimeInMillis;
@@ -54,21 +56,29 @@ public class Gameplay extends Level {
 
     public void update(float stateTime) {
 
+        //Initialize start time
+        if (!gamePlayInitiated){
+            startTime = stateTime;
+            gamePlayInitiated = true;
+        }
+
         // Update all levels and gameplay
-        updateLevels();
+        updateLevels(stateTime);
 
         // Update all the dodgeable objects
         this.dodgeables.update(stateTime);
 
     }
 
-    private void updateLevels() {
+    private void updateLevels(float stateTime) {
 
         // Method to keep track of how much time has passed and which level to run
 
         currentTimeInMillis = TimeUtils.nanoTime() / GameVariables.MILLION_SCALE;
-        totalGameTime = currentTimeInMillis - startTime;
+        totalGameTime = stateTime - startTime;
         powerUpShieldInterval = powerUps.getPowerUpShieldIntervalTime();
+
+        Gdx.app.log("STATETIME",  "" + totalGameTime);
 
         if (totalGameTime > LEVEL_ONE_START_TIME && totalGameTime <= LEVEL_ONE_END_TIME) {
 
