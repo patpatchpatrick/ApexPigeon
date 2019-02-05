@@ -17,6 +17,9 @@ import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
 public class Gameplay extends Level {
 
+    //Class to control the gameplay of the game.
+    //Controls the game levels, and how enemies are spawned as the game time increases
+
     //Levels
     private LevelOne levelOne;
     private LevelTwo levelTwo;
@@ -26,11 +29,10 @@ public class Gameplay extends Level {
 
     //GAME TIMES
     private boolean gamePlayInitiated = false;
-    private float startTime = 0f;
-    public static float totalGameTime; //USED TO KEEP TRACK OF TOTAL GAME TIME.. PRIMARY TIME VARIABLE USED IN LEVELS AND DODGEABLES
-    private float powerUpShieldInterval;
+    private float startTime = 0f; //Used to track when gameplay was initiated
+    public static float totalGameTime; //Used to track total game time. Primary time variable used in all levels classes and dodgeables.
 
-    //Class to control the gameplay of the game
+
     public Gameplay(Dodgeables dodgeables) {
         super(dodgeables);
 
@@ -42,7 +44,7 @@ public class Gameplay extends Level {
     }
 
 
-    public void render(float stateTime, SpriteBatch batch) {
+    public void render(SpriteBatch batch) {
 
         // Render all the dodgeable objects
         // Use the total game time so that the dodgeables stay in sync with the levels (both use totalGameTime)
@@ -52,48 +54,46 @@ public class Gameplay extends Level {
 
     public void update(float stateTime) {
 
-        //Initialize start time
+        //Initialize start time for the game to be the current statetime
         if (!gamePlayInitiated){
             startTime = stateTime;
             gamePlayInitiated = true;
         }
 
         // Update all levels and gameplay
-        updateLevels(stateTime);
+        // Update the total game time (total game time is always the difference between the stateTime and startTime in seconds)
+        totalGameTime = stateTime - startTime;
+        updateLevels();
 
         // Update all the dodgeable objects
-        this.dodgeables.update(stateTime);
+        // The dodgeable objects are the enemies in the game that must be dodged
+        this.dodgeables.update();
 
     }
 
-    private void updateLevels(float stateTime) {
+    private void updateLevels() {
 
-        // Method to keep track of how much time has passed and which level to run
-
-        totalGameTime = stateTime - startTime;
-        powerUpShieldInterval = powerUps.getPowerUpShieldIntervalTime();
-
-        Gdx.app.log("STATETIME",  "" + totalGameTime);
+        // Method to keep track of which level to run based on how much time has passed
 
         if (totalGameTime > LEVEL_ONE_START_TIME && totalGameTime <= LEVEL_ONE_END_TIME) {
 
-            levelOne.run(totalGameTime, powerUpShieldInterval);
+            levelOne.run(totalGameTime);
 
         } else if (totalGameTime > LEVEL_TWO_START_TIME && totalGameTime <= LEVEL_TWO_END_TIME){
 
-            levelTwo.run(true, NO_WAVE, totalGameTime, powerUpShieldInterval, false);
+            levelTwo.run(true, NO_WAVE, totalGameTime, false);
 
         } else if (totalGameTime > LEVEL_THREE_START_TIME & totalGameTime <= LEVEL_THREE_END_TIME){
 
-            levelThree.run(true, NO_WAVE, totalGameTime, powerUpShieldInterval, false);
+            levelThree.run(true, NO_WAVE, totalGameTime, false);
 
         } else if (totalGameTime > LEVEL_FOUR_START_TIME & totalGameTime <= LEVEL_FOUR_END_TIME){
 
-            levelFour.run(true, NO_WAVE, totalGameTime, powerUpShieldInterval, false);
+            levelFour.run(true, NO_WAVE, totalGameTime, false);
 
         } else if (totalGameTime > LEVEL_FINAL_START_TIME){
 
-            levelFinal.run(totalGameTime, powerUpShieldInterval);
+            levelFinal.run(totalGameTime);
         }
 
 

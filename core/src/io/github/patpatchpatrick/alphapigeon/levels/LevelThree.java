@@ -42,10 +42,9 @@ public class LevelThree extends Level {
     }
 
 
-    public boolean run(boolean runRandomWave, float waveNumber, float totalGameTime, float powerUpShieldInterval, boolean useStandardDuration) {
+    public boolean run(boolean runRandomWave, float waveNumber, float totalGameTime, boolean useStandardDuration) {
 
         this.totalGameTime = totalGameTime;
-        this.powerUpShieldInterval = powerUpShieldInterval;
 
         //Manually run a wave
         // Return true if wave is complete

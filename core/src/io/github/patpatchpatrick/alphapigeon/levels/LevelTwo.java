@@ -33,10 +33,9 @@ public class LevelTwo extends Level {
         super(dodgeables);
     }
 
-    public boolean run(boolean runRandomWave, float waveNumber, float totalGameTime, float powerUpShieldInterval, boolean useStandardDuration) {
+    public boolean run(boolean runRandomWave, float waveNumber, float totalGameTime, boolean useStandardDuration) {
 
         this.totalGameTime = totalGameTime;
-        this.powerUpShieldInterval = powerUpShieldInterval;
 
         //Manually run a wave
         // Return true if wave is complete
@@ -115,7 +114,7 @@ public class LevelTwo extends Level {
 
         spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
 
-        if (totalGameTime - PowerUps.lastpowerUpShieldSpawnTime > powerUpShieldInterval) {
+        if (totalGameTime - PowerUps.lastpowerUpShieldSpawnTime > PowerUps.randomSpawnIntervalTime) {
             powerUps.spawnPowerUp(PowerUps.POWER_UP_TYPE_SHIELD);
         }
         if (totalGameTime - rockets.getLastRocketSpawnTime(2) > RANDOM_WAVE_ROCKETS_SPAWN_DURATION) {

@@ -175,7 +175,7 @@ public class GameScreen implements Screen {
         game.batch.begin();
         scrollingBackground.render(game.batch);
         highScore.render(game.batch);
-        gameplay.render(stateTime, game.batch);
+        gameplay.render(game.batch);
         pigeon.render(stateTime, game.batch);
         if (state == State.PAUSE) {
             game.batch.draw(resumeButton, PAUSE_RESUME_BUTTON_X1, PAUSE_RESUME_BUTTON_Y1, PAUSE_RESUME_BUTTON_WIDTH, PAUSE_RESUME_BUTTON_HEIGHT);

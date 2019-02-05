@@ -100,7 +100,7 @@ public class Dodgeables {
 
     }
 
-    public void update(float stateTime) {
+    public void update() {
 
         //Update all dodgeable classes
         birds.update();
@@ -109,7 +109,7 @@ public class Dodgeables {
         teleports.update();
         powerUps.update();
         meteors.update();
-        ufos.update(stateTime);
+        ufos.update();
         notifications.update();
 
     }

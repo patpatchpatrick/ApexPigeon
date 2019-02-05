@@ -22,21 +22,19 @@ public abstract class Level {
     protected UFOs ufos;
 
     // WAVE VARIABLES
-    // Used to keep track of whether or not a random wave has started, and when
+    // Used to keep track of whether or not a random wave has started, when it started, and durations
     protected boolean waveIsInitiated = false;
     protected final float NO_WAVE = 0f;
     protected float waveToRun;
     protected float lastWaveStartTime = 0f;
-    protected final float RANDOM_WAVE_STANDARD_DURATION = 30f;
-    protected final float RANDOM_WAVE_SHORT_DURATION = 15f;
-    protected final float RANDOM_WAVE_LONG_DURATION = 60f;
+    protected final float RANDOM_WAVE_STANDARD_DURATION = 30f; //seconds
+    protected final float RANDOM_WAVE_SHORT_DURATION = 15f; //seconds
+    protected final float RANDOM_WAVE_LONG_DURATION = 60f; //seconds
 
     // GAME TIMES
-    protected float startTime = 0f;
     protected float totalGameTime;
-    protected float powerUpShieldInterval;
 
-    //LEVEL TIMES in seconds
+    //LEVEL TIMES (seconds)
     protected final float LEVEL_ONE_START_TIME = 0f;
     //L1W1 is only level 1 birds,  L1W2 is level 1 and 2 birds
     //Start time should be 0f and end time should be 40f

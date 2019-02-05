@@ -7,22 +7,14 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
-import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Dodgeable;
-import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBird;
-import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelTwoBird;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.PowerUp;
 import io.github.patpatchpatrick.alphapigeon.levels.Gameplay;
-import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
-import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 
 public class PowerUps {
 
@@ -56,7 +48,7 @@ public class PowerUps {
     //Shield intervals between spawns
     private final float SHIELD_INITIAL_SPAWN_INTERVAL_START_RANGE = 20; //seconds
     private final float SHIELD_INITIAL_SPAWN_INTERVAL_END_RANGE = 60; //seconds
-    private float shieldRandomSpawnInterval;
+    public static float randomSpawnIntervalTime; //The random spawn interval used to determine whether or not to spawn new powerUp
 
     public PowerUps(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables) {
         this.gameWorld = gameWorld;
@@ -76,7 +68,7 @@ public class PowerUps {
         };
 
         // set the initial shield spawn interval to a random number between 20 seconds and 60 seconds
-        shieldRandomSpawnInterval = MathUtils.random(SHIELD_INITIAL_SPAWN_INTERVAL_START_RANGE, SHIELD_INITIAL_SPAWN_INTERVAL_END_RANGE);
+        randomSpawnIntervalTime = MathUtils.random(SHIELD_INITIAL_SPAWN_INTERVAL_START_RANGE, SHIELD_INITIAL_SPAWN_INTERVAL_END_RANGE);
 
 
     }
@@ -208,11 +200,6 @@ public class PowerUps {
 
 
     }
-
-    public float getPowerUpShieldIntervalTime() {
-        return this.shieldRandomSpawnInterval;
-    }
-
 
     public void sweepDeadBodies() {
 

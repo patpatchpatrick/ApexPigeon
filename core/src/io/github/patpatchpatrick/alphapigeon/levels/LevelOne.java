@@ -20,7 +20,7 @@ public class LevelOne extends Level {
         super(dodgeables);
     }
 
-    public void run(float totalGameTime, float powerUpShieldInterval){
+    public void run(float totalGameTime){
 
 
         if (totalGameTime < LEVEL_ONE_WAVE_1) {
@@ -30,7 +30,7 @@ public class LevelOne extends Level {
                 meteors.spawnMeteor();
 
             }
-            if (totalGameTime - PowerUps.lastpowerUpShieldSpawnTime > powerUpShieldInterval) {
+            if (totalGameTime - PowerUps.lastpowerUpShieldSpawnTime > PowerUps.randomSpawnIntervalTime) {
                 powerUps.spawnPowerUp(PowerUps.POWER_UP_TYPE_SHIELD);
                 ufos.spawnVerticalUfo(ufos.ENERGY_BEAM_VERTICAL_DIRECTIONS, 3);
             }
@@ -42,7 +42,7 @@ public class LevelOne extends Level {
             if (totalGameTime - birds.getLastLevelTwoBirdSpawnTime() > L2BIRD_SPAWN_DURATION_WAVE_1) {
                 birds.spawnLevelTwoBird(totalGameTime);
             }
-            if (totalGameTime - PowerUps.lastpowerUpShieldSpawnTime > powerUpShieldInterval) {
+            if (totalGameTime - PowerUps.lastpowerUpShieldSpawnTime > PowerUps.randomSpawnIntervalTime) {
                 powerUps.spawnPowerUp(PowerUps.POWER_UP_TYPE_SHIELD);
             }
 

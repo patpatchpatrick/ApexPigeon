@@ -267,7 +267,7 @@ public class UFOs {
 
     }
 
-    public void update(float stateTime) {
+    public void update() {
 
         float currentTimeInMillis = Gameplay.totalGameTime;
 
