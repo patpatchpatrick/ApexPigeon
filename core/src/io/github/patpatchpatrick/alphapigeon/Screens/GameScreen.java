@@ -179,6 +179,8 @@ public class GameScreen implements Screen {
 
         gameState = GAME_PAUSED;
 
+        //TODO currently the energy beam/ball continues to grow after game is paused and sounds continue to play
+
     }
 
     @Override

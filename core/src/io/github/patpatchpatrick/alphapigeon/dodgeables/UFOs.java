@@ -399,7 +399,8 @@ public class UFOs {
 
         //REMOVE OFF SCREEN UFOs
         for (UFO ufo : activeUFOs) {
-            if (ufo.getPosition().x < 0 - ufo.WIDTH || ufo.getPosition().y < 0 - ufo.HEIGHT) {
+            if (ufo.getPosition().x < 0 - ufo.WIDTH || ufo.getPosition().x > camera.viewportWidth + 2 * ufo.WIDTH ||
+                    ufo.getPosition().y < 0 - ufo.HEIGHT || ufo.getPosition().y > camera.viewportHeight + 2 *ufo.HEIGHT) {
                 activeUFOs.removeValue(ufo, false);
                 dodgeables.activeDodgeables.removeValue(ufo, false);
                 ufoPool.free(ufo);

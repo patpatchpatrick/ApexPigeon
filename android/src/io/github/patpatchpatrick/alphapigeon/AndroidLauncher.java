@@ -303,23 +303,30 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
     @Override
     public void submitScore(long highScore) {
 
-        Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this))
-                .submitScore((leaderboard), highScore);
+        //Ensure user is signed in so game doesn't crash
+        if (GoogleSignIn.getLastSignedInAccount(this) != null) {
+
+            Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this))
+                    .submitScore((leaderboard), highScore);
+        }
 
     }
 
     @Override
     public void showLeaderboard() {
 
-        Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this))
-                .getLeaderboardIntent(leaderboard)
-                .addOnSuccessListener(new OnSuccessListener<Intent>() {
-                    @Override
-                    public void onSuccess(Intent intent) {
-                        startActivityForResult(intent, RC_LEADERBOARD_UI);
-                    }
-                });
+        //Ensure user is signed in so game doesn't crash
+        if (GoogleSignIn.getLastSignedInAccount(this) != null) {
 
+            Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this))
+                    .getLeaderboardIntent(leaderboard)
+                    .addOnSuccessListener(new OnSuccessListener<Intent>() {
+                        @Override
+                        public void onSuccess(Intent intent) {
+                            startActivityForResult(intent, RC_LEADERBOARD_UI);
+                        }
+                    });
+        }
 
     }
 
@@ -328,38 +335,42 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
 
         //Get a list of player centered high scores and return it in ArrayList<String> format
 
-        Task<AnnotatedData<LeaderboardsClient.LeaderboardScores>> playerCenteredScoresTask =
-                Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this))
-                        .loadPlayerCenteredScores(leaderboard, TIME_SPAN_ALL_TIME, COLLECTION_PUBLIC, 10, false);
+        //Ensure user is signed in so game doesn't crash
+        if (GoogleSignIn.getLastSignedInAccount(this) != null) {
 
-        playerCenteredScoresTask.addOnSuccessListener(new OnSuccessListener<AnnotatedData<LeaderboardsClient.LeaderboardScores>>() {
-            @Override
-            public void onSuccess(AnnotatedData<LeaderboardsClient.LeaderboardScores> leaderboardScoresAnnotatedData) {
+            Task<AnnotatedData<LeaderboardsClient.LeaderboardScores>> playerCenteredScoresTask =
+                    Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this))
+                            .loadPlayerCenteredScores(leaderboard, TIME_SPAN_ALL_TIME, COLLECTION_PUBLIC, 10, false);
 
-                LeaderboardsClient.LeaderboardScores leaderboardScores = leaderboardScoresAnnotatedData.get();
-                LeaderboardScoreBuffer leaderboardScoreBuffer = leaderboardScores.getScores();
-                int count = 0;
-                if (leaderboardScoreBuffer != null) {
-                    count = leaderboardScoreBuffer.getCount();
+            playerCenteredScoresTask.addOnSuccessListener(new OnSuccessListener<AnnotatedData<LeaderboardsClient.LeaderboardScores>>() {
+                @Override
+                public void onSuccess(AnnotatedData<LeaderboardsClient.LeaderboardScores> leaderboardScoresAnnotatedData) {
+
+                    LeaderboardsClient.LeaderboardScores leaderboardScores = leaderboardScoresAnnotatedData.get();
+                    LeaderboardScoreBuffer leaderboardScoreBuffer = leaderboardScores.getScores();
+                    int count = 0;
+                    if (leaderboardScoreBuffer != null) {
+                        count = leaderboardScoreBuffer.getCount();
+                    }
+                    ArrayList<String> playerCenteredHighScores = new ArrayList<>();
+                    for (int i = 0; i < count; i++) {
+                        LeaderboardScore score = leaderboardScoreBuffer.get(i);
+                        String scoreString = "";
+                        scoreString += "Name: " + score.getScoreHolderDisplayName() +
+                                " Rank: " + score.getDisplayRank() + " Score: " + score.getDisplayScore();
+                        playerCenteredHighScores.add(scoreString);
+                    }
+                    leaderboardScoreBuffer.release();
+                    mobileCallbacks.requestedHighScoresReceived(playerCenteredHighScores);
                 }
-                ArrayList<String> playerCenteredHighScores = new ArrayList<>();
-                for (int i = 0; i < count; i++) {
-                    LeaderboardScore score = leaderboardScoreBuffer.get(i);
-                    String scoreString = "";
-                    scoreString += "Name: " + score.getScoreHolderDisplayName() +
-                            " Rank: " + score.getDisplayRank() + " Score: " + score.getDisplayScore();
-                    playerCenteredHighScores.add(scoreString);
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    handleException(e, getString(R.string.leaderboards_exception));
                 }
-                leaderboardScoreBuffer.release();
-                mobileCallbacks.requestedHighScoresReceived(playerCenteredHighScores);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                handleException(e, getString(R.string.leaderboards_exception));
-            }
-        });
+            });
 
+        }
 
     }
 
@@ -387,40 +398,43 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
         }
 
 
-        Task<AnnotatedData<LeaderboardsClient.LeaderboardScores>> topScoresTask =
-                Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this))
-                        .loadTopScores(leaderboard, timeSpan, COLLECTION_PUBLIC, 20, false);
+        //Ensure user is signed in so game doesn't crash
+        if (GoogleSignIn.getLastSignedInAccount(this) != null) {
 
-        topScoresTask.addOnSuccessListener(new OnSuccessListener<AnnotatedData<LeaderboardsClient.LeaderboardScores>>() {
-            @Override
-            public void onSuccess(AnnotatedData<LeaderboardsClient.LeaderboardScores> leaderboardScoresAnnotatedData) {
+            Task<AnnotatedData<LeaderboardsClient.LeaderboardScores>> topScoresTask =
+                    Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this))
+                            .loadTopScores(leaderboard, timeSpan, COLLECTION_PUBLIC, 20, false);
 
-                LeaderboardsClient.LeaderboardScores leaderboardScores = leaderboardScoresAnnotatedData.get();
-                LeaderboardScoreBuffer leaderboardScoreBuffer = leaderboardScores.getScores();
-                int count = 0;
-                if (leaderboardScoreBuffer != null) {
-                    count = leaderboardScoreBuffer.getCount();
+            topScoresTask.addOnSuccessListener(new OnSuccessListener<AnnotatedData<LeaderboardsClient.LeaderboardScores>>() {
+                @Override
+                public void onSuccess(AnnotatedData<LeaderboardsClient.LeaderboardScores> leaderboardScoresAnnotatedData) {
+
+                    LeaderboardsClient.LeaderboardScores leaderboardScores = leaderboardScoresAnnotatedData.get();
+                    LeaderboardScoreBuffer leaderboardScoreBuffer = leaderboardScores.getScores();
+                    int count = 0;
+                    if (leaderboardScoreBuffer != null) {
+                        count = leaderboardScoreBuffer.getCount();
+                    }
+                    ArrayList<String> topHighScores = new ArrayList<>();
+                    for (int i = 0; i < count; i++) {
+                        LeaderboardScore score = leaderboardScoreBuffer.get(i);
+                        String scoreString = "";
+                        scoreString += "Name: " + score.getScoreHolderDisplayName() +
+                                " Rank: " + score.getDisplayRank() + " Score: " + score.getDisplayScore();
+                        topHighScores.add(scoreString);
+                    }
+                    leaderboardScoreBuffer.release();
+                    //Send callback to mobile device with scores requested
+                    mobileCallbacks.requestedHighScoresReceived(topHighScores);
                 }
-                ArrayList<String> topHighScores = new ArrayList<>();
-                for (int i = 0; i < count; i++) {
-                    LeaderboardScore score = leaderboardScoreBuffer.get(i);
-                    String scoreString = "";
-                    scoreString += "Name: " + score.getScoreHolderDisplayName() +
-                            " Rank: " + score.getDisplayRank() + " Score: " + score.getDisplayScore();
-                    topHighScores.add(scoreString);
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    handleException(e, getString(R.string.leaderboards_exception));
                 }
-                leaderboardScoreBuffer.release();
-                //Send callback to mobile device with scores requested
-                mobileCallbacks.requestedHighScoresReceived(topHighScores);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                handleException(e, getString(R.string.leaderboards_exception));
-            }
-        });
+            });
 
-
+        }
     }
 
     @Override

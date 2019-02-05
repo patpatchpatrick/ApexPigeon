@@ -162,7 +162,7 @@ public class Birds {
         // so that they can be reused 
 
         for (LevelOneBird levelOneBird : activeLevelOneBirds) {
-            if (levelOneBird.getPosition().x < 0 - levelOneBird.WIDTH || levelOneBird.getPosition().x > camera.viewportWidth + levelOneBird.WIDTH) {
+            if (levelOneBird.getPosition().x < 0 - levelOneBird.WIDTH || levelOneBird.getPosition().x > camera.viewportWidth + levelOneBird.WIDTH || levelOneBird.getPosition().y < 0 - 2 * levelOneBird.HEIGHT) {
                 activeLevelOneBirds.removeValue(levelOneBird, false);
                 dodgeables.activeDodgeables.removeValue(levelOneBird, false);
                 levelOneBirdPool.free(levelOneBird);
@@ -170,7 +170,7 @@ public class Birds {
         }
 
         for (LevelOneBirdReverse levelOneBirdReverse : activeLevelOneBirdReverses) {
-            if (levelOneBirdReverse.getPosition().x < 0 - levelOneBirdReverse.WIDTH || levelOneBirdReverse.getPosition().x > camera.viewportWidth + levelOneBirdReverse.WIDTH) {
+            if (levelOneBirdReverse.getPosition().x < 0 - levelOneBirdReverse.WIDTH || levelOneBirdReverse.getPosition().x > camera.viewportWidth + levelOneBirdReverse.WIDTH || levelOneBirdReverse.getPosition().y < 0 - 2 * levelOneBirdReverse.HEIGHT) {
                 activeLevelOneBirdReverses.removeValue(levelOneBirdReverse, false);
                 dodgeables.activeDodgeables.removeValue(levelOneBirdReverse, false);
                 levelOneBirdReversePool.free(levelOneBirdReverse);
@@ -178,7 +178,7 @@ public class Birds {
         }
 
         for (LevelTwoBird levelTwoBird : activeLevelTwoBirds) {
-            if (levelTwoBird.getPosition().x < 0 - levelTwoBird.WIDTH || levelTwoBird.getPosition().x > camera.viewportWidth + levelTwoBird.WIDTH) {
+            if (levelTwoBird.getPosition().x < 0 - levelTwoBird.WIDTH || levelTwoBird.getPosition().x > camera.viewportWidth + levelTwoBird.WIDTH || levelTwoBird.getPosition().y < 0 - 2 * levelTwoBird.HEIGHT) {
                 activeLevelTwoBirds.removeValue(levelTwoBird, false);
                 dodgeables.activeDodgeables.removeValue(levelTwoBird, false);
                 levelTwoBirdPool.free(levelTwoBird);
@@ -186,7 +186,7 @@ public class Birds {
         }
 
         for (LevelTwoBirdReverse levelTwoBirdReverse : activeLevelTwoBirdReverses) {
-            if (levelTwoBirdReverse.getPosition().x < 0 - levelTwoBirdReverse.WIDTH || levelTwoBirdReverse.getPosition().x > camera.viewportWidth + levelTwoBirdReverse.WIDTH) {
+            if (levelTwoBirdReverse.getPosition().x < 0 - levelTwoBirdReverse.WIDTH || levelTwoBirdReverse.getPosition().x > camera.viewportWidth + levelTwoBirdReverse.WIDTH || levelTwoBirdReverse.getPosition().y < 0 - 2 * levelTwoBirdReverse.HEIGHT) {
                 activeLevelTwoBirdReverses.removeValue(levelTwoBirdReverse, false);
                 dodgeables.activeDodgeables.removeValue(levelTwoBirdReverse, false);
                 levelTwoBirdReversePool.free(levelTwoBirdReverse);
