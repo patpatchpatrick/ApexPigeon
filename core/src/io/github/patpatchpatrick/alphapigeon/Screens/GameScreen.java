@@ -6,6 +6,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -41,9 +42,14 @@ public class GameScreen implements Screen {
     AlphaPigeon game;
 
     //GAME STATE
-    private float gameState = 1;
-    private final float GAME_RUNNING = 1;
-    private final float GAME_PAUSED = 2;
+    public enum State {
+        PAUSE,
+        RUN,
+        RESUME,
+        STOPPED
+    }
+
+    public State state = State.RUN;
     private boolean gameIsOver = false;
     private PlayServices playServices;
     private DatabaseAndPreferenceManager databaseAndPreferenceManager;
@@ -69,6 +75,14 @@ public class GameScreen implements Screen {
     private final float PIGEON_KEY_INPUT_FORCE = 50.0f;
     private final float PIGEON_TOUCH_INPUT_FORCE = 10.0f;
 
+    //Textures
+    private Texture pauseButton;
+    private Texture resumeButton;
+    private final float PAUSE_RESUME_BUTTON_WIDTH = 2.7f;
+    private final float PAUSE_RESUME_BUTTON_HEIGHT = 2.9f;
+    private final float PAUSE_RESUME_BUTTON_X1 = 0.8f;
+    private final float PAUSE_RESUME_BUTTON_Y1 = 44.4f;
+
     public GameScreen(AlphaPigeon game, PlayServices playServices, DatabaseAndPreferenceManager databaseAndPreferenceManager) {
         this.game = game;
         this.playServices = playServices;
@@ -88,7 +102,7 @@ public class GameScreen implements Screen {
 
 
         //Set viewport to stretch or fit viewport depending on whether user has enabled full screen mode setting
-        if (SettingsManager.fullScreenModeIsOn){
+        if (SettingsManager.fullScreenModeIsOn) {
             viewport = new StretchViewport(GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT, camera);
         } else {
             viewport = new FitViewport(GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT, camera);
@@ -116,10 +130,14 @@ public class GameScreen implements Screen {
         //Get most recent updated user settings from mobile device db/prefs
         SettingsManager.updateSettings();
 
-        if (playServices != null){
+        if (playServices != null) {
             //Hide ads on game screen
             playServices.showBannerAds(false);
         }
+
+        //Initialize pause and play button textures
+        pauseButton = new Texture(Gdx.files.internal("textures/icons/PauseButton.png"));
+        resumeButton = new Texture(Gdx.files.internal("textures/icons/ResumeButton.png"));
 
     }
 
@@ -137,14 +155,16 @@ public class GameScreen implements Screen {
 
         // update the state time
         // if game is paused, there is no change in time
-        deltaTime = gameState == GAME_PAUSED ? 0 : Gdx.graphics.getDeltaTime();
+        deltaTime = state == State.PAUSE ? 0 : Gdx.graphics.getDeltaTime();
         stateTime += deltaTime;
 
         // tell the camera to update its matrices
         camera.update();
 
         //Update method called before rendering
-        update();
+        if (state != State.PAUSE) {
+            update();
+        }
 
         //debugRenderer.render(world, camera.combined);
         // tell the SpriteBatch to render in the
@@ -156,6 +176,11 @@ public class GameScreen implements Screen {
         highScore.render(game.batch);
         gameplay.render(stateTime, game.batch);
         pigeon.render(stateTime, game.batch);
+        if (state == State.PAUSE) {
+            game.batch.draw(resumeButton, PAUSE_RESUME_BUTTON_X1, PAUSE_RESUME_BUTTON_Y1, PAUSE_RESUME_BUTTON_WIDTH, PAUSE_RESUME_BUTTON_HEIGHT);
+        } else {
+            game.batch.draw(pauseButton, PAUSE_RESUME_BUTTON_X1, PAUSE_RESUME_BUTTON_Y1, PAUSE_RESUME_BUTTON_WIDTH, PAUSE_RESUME_BUTTON_HEIGHT);
+        }
         game.batch.end();
 
         if (gameIsOver) {
@@ -177,7 +202,7 @@ public class GameScreen implements Screen {
     @Override
     public void pause() {
 
-        gameState = GAME_PAUSED;
+        state = State.PAUSE;
 
         //TODO currently the energy beam/ball continues to grow after game is paused and sounds continue to play
 
@@ -186,7 +211,7 @@ public class GameScreen implements Screen {
     @Override
     public void resume() {
 
-        gameState = GAME_RUNNING;
+        state = State.RUN;
 
     }
 
@@ -199,6 +224,8 @@ public class GameScreen implements Screen {
     public void dispose() {
 
         // dispose of all the native resources... CALL THIS METHOD MANUALLY WHEN YOU EXIT A SCREEN
+        resumeButton.dispose();
+        pauseButton.dispose();
         pigeon.dispose();
         dodgeables.dispose();
         highScore.dispose();
@@ -210,10 +237,8 @@ public class GameScreen implements Screen {
     public void update() {
 
         // step the world
-        // if game is paused, don't step the world
-        if (gameState != GAME_PAUSED) {
-            world.step(1 / 60f, 6, 2);
-        }
+        world.step(1 / 60f, 6, 2);
+
 
         sweepDeadBodies();
 
@@ -304,7 +329,6 @@ public class GameScreen implements Screen {
                             collidedEnemyFixture = fixtureA;
                         }
                         pigeon.powerUp(powerUpFixture);
-
                     } else if (teleportInvolvedInCollision) {
                         Fixture teleportFixture;
                         if (fixtureA.getFilterData().categoryBits == GameVariables.CATEGORY_TELEPORT) {
@@ -449,7 +473,7 @@ public class GameScreen implements Screen {
             public boolean keyDown(int keycode) {
 
                 //If the user has touch controls turned on, apply a force on the bird depending on which button is pushed
-                if (SettingsManager.touchSettingIsOn){
+                if (SettingsManager.touchSettingIsOn) {
                     switch (keycode) {
                         case Input.Keys.LEFT:
                             pigeonBody.applyForceToCenter(-PIGEON_KEY_INPUT_FORCE * SettingsManager.touchSensitivity, 0, true);
@@ -483,11 +507,22 @@ public class GameScreen implements Screen {
             public boolean touchDown(int screenX, int screenY, int pointer, int button) {
                 //Get the mouse coordinates and unproject to the world coordinates
                 Vector3 mousePos = new Vector3(screenX, screenY, 0);
-                camera.unproject(mousePos, viewport.getScreenX(), viewport.getScreenY(),  viewport.getScreenWidth(), viewport.getScreenHeight());
+                camera.unproject(mousePos, viewport.getScreenX(), viewport.getScreenY(), viewport.getScreenWidth(), viewport.getScreenHeight());
 
-                //If the user has touch controls turned on, apply a force on the bird proportional to
-                //the distance from the bird that the user touched
-                if (SettingsManager.touchSettingIsOn && button == Input.Buttons.LEFT) {
+                if (mousePos.x > PAUSE_RESUME_BUTTON_X1 && mousePos.x < PAUSE_RESUME_BUTTON_X1 + PAUSE_RESUME_BUTTON_WIDTH &&
+                        mousePos.y > PAUSE_RESUME_BUTTON_Y1 && mousePos.y < PAUSE_RESUME_BUTTON_Y1 + PAUSE_RESUME_BUTTON_HEIGHT) {
+                    if (button == Input.Buttons.LEFT) {
+                        //Toggle Pause/Resume game if the Pause/Resume button is pushed
+                        if (state == State.RUN) {
+                            state = State.PAUSE;
+                        } else {
+                            state = State.RUN;
+                        }
+                        return true;
+                    }
+                } else if (SettingsManager.touchSettingIsOn && button == Input.Buttons.LEFT) {
+                    //If the user has touch controls turned on, apply a force on the bird proportional to
+                    //the distance from the bird that the user touched
                     pigeonBody.applyForceToCenter(PIGEON_TOUCH_INPUT_FORCE * SettingsManager.touchSensitivity * (mousePos.x - pigeonBody.getPosition().x),
                             PIGEON_TOUCH_INPUT_FORCE * SettingsManager.touchSensitivity * (mousePos.y - pigeonBody.getPosition().y), true);
                     return true;
