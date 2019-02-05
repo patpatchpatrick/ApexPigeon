@@ -27,10 +27,10 @@ public class LevelOne extends Level {
 
             if (currentTimeInMillis - birds.getLastLevelOneBirdSpawnTime() > L1BIRD_SPAWN_DURATION_WAVE_0) {
                 birds.spawnLevelOneBird(totalGameTime);
+                alienMissiles.spawnAlienMissile(alienMissiles.SPAWN_DIRECTION_LEFTWARD, 1);
             }
             if (currentTimeInMillis - PowerUps.lastpowerUpShieldSpawnTime > powerUpShieldInterval) {
                 powerUps.spawnPowerUp(PowerUps.POWER_UP_TYPE_SHIELD);
-                ufos.spawnUfo(ufos.ENERGY_BEAM_ALL_DIRECTIONS, 1);
             }
         } else if (totalGameTime >= LEVEL_ONE_WAVE_1 && totalGameTime < LEVEL_ONE_END_TIME) {
 

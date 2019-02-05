@@ -192,7 +192,7 @@ public class AlienMissiles {
         for (AlienMissileExplosion alienMissileExplosion : activeAlienMissileExplosions){
             BodyData missileExplosionData = (BodyData) alienMissileExplosion.dodgeableBody.getUserData();
             if (missileExplosionData != null) {
-                long missileExplosionSpawnTime = missileExplosionData.getExplosionTime();
+                long missileExplosionSpawnTime = missileExplosionData.getSpawnTime();
                 if (currentTime - missileExplosionSpawnTime > 500) {
                     missileExplosionData.setFlaggedForDelete(true);
                 }
@@ -225,7 +225,7 @@ public class AlienMissiles {
         for (AlienMissileCornerExplosion alienMissileCornerExplosion : activeAlienMissileCornerExplosions){
             BodyData missileExplosionData = (BodyData) alienMissileCornerExplosion.dodgeableBody.getUserData();
             if (missileExplosionData != null) {
-                long missileExplosionSpawnTime = missileExplosionData.getExplosionTime();
+                long missileExplosionSpawnTime = missileExplosionData.getSpawnTime();
                 if (currentTime - missileExplosionSpawnTime > 500) {
                     missileExplosionData.setFlaggedForDelete(true);
                 }

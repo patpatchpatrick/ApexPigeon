@@ -47,6 +47,7 @@ public class Rockets {
     private final Pool<RocketExplosion> rocketExplosionPool;
     private Animation<TextureRegion> rocketExplosionAnimation;
     private Texture rocketExplosionSheet;
+    private final float EXPLOSION_DURATION = 500;
     private long lastRocketExplosionSpawnTime;
 
     //Sounds
@@ -134,8 +135,8 @@ public class Rockets {
         for (RocketExplosion rocketExplosion : activeRocketExplosions) {
             BodyData rocketExplosionData = (BodyData) rocketExplosion.dodgeableBody.getUserData();
             if (rocketExplosionData != null) {
-                long rocketExplosionTime = rocketExplosionData.getExplosionTime();
-                if (currentTimeInMillis - rocketExplosionTime > 500) {
+                long rocketExplosionSpawnTime = rocketExplosionData.getSpawnTime();
+                if (currentTimeInMillis - rocketExplosionSpawnTime > EXPLOSION_DURATION) {
                     rocketExplosionData.setFlaggedForDelete(true);
                 }
             } else {

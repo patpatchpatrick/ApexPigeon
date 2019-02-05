@@ -78,14 +78,6 @@ public class BodyData {
         }
     }
 
-    public void setExplosionData(long lastRocketExplosionTime) {
-        this.lastRocketExplosionTime = lastRocketExplosionTime;
-    }
-
-    public long getExplosionTime() {
-        return this.lastRocketExplosionTime;
-    }
-
     public float getRocketYForce() {
         return rocketYForce;
     }

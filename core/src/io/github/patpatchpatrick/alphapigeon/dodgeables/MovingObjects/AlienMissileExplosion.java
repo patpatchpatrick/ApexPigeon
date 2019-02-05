@@ -52,7 +52,7 @@ public class AlienMissileExplosion extends Dodgeable {
         //Set the time the missile was exploded on the missile explosion  body.  This is used in the update method
         //to destroy the missile explosion body after a set amount of time
         BodyData alienMissileExplosionData = new BodyData(false);
-        alienMissileExplosionData.setExplosionData(TimeUtils.nanoTime()/GameVariables.MILLION_SCALE);
+        alienMissileExplosionData.setSpawnTime(TimeUtils.nanoTime()/GameVariables.MILLION_SCALE);
         dodgeableBody.setUserData(alienMissileExplosionData);
 
     }

@@ -54,7 +54,7 @@ public class RocketExplosion extends Dodgeable {
         //Set the time the rocket was exploded on the rocket.  This is used in the update method
         //to destroy the rocket explosion after a set amount of time
         BodyData rocketExplosionData = new BodyData(false);
-        rocketExplosionData.setExplosionData(TimeUtils.nanoTime() / GameVariables.MILLION_SCALE);
+        rocketExplosionData.setSpawnTime(TimeUtils.nanoTime() / GameVariables.MILLION_SCALE);
         dodgeableBody.setUserData(rocketExplosionData);
 
     }
