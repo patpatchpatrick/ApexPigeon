@@ -393,6 +393,15 @@ public class Birds {
 
     }
 
+    public void resetSpawnTimes(){
+
+        lastLevelOneBirdSpawnTime = 0;
+        lastLevelOneBirdReverseSpawnTime = 0;
+        lastLevelTwoBirdSpawnTime = 0;
+        lastLevelTwoBirdReverseSpawnTime = 0;
+
+    }
+
     public void dispose() {
         levelOneBirdFlySheet.dispose();
         levelTwoBirdFlySheet.dispose();

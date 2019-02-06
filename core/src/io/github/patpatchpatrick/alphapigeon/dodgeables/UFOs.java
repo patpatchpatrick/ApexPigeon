@@ -899,6 +899,10 @@ public class UFOs {
 
     }
 
+    public void resetSpawnTimes(){
+        lastUfoSpawnTime = 0;
+    }
+
     public void dispose() {
         ufoSheet.dispose();
         energyBeamSheet.dispose();

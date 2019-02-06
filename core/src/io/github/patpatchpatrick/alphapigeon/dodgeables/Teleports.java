@@ -173,6 +173,10 @@ public class Teleports {
 
     }
 
+    public void resetSpawnTimes(){
+        lastTeleportSpawnTime =  0;
+    }
+
     public void dispose(){
         teleportSheet.dispose();
     }

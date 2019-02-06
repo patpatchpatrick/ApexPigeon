@@ -216,6 +216,11 @@ public class PowerUps {
 
     }
 
+    public void resetSpawnTimes(){
+        lastpowerUpShieldSpawnTime = 0;
+        lastpowerUpSkullSpawnTime = 0;
+    }
+
     public void dispose() {
         powerUpShieldSheet.dispose();
         powerUpSkullSheet.dispose();

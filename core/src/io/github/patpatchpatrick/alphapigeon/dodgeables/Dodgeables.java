@@ -125,6 +125,17 @@ public class Dodgeables {
 
     }
 
+    public void resetSpawnTimes(){
+        //Reset all spawn times for all dodgeables
+        alienMissiles.resetSpawnTimes();
+        birds.resetSpawnTimes();
+        meteors.resetSpawnTimes();
+        powerUps.resetSpawnTimes();
+        rockets.resetSpawnTimes();
+        teleports.resetSpawnTimes();
+        ufos.resetSpawnTimes();
+    }
+
     public void dispose() {
 
         //Dispose all dodgeable classes' textures

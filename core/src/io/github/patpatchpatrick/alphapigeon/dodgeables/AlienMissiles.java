@@ -58,14 +58,12 @@ public class AlienMissiles {
     private Array<Body> alienMissileExplosionArray = new Array<Body>();
     private Animation<TextureRegion> alienMissileExplosionAnimation;
     private Texture alienMissileExplosionSheet;
-    private float lastAlienMissileExplosionSpawnTime;
 
     //Alien Missile Corner variables
     private final Array<AlienMissileCorner> activeAlienMissileCorners = new Array<AlienMissileCorner>();
     private final Pool<AlienMissileCorner> alienMissileCornersPool;
     private Animation<TextureRegion> alienMissileCornerAnimation;
     private Texture alienMissileCornerSheet;
-    private float lastAlienMissileCornerSpawnTime;
     private final float ALIEN_MISSILE_CORNER_EXPLOSION_FUSE_TIME = 1f;  //seconds
 
     //Alien Missile Corner Explosion variables
@@ -272,9 +270,6 @@ public class AlienMissiles {
         activeAlienMissileExplosions.add(alienMissileExplosion);
         dodgeables.activeDodgeables.add(alienMissileExplosion);
 
-        //keep track of time the missile was spawned
-        lastAlienMissileExplosionSpawnTime = Gameplay.totalGameTime;
-
         //play explosion sound
         Sounds.alienMissileExplosionSound.play(SettingsManager.gameVolume);
 
@@ -451,6 +446,12 @@ public class AlienMissiles {
                 alienMissileCornerExplosionsPool.free(alienMissileCornerExplosion);
             }
         }
+
+    }
+
+    public void resetSpawnTimes(){
+
+        lastAlienMissileSpawnTime = 0;
 
     }
 

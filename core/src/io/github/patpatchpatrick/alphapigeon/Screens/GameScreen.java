@@ -455,6 +455,7 @@ public class GameScreen implements Screen {
                 for (Dodgeable dodgeable : dodgeables.activeDodgeables) {
                     dodgeable.reset();
                 }
+                dodgeables.resetSpawnTimes();
                 Array<Body> bodies = new Array<Body>();
                 world.getBodies(bodies);
                 for (int i = 0; i < bodies.size; i++) {

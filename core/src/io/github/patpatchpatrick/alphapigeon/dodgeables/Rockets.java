@@ -51,7 +51,6 @@ public class Rockets {
     private Animation<TextureRegion> rocketExplosionAnimation;
     private Texture rocketExplosionSheet;
     private final float EXPLOSION_DURATION = 0.5f; //seconds
-    private float lastRocketExplosionSpawnTime;
 
 
     public Rockets(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables) {
@@ -195,9 +194,6 @@ public class Rockets {
         activeRocketExplosions.add(rocketExplosion);
         dodgeables.activeDodgeables.add(rocketExplosion);
 
-        //keep track of time the rocket explosion was spawned
-        lastRocketExplosionSpawnTime = Gameplay.totalGameTime;
-
         //Play rocket explosion sound
         Sounds.rocketExplosionSound.play(SettingsManager.gameVolume);
 
@@ -297,6 +293,10 @@ public class Rockets {
                 rocketExplosionPool.free(rocketExplosion);
             }
         }
+    }
+
+    public void resetSpawnTimes(){
+        lastRocketSpawnTime = 0;
     }
 
     public void dispose() {

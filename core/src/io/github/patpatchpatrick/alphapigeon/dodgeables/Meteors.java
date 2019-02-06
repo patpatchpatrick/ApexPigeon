@@ -156,6 +156,10 @@ public class Meteors {
 
     }
 
+    public void resetSpawnTimes(){
+        lastMeteorSpawnTime = 0;
+    }
+
     public void dispose(){
         meteorTextureSpriteSheet.dispose();
     }
