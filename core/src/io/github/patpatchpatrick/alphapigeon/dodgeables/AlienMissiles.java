@@ -31,6 +31,7 @@ import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.SettingsManager;
+import io.github.patpatchpatrick.alphapigeon.resources.Sounds;
 
 public class AlienMissiles {
 
@@ -72,8 +73,6 @@ public class AlienMissiles {
     private final Pool<AlienMissileCornerExplosion> alienMissileCornerExplosionsPool;
     private Animation<TextureRegion> alienMissileCornerExplosionAnimation;
 
-    //Sounds
-    private Sound alienMissileExplosionSound = Gdx.audio.newSound(Gdx.files.internal("sounds/alienMissileExplosion.mp3"));
 
     public AlienMissiles(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables){
         this.gameWorld = gameWorld;
@@ -277,7 +276,7 @@ public class AlienMissiles {
         lastAlienMissileExplosionSpawnTime = Gameplay.totalGameTime;
 
         //play explosion sound
-        alienMissileExplosionSound.play(SettingsManager.gameVolume);
+        Sounds.alienMissileExplosionSound.play(SettingsManager.gameVolume);
 
     }
 
@@ -323,7 +322,7 @@ public class AlienMissiles {
         dodgeables.activeDodgeables.add(alienMissileCornerExplosion);
 
         //play explosion sound
-        alienMissileExplosionSound.play(SettingsManager.gameVolume);
+        Sounds.alienMissileExplosionSound.play(SettingsManager.gameVolume);
 
 
     }
@@ -460,7 +459,6 @@ public class AlienMissiles {
         alienMissileSheet.dispose();
         alienMissileExplosionSheet.dispose();
         alienMissileCornerSheet.dispose();
-        alienMissileExplosionSound.dispose();
     }
 
 }

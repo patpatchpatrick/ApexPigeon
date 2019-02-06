@@ -17,6 +17,7 @@ import io.github.patpatchpatrick.alphapigeon.levels.Gameplay;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.SettingsManager;
+import io.github.patpatchpatrick.alphapigeon.resources.Sounds;
 
 public class UFO extends Dodgeable {
     private UFOs ufos;
@@ -68,7 +69,7 @@ public class UFO extends Dodgeable {
 
     }
 
-    public void init(float direction, Sound flyingSound) {
+    public void init(float direction) {
 
         //Set the direction which the energy beams associated with the UFO should fire
         this.direction = direction;
@@ -82,13 +83,14 @@ public class UFO extends Dodgeable {
         spawnTime = Gameplay.totalGameTime;
 
         //Play UFO Sound
-        this.flyingSound = flyingSound;
+        this.flyingSound = Sounds.ufoFlyingSound;
         this.flyingSound.loop(SettingsManager.gameVolume);
+        Sounds.activeSounds.add(this.flyingSound);
 
 
     }
 
-    public void initHorizontal(float direction, Sound flyingSound) {
+    public void initHorizontal(float direction) {
 
         //Set the direction which the energy beams associated with the UFO should fire
         this.direction = direction;
@@ -102,12 +104,13 @@ public class UFO extends Dodgeable {
         spawnTime = Gameplay.totalGameTime;
 
         //Play UFO Sound
-        this.flyingSound = flyingSound;
+        this.flyingSound = Sounds.ufoFlyingSound;
         this.flyingSound.loop(SettingsManager.gameVolume);
+        Sounds.activeSounds.add(this.flyingSound);
 
     }
 
-    public void initVertical(float direction, Sound flyingSound){
+    public void initVertical(float direction){
         //Set the direction which the energy beams associated with the UFO should fire
         this.direction = direction;
 
@@ -120,12 +123,13 @@ public class UFO extends Dodgeable {
         spawnTime = Gameplay.totalGameTime;
 
         //Play UFO Sound
-        this.flyingSound = flyingSound;
+        this.flyingSound = Sounds.ufoFlyingSound;
         this.flyingSound.loop(SettingsManager.gameVolume);
+        Sounds.activeSounds.add(this.flyingSound);
 
     }
 
-    public void initStopInCenter(float direction, float timeToHoldInCenter, Sound flyingSound) {
+    public void initStopInCenter(float direction, float timeToHoldInCenter) {
 
         //This version of the UFO will stop in the center of the screen for a specified period of time
 
@@ -144,12 +148,13 @@ public class UFO extends Dodgeable {
         this.timeToHold = timeToHoldInCenter;
 
         //Play UFO Sound
-        this.flyingSound = flyingSound;
+        this.flyingSound = Sounds.ufoFlyingSound;
         this.flyingSound.loop(SettingsManager.gameVolume);
+        Sounds.activeSounds.add(this.flyingSound);
 
     }
 
-    public void initStopInRightCenter(float direction, float timeToHoldInCenter, Sound flyingSound) {
+    public void initStopInRightCenter(float direction, float timeToHoldInCenter) {
 
         //This version of the UFO will stop in the center of the screen for a specified period of time
 
@@ -168,12 +173,13 @@ public class UFO extends Dodgeable {
         this.timeToHold = timeToHoldInCenter;
 
         //Play UFO Sound
-        this.flyingSound = flyingSound;
+        this.flyingSound = Sounds.ufoFlyingSound;
         this.flyingSound.loop(SettingsManager.gameVolume);
+        Sounds.activeSounds.add(this.flyingSound);
 
     }
 
-    public void initStopInTopRightCorner(float direction, float timeToHold, Sound flyingSound){
+    public void initStopInTopRightCorner(float direction, float timeToHold){
         //This version of the UFO will stop in the right corner of the screen for a specified period of time
 
         //Set the direction which the energy beams associated with the UFO should fire
@@ -191,11 +197,12 @@ public class UFO extends Dodgeable {
         this.timeToHold = timeToHold;
 
         //Play UFO Sound
-        this.flyingSound = flyingSound;
+        this.flyingSound = Sounds.ufoFlyingSound;
         this.flyingSound.loop(SettingsManager.gameVolume);
+        Sounds.activeSounds.add(this.flyingSound);
     }
 
-    public void initStopInBottomLeftCorner(float direction, float timeToHold, Sound flyingSound){
+    public void initStopInBottomLeftCorner(float direction, float timeToHold){
         //This version of the UFO will stop in the bottom left corner of the screen for a specified period of time
 
         //Set the direction which the energy beams associated with the UFO should fire
@@ -213,8 +220,9 @@ public class UFO extends Dodgeable {
         this.timeToHold = timeToHold;
 
         //Play UFO Sound
-        this.flyingSound = flyingSound;
+        this.flyingSound = Sounds.ufoFlyingSound;
         this.flyingSound.loop(SettingsManager.gameVolume);
+        Sounds.activeSounds.add(this.flyingSound);
     }
 
     @Override
@@ -256,6 +264,7 @@ public class UFO extends Dodgeable {
         this.timeToHold = 0;
 
         this.flyingSound.stop();
+        Sounds.activeSounds.remove(this.flyingSound);
 
     }
 }

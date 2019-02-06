@@ -8,6 +8,7 @@ import io.github.patpatchpatrick.alphapigeon.Screens.MainMenuScreen;
 import io.github.patpatchpatrick.alphapigeon.resources.DatabaseAndPreferenceManager;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
 import io.github.patpatchpatrick.alphapigeon.resources.SettingsManager;
+import io.github.patpatchpatrick.alphapigeon.resources.Sounds;
 
 public class AlphaPigeon extends Game{
     public SpriteBatch batch;
@@ -53,6 +54,7 @@ public class AlphaPigeon extends Game{
 
         batch.dispose();
         font.dispose();
+        Sounds.dispose();
     }
 
 }

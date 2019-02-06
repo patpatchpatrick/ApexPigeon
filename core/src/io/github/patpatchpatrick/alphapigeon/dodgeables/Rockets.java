@@ -27,6 +27,7 @@ import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.SettingsManager;
+import io.github.patpatchpatrick.alphapigeon.resources.Sounds;
 
 public class Rockets {
 
@@ -51,10 +52,6 @@ public class Rockets {
     private Texture rocketExplosionSheet;
     private final float EXPLOSION_DURATION = 0.5f; //seconds
     private float lastRocketExplosionSpawnTime;
-
-    //Sounds
-    private Sound rocketSpawnSound = Gdx.audio.newSound(Gdx.files.internal("sounds/rocketSpawn.wav"));
-    private Sound rocketExplosionSound = Gdx.audio.newSound(Gdx.files.internal("sounds/rocketExplosion.wav"));
 
 
     public Rockets(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables) {
@@ -185,7 +182,7 @@ public class Rockets {
         lastSpawnTimeByLevel.put(level, lastRocketSpawnTime);
 
         //Play rocket spawn sounds
-        rocketSpawnSound.play(SettingsManager.gameVolume);
+        Sounds.rocketSpawnSound.play(SettingsManager.gameVolume);
 
     }
 
@@ -202,7 +199,7 @@ public class Rockets {
         lastRocketExplosionSpawnTime = Gameplay.totalGameTime;
 
         //Play rocket explosion sound
-        rocketExplosionSound.play(SettingsManager.gameVolume);
+        Sounds.rocketExplosionSound.play(SettingsManager.gameVolume);
 
 
     }
@@ -305,8 +302,6 @@ public class Rockets {
     public void dispose() {
         rocketExplosionSheet.dispose();
         rocketSheet.dispose();
-        rocketSpawnSound.dispose();
-        rocketExplosionSound.dispose();
     }
 
 }

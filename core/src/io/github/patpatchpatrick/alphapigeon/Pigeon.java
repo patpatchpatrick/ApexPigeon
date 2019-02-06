@@ -46,14 +46,12 @@ public class Pigeon {
     private Texture powerUpShieldSheet;
     private Animation<TextureRegion> powerUpShieldAnimation;
 
-    //Sounds
-    private Sound powerUpShieldSound;
-    private Sound powerUpShieldZapSound;
-    private Sound teleportSound;
-
     //Fonts and text to display on pigeon
     private BitmapFont pigeonFonts;
     FreeTypeFontGenerator pigeonFontGenerator;
+
+    //Sound
+    private Sound powerUpShieldSound = Sounds.powerUpShieldSound;
 
 
     public Pigeon(World world, AlphaPigeon game, GameScreen gameScreen) {
@@ -86,11 +84,6 @@ public class Pigeon {
 
         initializePowerUpShieldAnimation();
 
-        // load the powerUpShield sound effect
-        powerUpShieldSound = Gdx.audio.newSound(Gdx.files.internal("sounds/powerUpShield.mp3"));
-        powerUpShieldZapSound = Gdx.audio.newSound(Gdx.files.internal("sounds/powerUpShieldZap.mp3"));
-        teleportSound = Gdx.audio.newSound(Gdx.files.internal("sounds/teleportSound.mp3"));
-
         //Initialize font pigeonFontGenerator for powerups
         pigeonFontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("arcadeclassic.TTF"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
@@ -115,7 +108,9 @@ public class Pigeon {
             case PowerUps.POWER_UP_TYPE_SHIELD:
                 //Play powerUp sounds
                 this.currentPowerUp = PowerUps.POWER_UP_TYPE_SHIELD;
-                powerUpShieldSound.play(SettingsManager.gameVolume);
+                powerUpShieldSound = Sounds.powerUpShieldSound;
+                powerUpShieldSound.loop(SettingsManager.gameVolume);
+                Sounds.activeSounds.add(powerUpShieldSound);
                 break;
             case PowerUps.POWER_UP_TYPE_SKULL:
                 //Play powerUp sounds
@@ -141,11 +136,12 @@ public class Pigeon {
         this.currentPowerUp = PowerUps.POWER_UP_TYPE_NONE;
         //Stop the power up sounds
         powerUpShieldSound.stop();
+        Sounds.activeSounds.remove(powerUpShieldSound);
 
     }
 
     public void zapEnemy() {
-        powerUpShieldZapSound.play(SettingsManager.gameVolume);
+        Sounds.powerUpShieldZapSound.play(SettingsManager.gameVolume);
     }
 
     public int getPowerUpType() {
@@ -169,7 +165,7 @@ public class Pigeon {
                 final BodyData deleteObjectTwo = new BodyData(true);
 
                 //Play the teleport sound
-                teleportSound.play(SettingsManager.gameVolume);
+                Sounds.teleportSound.play(SettingsManager.gameVolume);
 
                 //Move the pigeon to the opposite teleport's location and then destroy both teleports
                 //This must be done using Runnable app.postRunnable so it occurs in the rendering thread which is currently locked
@@ -288,6 +284,5 @@ public class Pigeon {
         pigeonFlySheet.dispose();
         powerUpShieldSheet.dispose();
         powerUpShieldSound.dispose();
-        powerUpShieldZapSound.dispose();
     }
 }

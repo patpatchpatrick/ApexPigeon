@@ -41,9 +41,6 @@ public class Meteors {
     private final float METEOR_WIDTH = 80f;
     private final float METEOR_HEIGHT = METEOR_WIDTH / 2;
 
-    //Sounds
-    private Sound meteorSound = Gdx.audio.newSound(Gdx.files.internal("sounds/meteor.mp3"));
-
     public Meteors(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, Dodgeables dodgeables){
 
         this.gameWorld = gameWorld;
@@ -96,7 +93,7 @@ public class Meteors {
         // Spawn(obtain) a new meteor from the meteors pool and add to list of active meteors
 
         Meteor meteor = meteorsPool.obtain();
-        meteor.init(meteorSound);
+        meteor.init();
         activeMeteors.add(meteor);
         dodgeables.activeDodgeables.add(meteor);
 

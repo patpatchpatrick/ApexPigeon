@@ -15,6 +15,7 @@ import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.SettingsManager;
+import io.github.patpatchpatrick.alphapigeon.resources.Sounds;
 
 public class UfoEnergyBeamUp extends UfoEnergyBeam {
 
@@ -47,7 +48,7 @@ public class UfoEnergyBeamUp extends UfoEnergyBeam {
         loader.attachFixture(dodgeableBody, "EnergyBeamUp", energyBeamFixtureDef, WIDTH);
     }
 
-    public void init(UFO ufo, float energyBeamDirection, Sound energyBeamSound) {
+    public void init(UFO ufo, float energyBeamDirection) {
 
         // Get ufo positions to determine where to spawn the energy beam
         float ufoXPosition = ufo.getPosition().x;
@@ -75,8 +76,9 @@ public class UfoEnergyBeamUp extends UfoEnergyBeam {
         this.ufo = ufo;
 
         //Set and play the energy beam sound
-        this.energyBeamSound = energyBeamSound;
+        this.energyBeamSound = Sounds.ufoEnergyBeamSound;
         this.energyBeamSound.loop(SettingsManager.gameVolume);
+        Sounds.activeSounds.add(this.energyBeamSound);
 
     }
 

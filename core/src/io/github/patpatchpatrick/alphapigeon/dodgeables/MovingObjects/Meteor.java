@@ -13,6 +13,7 @@ import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyEditorLoader;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.SettingsManager;
+import io.github.patpatchpatrick.alphapigeon.resources.Sounds;
 
 public class Meteor extends Dodgeable {
 
@@ -46,7 +47,7 @@ public class Meteor extends Dodgeable {
 
     }
 
-    public void init(Sound meteorSound) {
+    public void init() {
 
         dodgeableBody.setActive(true);
         dodgeableBody.setTransform(MathUtils.random(0 - WIDTH/2, camera.viewportWidth), camera.viewportHeight + HEIGHT/2, dodgeableBody.getAngle());
@@ -54,8 +55,10 @@ public class Meteor extends Dodgeable {
         this.alive = true;
 
         //Play spawn sound
-        this.meteorSound =  meteorSound;
-        this.meteorSound.play(SettingsManager.gameVolume);
+        this.meteorSound = Sounds.meteorSound;
+        this.meteorSound.loop(SettingsManager.gameVolume);
+        Sounds.activeSounds.add(this.meteorSound);
+
 
     }
 
@@ -65,5 +68,6 @@ public class Meteor extends Dodgeable {
 
         //Stop playing sound
         this.meteorSound.stop();
+        Sounds.activeSounds.remove(this.meteorSound);
     }
 }

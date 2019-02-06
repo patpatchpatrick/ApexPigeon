@@ -84,10 +84,6 @@ public class UFOs {
     private Animation<TextureRegion> energyBeamStaticAnimation;
     private Texture energyBeamStaticSheet;
 
-    //Sounds
-    private Sound ufoFlyingSound = Gdx.audio.newSound(Gdx.files.internal("sounds/ufoFlying.mp3"));
-    private Sound ufoEnergyBallSound = Gdx.audio.newSound(Gdx.files.internal("sounds/ufoEnergyBall.mp3"));
-    private Sound ufoEnergyBeamSound = Gdx.audio.newSound(Gdx.files.internal("sounds/ufoEnergyBeam.mp3"));
 
     public UFOs(final World gameWorld, final AlphaPigeon game, final OrthographicCamera camera, final Dodgeables dodgeables) {
 
@@ -513,7 +509,7 @@ public class UFOs {
         // Spawn(obtain) a new UFO from the UFO pool and add to list of active UFOs
 
         UFO ufo = ufoPool.obtain();
-        ufo.init(direction, ufoFlyingSound);
+        ufo.init(direction);
         activeUFOs.add(ufo);
         dodgeables.activeDodgeables.add(ufo);
 
@@ -531,7 +527,7 @@ public class UFOs {
         // towards the left of the screen horizontally
 
         UFO ufo = ufoPool.obtain();
-        ufo.initHorizontal(direction, ufoFlyingSound);
+        ufo.initHorizontal(direction);
         activeUFOs.add(ufo);
         dodgeables.activeDodgeables.add(ufo);
 
@@ -548,7 +544,7 @@ public class UFOs {
         // towards the bottom of the screen vertically
 
         UFO ufo = ufoPool.obtain();
-        ufo.initVertical(direction, ufoFlyingSound);
+        ufo.initVertical(direction);
         activeUFOs.add(ufo);
         dodgeables.activeDodgeables.add(ufo);
 
@@ -565,7 +561,7 @@ public class UFOs {
         // StopInCenter Ufos stop in the center of the screen for a certain amount of time
 
         UFO ufo = ufoPool.obtain();
-        ufo.initStopInCenter(direction, timeToHoldInCenter, ufoFlyingSound);
+        ufo.initStopInCenter(direction, timeToHoldInCenter);
         activeUFOs.add(ufo);
         dodgeables.activeDodgeables.add(ufo);
 
@@ -584,7 +580,7 @@ public class UFOs {
         // for a certain amount of time
 
         UFO ufo = ufoPool.obtain();
-        ufo.initStopInRightCenter(direction, timeToHoldInRightCenter, ufoFlyingSound);
+        ufo.initStopInRightCenter(direction, timeToHoldInRightCenter);
         activeUFOs.add(ufo);
         dodgeables.activeDodgeables.add(ufo);
 
@@ -601,7 +597,7 @@ public class UFOs {
         // StopInCorner Ufos stop in the corner of the screen for a certain amount of time
 
         UFO ufo = ufoPool.obtain();
-        ufo.initStopInTopRightCorner(direction, timeToHold, ufoFlyingSound);
+        ufo.initStopInTopRightCorner(direction, timeToHold);
         activeUFOs.add(ufo);
         dodgeables.activeDodgeables.add(ufo);
 
@@ -618,7 +614,7 @@ public class UFOs {
         // StopInCorner Ufos stop in the corner of the screen for a certain amount of time
 
         UFO ufo = ufoPool.obtain();
-        ufo.initStopInBottomLeftCorner(direction, timeToHold, ufoFlyingSound);
+        ufo.initStopInBottomLeftCorner(direction, timeToHold);
         activeUFOs.add(ufo);
         dodgeables.activeDodgeables.add(ufo);
 
@@ -643,24 +639,24 @@ public class UFOs {
 
         if (ufo.direction == ENERGY_BEAM_RANDOM) {
             float randomEnergyBeamDirection = MathUtils.random(0, 3);
-            ufo.energyBalls.add(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, randomEnergyBeamDirection, ufoEnergyBallSound));
+            ufo.energyBalls.add(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, randomEnergyBeamDirection));
             ufo.energyBallIsSpawned = true;
         } else if (ufo.direction == ENERGY_BEAM_ALL_DIRECTIONS) {
-            ufo.energyBalls.add(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_LEFT, ufoEnergyBallSound));
-            ufo.energyBalls.add(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_UP, ufoEnergyBallSound));
-            ufo.energyBalls.add(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_RIGHT, ufoEnergyBallSound));
-            ufo.energyBalls.add(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_DOWN, ufoEnergyBallSound));
+            ufo.energyBalls.add(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_LEFT));
+            ufo.energyBalls.add(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_UP));
+            ufo.energyBalls.add(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_RIGHT));
+            ufo.energyBalls.add(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_DOWN));
             ufo.energyBallIsSpawned = true;
         } else if (ufo.direction == ENERGY_BEAM_HORIZONAL_DIRECTIONS) {
-            ufo.energyBalls.add(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_LEFT, ufoEnergyBallSound));
-            ufo.energyBalls.add(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_RIGHT, ufoEnergyBallSound));
+            ufo.energyBalls.add(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_LEFT));
+            ufo.energyBalls.add(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_RIGHT));
             ufo.energyBallIsSpawned = true;
         } else if (ufo.direction == ENERGY_BEAM_VERTICAL_DIRECTIONS) {
-            ufo.energyBalls.add(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_UP, ufoEnergyBallSound));
-            ufo.energyBalls.add(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_DOWN, ufoEnergyBallSound));
+            ufo.energyBalls.add(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_UP));
+            ufo.energyBalls.add(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ENERGY_BEAM_DOWN));
             ufo.energyBallIsSpawned = true;
         } else {
-            ufo.energyBalls.add(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ufo.direction, ufoEnergyBallSound));
+            ufo.energyBalls.add(new EnergyBall(ENERGY_BALL_INITIAL_WIDTH, ENERGY_BALL_INITIAL_HEIGHT, ufo.direction));
             ufo.energyBallIsSpawned = true;
         }
 
@@ -679,7 +675,7 @@ public class UFOs {
             // Spawn(obtain) a new energy beam left from the energy beam left pool and add to list of active energy beam lefts
 
             UfoEnergyBeamLeft ufoEnergyBeamLeft = ufoEnergyBeamLeftPool.obtain();
-            ufoEnergyBeamLeft.init(ufo, energyBeamDirection, ufoEnergyBeamSound);
+            ufoEnergyBeamLeft.init(ufo, energyBeamDirection);
             activeEnergyBeamLefts.add(ufoEnergyBeamLeft);
             dodgeables.activeDodgeables.add(ufoEnergyBeamLeft);
             ufo.energyBeams.add(ufoEnergyBeamLeft);
@@ -693,7 +689,7 @@ public class UFOs {
             // Spawn(obtain) a new energy beam Right from the energy beam Right pool and add to list of active energy beam Rights
 
             UfoEnergyBeamRight ufoEnergyBeamRight = ufoEnergyBeamRightPool.obtain();
-            ufoEnergyBeamRight.init(ufo, energyBeamDirection, ufoEnergyBeamSound);
+            ufoEnergyBeamRight.init(ufo, energyBeamDirection);
             activeEnergyBeamRights.add(ufoEnergyBeamRight);
             dodgeables.activeDodgeables.add(ufoEnergyBeamRight);
             ufo.energyBeams.add(ufoEnergyBeamRight);
@@ -706,7 +702,7 @@ public class UFOs {
             // Spawn(obtain) a new energy beam Down from the energy beam Down pool and add to list of active energy beam Downs
 
             UfoEnergyBeamDown ufoEnergyBeamDown = ufoEnergyBeamDownPool.obtain();
-            ufoEnergyBeamDown.init(ufo, energyBeamDirection, ufoEnergyBeamSound);
+            ufoEnergyBeamDown.init(ufo, energyBeamDirection);
             activeEnergyBeamDowns.add(ufoEnergyBeamDown);
             dodgeables.activeDodgeables.add(ufoEnergyBeamDown);
             ufo.energyBeams.add(ufoEnergyBeamDown);
@@ -719,7 +715,7 @@ public class UFOs {
             // Spawn(obtain) a new energy beam Up from the energy beam Up pool and add to list of active energy beam Ups
 
             UfoEnergyBeamUp ufoEnergyBeamUp = ufoEnergyBeamUpPool.obtain();
-            ufoEnergyBeamUp.init(ufo, energyBeamDirection, ufoEnergyBeamSound);
+            ufoEnergyBeamUp.init(ufo, energyBeamDirection);
             activeEnergyBeamUps.add(ufoEnergyBeamUp);
             dodgeables.activeDodgeables.add(ufoEnergyBeamUp);
             ufo.energyBeams.add(ufoEnergyBeamUp);
@@ -908,8 +904,7 @@ public class UFOs {
         energyBeamSheet.dispose();
         energyBallSheet.dispose();
         energyBeamStaticSheet.dispose();
-        ufoFlyingSound.dispose();
-        ufoEnergyBallSound.dispose();
+
     }
 
 

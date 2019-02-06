@@ -204,8 +204,8 @@ public class GameScreen implements Screen {
     public void pause() {
 
         state = State.PAUSE;
+        Sounds.pause();
 
-        //TODO currently the energy beam/ball continues to grow after game is paused and sounds continue to play
 
     }
 
@@ -213,6 +213,7 @@ public class GameScreen implements Screen {
     public void resume() {
 
         state = State.RUN;
+        Sounds.resume();
 
     }
 
@@ -515,9 +516,9 @@ public class GameScreen implements Screen {
                     if (button == Input.Buttons.LEFT) {
                         //Toggle Pause/Resume game if the Pause/Resume button is pushed
                         if (state == State.RUN) {
-                            state = State.PAUSE;
+                            pause();
                         } else {
-                            state = State.RUN;
+                            resume();
                         }
                         return true;
                     }

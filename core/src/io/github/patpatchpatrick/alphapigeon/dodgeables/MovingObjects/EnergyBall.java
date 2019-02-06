@@ -3,6 +3,7 @@ package io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects;
 import com.badlogic.gdx.audio.Sound;
 
 import io.github.patpatchpatrick.alphapigeon.resources.SettingsManager;
+import io.github.patpatchpatrick.alphapigeon.resources.Sounds;
 
 public class EnergyBall implements MovingObject {
 
@@ -29,12 +30,13 @@ public class EnergyBall implements MovingObject {
     public EnergyBall() {
     }
 
-    public EnergyBall(float width, float height, float direction, Sound energyBallSound) {
+    public EnergyBall(float width, float height, float direction) {
         this.width = width;
         this.height = height;
         this.direction = direction;
-        this.energyBallSound = energyBallSound;
+        this.energyBallSound = Sounds.ufoEnergyBallSound;
         this.energyBallSound.loop(SettingsManager.gameVolume);
+        Sounds.activeSounds.add(Sounds.ufoEnergyBallSound);
     }
 
     public void setEnergyBeamIsSpawned(Boolean energyBeamSpawned){
@@ -102,6 +104,7 @@ public class EnergyBall implements MovingObject {
 
     public void reset(){
         this.energyBallSound.stop();
+        Sounds.activeSounds.remove(this.energyBallSound);
     }
 
 }

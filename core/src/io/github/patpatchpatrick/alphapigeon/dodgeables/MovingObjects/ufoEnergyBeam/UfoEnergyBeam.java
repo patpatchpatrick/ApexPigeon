@@ -6,6 +6,7 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Dodgeable;
+import io.github.patpatchpatrick.alphapigeon.resources.Sounds;
 
 //Class shared by all UFO energy beams
 
@@ -23,11 +24,9 @@ public abstract class UfoEnergyBeam extends Dodgeable {
     public void reset() {
         super.reset();
 
-        //Stop playing energy beam sound when it is no longer active
+        //Stop playing energy beam sound when it is no longer active and remove from active sounds
         this.energyBeamSound.stop();
+        Sounds.activeSounds.remove(this.energyBeamSound);
     }
 
-    public void stopSound() {
-        this.energyBeamSound.stop();
-    }
 }
