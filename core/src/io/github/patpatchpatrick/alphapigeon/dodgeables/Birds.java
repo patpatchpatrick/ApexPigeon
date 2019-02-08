@@ -208,7 +208,7 @@ public class Birds {
 
         //keep track of time the bird was spawned
         lastLevelOneBirdSpawnTime = Gameplay.totalGameTime;
-        Gdx.app.log("BIRDSPAWNTIME", "" + lastLevelOneBirdSpawnTime);
+
 
     }
 

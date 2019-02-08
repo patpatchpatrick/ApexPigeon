@@ -38,8 +38,8 @@ public abstract class Level {
     protected final float LEVEL_ONE_START_TIME = 0f;
     //L1W1 is only level 1 birds,  L1W2 is level 1 and 2 birds
     //Start time should be 0f and end time should be 40f
-    protected final float LEVEL_ONE_WAVE_1 = 20f;
-    protected final float LEVEL_ONE_END_TIME = 0f;
+    protected final float LEVEL_ONE_WAVE_1 = 5f;
+    protected final float LEVEL_ONE_END_TIME = 50f;
     //L2 is "easy" difficulty
     //End time should be 120f
     protected final float LEVEL_TWO_START_TIME = LEVEL_ONE_END_TIME;

@@ -8,8 +8,14 @@ public class GameVariables {
 
     //Pigeon Variables
         // The pigeon's speed in m/s
-        // This speed slowly accelerated as the game progresses
+        // This speed is slowly increased as the game progresses
+        // Changes to the pigeon's speed are made in the "Gameplay" class
+        // The pigeon's speed also affects the speed of bird dodgeables (they fly faster relative to pigeon as pigeon's speed increases)
+        // The pigeon's speed also affects the speed of the scrolling background (it scrolls faster as the pigeon speeds up)
+        // The pigeon's speed also affects the high score (it increases faster as time goes on)
+        // The pigeon's speed reaches the max speed after 10 minutes (600 seconds)
     public static float pigeonSpeed = 9;
+    public static final float PIGEON_MAX_SPEED = 300;
 
     //Collisions
         // Filter Categories

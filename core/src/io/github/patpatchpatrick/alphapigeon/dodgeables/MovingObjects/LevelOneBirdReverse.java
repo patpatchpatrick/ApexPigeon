@@ -48,22 +48,21 @@ public class LevelOneBirdReverse extends Dodgeable {
         //Initiate the object
         dodgeableBody.setActive(true);
         dodgeableBody.setFixedRotation(true);
-        dodgeableBody.setTransform(0-WIDTH, MathUtils.random(0, camera.viewportHeight - HEIGHT), dodgeableBody.getAngle());
+        dodgeableBody.setTransform(0 - WIDTH, MathUtils.random(0, camera.viewportHeight - HEIGHT), dodgeableBody.getAngle());
         dodgeableBody.applyForceToCenter(this.forceMultiplier * FORCE_X, 0, true);
         this.alive = true;
 
     }
 
-    private void setForceMultiplier(float totalGameTime){
+    private void setForceMultiplier(float totalGameTime) {
 
         //Set the force multiplier for the object
-        //The force multiplier is the magnitude by which object's force/speed is increased
-        //The force multiplier increases over time
+        //The force multiplier is the magnitude by which object's force is increased
+        //The force multiplier increases over time and is proportional to the pigeon's speed
+        //The force multiplier was designed so force is 1f when pigeon's initial speed is 9 (m/s) and
+        //the force multiplier is 10f when pigeon's max speed of 300 (m/s) is reached.
 
-        this.forceMultiplier = 1f + totalGameTime * 0.000015f;
-        // The maximum force multiplier for this object is 10
-        if (this.forceMultiplier >= 10f){
-            this.forceMultiplier = 10f;
-        }
+        this.forceMultiplier = (3f / 97f) * GameVariables.pigeonSpeed + (70f / 97f);
     }
 }
+

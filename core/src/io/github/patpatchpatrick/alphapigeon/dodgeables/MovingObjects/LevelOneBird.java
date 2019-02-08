@@ -74,14 +74,15 @@ public class LevelOneBird extends Dodgeable {
     private void setForceMultiplier(float totalGameTime){
 
         //Set the force multiplier for the object
-        //The force multiplier is the magnitude by which object's force/speed is increased
-        //The force multiplier increases over time
+        //The force multiplier is the magnitude by which object's force is increased
+        //The force multiplier increases over time and is proportional to the pigeon's speed
+        //The force multiplier was designed so force is 1f when pigeon's initial speed is 9 (m/s) and
+        //the force multiplier is 10f when pigeon's max speed of 300 (m/s) is reached.
 
-        this.forceMultiplier = 1f + totalGameTime * 0.000015f;
-        // The maximum force multiplier for this object is 10
-        if (this.forceMultiplier >= 10f){
-            this.forceMultiplier = 10f;
-        }
+        this.forceMultiplier = (3f / 97f) * GameVariables.pigeonSpeed + (70f / 97f);
+
+        Gdx.app.log("L1ForceMulti", "" + this.forceMultiplier);
+
     }
 
 }
