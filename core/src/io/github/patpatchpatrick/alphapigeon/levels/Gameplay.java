@@ -66,9 +66,9 @@ public class Gameplay extends Level {
         updateLevels();
 
         // Update pigeon speed based on totalGameTime
-        // Pigeon min speed is 9 (m/s) and max speed is 300 (m/s) after 10 minutes (600 seconds)
+        // Pigeon min speed is 9 (m/s) and max speed is 300 (m/s) after about 20 minutes (600 seconds)
         if (GameVariables.pigeonSpeed < GameVariables.PIGEON_MAX_SPEED){
-            GameVariables.pigeonSpeed = 9f + (97f / 200f) * totalGameTime;
+            GameVariables.pigeonSpeed = 72f + (49f / 200f) * totalGameTime;
         } else {
             GameVariables.pigeonSpeed = GameVariables.PIGEON_MAX_SPEED;
         }

@@ -206,7 +206,11 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
                         if (task.isSuccessful()) {
                             // The signed in account is stored in the task's result.
                             signedInAccount = task.getResult();
-                            Log.d("SILENTSIGNIN", "SUCCESSFUL");
+                            if (signedInAccount != null) {
+                                GamesClient gamesClient = Games.getGamesClient(AndroidLauncher.this, signedInAccount);
+                                gamesClient.setGravityForPopups(Gravity.TOP | Gravity.CENTER_HORIZONTAL);
+                                gamesClient.setViewForPopups(((AndroidGraphics) AndroidLauncher.this.getGraphics()).getView());
+                            }
                         } else {
                             // Player will need to sign-in explicitly using via UI if the silent sign-in fails
                             // with exception code of SIGN_IN_REQUIRED
@@ -235,8 +239,13 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if (result.isSuccess()) {
                 // The signed in account is stored in the result.
+                // Set pop up notification for signed in account to display when user is signed in
                 signedInAccount = result.getSignInAccount();
-                Log.d("ManualSignIn", "Success");
+                if (signedInAccount != null) {
+                    GamesClient gamesClient = Games.getGamesClient(AndroidLauncher.this, signedInAccount);
+                    gamesClient.setGravityForPopups(Gravity.TOP | Gravity.CENTER_HORIZONTAL);
+                    gamesClient.setViewForPopups(((AndroidGraphics) AndroidLauncher.this.getGraphics()).getView());
+                }
             } else {
                 int failCode = result.getStatus().getStatusCode();
                 Log.d("FAILCODE", "" + failCode);
@@ -278,11 +287,6 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
     @Override
     public void signIn() {
         signInSilently();
-        if (signedInAccount != null) {
-            GamesClient gamesClient = Games.getGamesClient(AndroidLauncher.this, signedInAccount);
-            gamesClient.setGravityForPopups(Gravity.TOP | Gravity.CENTER_HORIZONTAL);
-            gamesClient.setViewForPopups(((AndroidGraphics) AndroidLauncher.this.getGraphics()).getView());
-        }
     }
 
     @Override

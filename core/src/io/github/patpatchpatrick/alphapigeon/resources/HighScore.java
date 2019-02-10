@@ -60,7 +60,7 @@ public class HighScore {
         //Update local game stats (high scores, total number of games, etc..) data for the user after a game is complete
         //Use the database manager to update local data
 
-        //Get the current high score from the local  database/shared prefs of the users device
+        //Get the current high score from the local database/shared prefs of the users device
         HighScore.currentHighScore = databaseAndPreferenceManager.getHighScore();
 
         //If the recent game score is greater than the high score, that score becomes the new high score
