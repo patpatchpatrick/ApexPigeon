@@ -17,7 +17,7 @@ public class ScrollingBackground {
 
     public ScrollingBackground() {
 
-        backgroundImage = new Texture("textures/CloudBackgroundDark.png");
+        backgroundImage = new Texture("textures/CloudPixelArtDark.png");
 
         //Initiate the background speed as the minimum speed
         imageScale = 10;

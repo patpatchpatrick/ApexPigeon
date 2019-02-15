@@ -34,6 +34,9 @@ public class PowerUps {
     //power up shield duration in seconds
     public static final float POWER_UP_SHIELD_DURATION = 8;
 
+    //Last spawn time for any power up
+    public static float lastPowerUpSpawnTime;
+
     //PowerUp Shield variables
     private Animation<TextureRegion> powerUpShieldAnimation;
     private Texture powerUpShieldSheet;
@@ -43,6 +46,7 @@ public class PowerUps {
     private Animation<TextureRegion> powerUpSkullAnimation;
     private Texture powerUpSkullSheet;
     public static float lastpowerUpSkullSpawnTime;
+
 
 
     //Shield intervals between spawns
@@ -128,9 +132,11 @@ public class PowerUps {
         switch (powerUpType) {
             case POWER_UP_TYPE_SHIELD:
                 lastpowerUpShieldSpawnTime = Gameplay.totalGameTime;
+                lastPowerUpSpawnTime = Gameplay.totalGameTime;
                 break;
             case POWER_UP_TYPE_SKULL:
                 lastpowerUpSkullSpawnTime = Gameplay.totalGameTime;
+                lastPowerUpSpawnTime = Gameplay.totalGameTime;
                 break;
         }
 
@@ -219,6 +225,7 @@ public class PowerUps {
     public void resetSpawnTimes(){
         lastpowerUpShieldSpawnTime = 0;
         lastpowerUpSkullSpawnTime = 0;
+        lastPowerUpSpawnTime = 0;
     }
 
     public void dispose() {

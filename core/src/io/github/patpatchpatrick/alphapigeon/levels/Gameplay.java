@@ -2,6 +2,7 @@ package io.github.patpatchpatrick.alphapigeon.levels;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.patpatchpatrick.alphapigeon.dodgeables.AlienMissiles;
@@ -55,7 +56,7 @@ public class Gameplay extends Level {
     public void update(float stateTime) {
 
         //Initialize start time for the game to be the current statetime
-        if (!gamePlayInitiated){
+        if (!gamePlayInitiated) {
             startTime = stateTime;
             gamePlayInitiated = true;
         }
@@ -67,7 +68,7 @@ public class Gameplay extends Level {
 
         // Update pigeon speed based on totalGameTime
         // Pigeon min speed is 9 (m/s) and max speed is 300 (m/s) after about 20 minutes (600 seconds)
-        if (GameVariables.pigeonSpeed < GameVariables.PIGEON_MAX_SPEED){
+        if (GameVariables.pigeonSpeed < GameVariables.PIGEON_MAX_SPEED) {
             GameVariables.pigeonSpeed = 9f + (0.45f) * totalGameTime;
         } else {
             GameVariables.pigeonSpeed = GameVariables.PIGEON_MAX_SPEED;
@@ -89,29 +90,43 @@ public class Gameplay extends Level {
         if (totalGameTime > LEVEL_ONE_START_TIME && totalGameTime <= LEVEL_ONE_END_TIME) {
 
             levelOne.run(totalGameTime);
+            spawnRandomPowerUp();
             Gdx.app.log("LEVEL ONE", "PLAYING");
 
-        } else if (totalGameTime > LEVEL_TWO_START_TIME && totalGameTime <= LEVEL_TWO_END_TIME){
+        } else if (totalGameTime > LEVEL_TWO_START_TIME && totalGameTime <= LEVEL_TWO_END_TIME) {
 
             levelTwo.run(true, NO_WAVE, totalGameTime, false);
+            spawnRandomPowerUp();
             Gdx.app.log("LEVEL TWO", "PLAYING");
 
-        } else if (totalGameTime > LEVEL_THREE_START_TIME & totalGameTime <= LEVEL_THREE_END_TIME){
+        } else if (totalGameTime > LEVEL_THREE_START_TIME & totalGameTime <= LEVEL_THREE_END_TIME) {
 
             levelThree.run(true, NO_WAVE, totalGameTime, false);
+            spawnRandomPowerUp();
             Gdx.app.log("LEVEL THREE", "PLAYING");
 
-        } else if (totalGameTime > LEVEL_FOUR_START_TIME & totalGameTime <= LEVEL_FOUR_END_TIME){
+        } else if (totalGameTime > LEVEL_FOUR_START_TIME & totalGameTime <= LEVEL_FOUR_END_TIME) {
 
             levelFour.run(true, NO_WAVE, totalGameTime, false);
+            spawnRandomPowerUp();
             Gdx.app.log("LEVEL FOUR", "PLAYING");
 
-        } else if (totalGameTime > LEVEL_FINAL_START_TIME){
+        } else if (totalGameTime > LEVEL_FINAL_START_TIME) {
 
             levelFinal.run(totalGameTime);
+            spawnRandomPowerUp();
             Gdx.app.log("LEVEL FINAL", "PLAYING");
         }
 
 
+    }
+
+    private void spawnRandomPowerUp() {
+
+        //Spawn random power up if time between power ups has passed (Power Up Interval)
+
+        if (totalGameTime - PowerUps.lastPowerUpSpawnTime > PowerUps.randomSpawnIntervalTime) {
+            powerUps.spawnPowerUp(MathUtils.random(PowerUps.POWER_UP_TYPE_SHIELD, PowerUps.POWER_UP_TYPE_SKULL));
+        }
     }
 }

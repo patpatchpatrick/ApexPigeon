@@ -84,7 +84,7 @@ public class Pigeon {
         initializePowerUpShieldAnimation();
 
         //Initialize font pigeonFontGenerator for powerups
-        pigeonFontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("arcadeclassic.TTF"));
+        pigeonFontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/arcadeclassic.TTF"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 18;
         parameter.minFilter = Texture.TextureFilter.Linear;
