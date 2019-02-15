@@ -48,7 +48,6 @@ public class UFOs {
     //UFO tracking variables
 
     //UFO Energy Ball variables
-    private Array<Body> energyBallArray = new Array<Body>();
     private Animation<TextureRegion> energyBallAnimation;
     private Texture energyBallSheet;
     private final float ENERGY_BALL_INITIAL_WIDTH = 5f;

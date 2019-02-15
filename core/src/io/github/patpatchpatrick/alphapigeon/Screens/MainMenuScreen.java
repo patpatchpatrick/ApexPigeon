@@ -33,16 +33,13 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
     private Viewport viewport;
     private Texture mainMenuBackground;
     private Texture mainMenuLogoAndText;
-    private Texture testTexture;
     private PlayServices playServices;
     private DatabaseAndPreferenceManager databaseAndPreferenceManager;
-    private MobileCallbacks mobileCallbacks;
 
     //Input Processor
     private InputProcessor inputProcessor;
 
     //Variables
-    private final float imageScale = 10;
     private float mainMenuStateTime;
     private float mainMenuDeltaTime;
 
@@ -80,10 +77,6 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
     private final float SOUND_BUTTON_X2 = 80 - 2.8f;
     private final float SOUND_BUTTON_Y1 = 3f;
     private final float SOUND_BUTTON_Y2 = 8.5f;
-    private float resizedSoundX1;
-    private float resizedSoundY1;
-    Vector3 unprojectedSoundXY;
-    Vector3 unprojectedSoundXY2;
 
     //Animations
     //---LevelOneBird

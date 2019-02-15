@@ -17,14 +17,12 @@ public class AccelerometerController {
 
     private Pigeon pigeon;
     private Body pigeonBody;
-    private OrthographicCamera camera;
 
     private Boolean accelerometerAvailable;
 
-    public AccelerometerController(Pigeon pigeon, OrthographicCamera camera){
+    public AccelerometerController(Pigeon pigeon){
         this.pigeon = pigeon;
         pigeonBody = this.pigeon.getBody();
-        this.camera = camera;
 
         //Determine if an accelerometer is available
         accelerometerAvailable = Gdx.input.isPeripheralAvailable(Input.Peripheral.Accelerometer);

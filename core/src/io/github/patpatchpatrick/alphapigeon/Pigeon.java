@@ -39,7 +39,6 @@ public class Pigeon {
     //Power Up Variables
     private int currentPowerUp;
     private float currentPowerUpTime = 0;
-    private final long MILLION_SCALE = 1000000;
     private String powerUpShieldTimeRemaining = "";
 
     //Power Up Shield Animation Variables

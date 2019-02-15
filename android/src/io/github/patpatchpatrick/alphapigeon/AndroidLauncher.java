@@ -152,6 +152,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
         // Get the content resolver for database
         contentResolver = getContentResolver();
 
+
         // Create the client used to sign in to Google services.
         mGoogleSignInClient = GoogleSignIn.getClient(this,
                 new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN).build());

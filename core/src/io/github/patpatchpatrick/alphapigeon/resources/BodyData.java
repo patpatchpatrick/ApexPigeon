@@ -20,7 +20,6 @@ public class BodyData {
 
     //ROCKET DATA
     private float rocketYForce = 0f;
-    private long lastRocketExplosionTime = 99999;
 
     //UFO DATA
     private float energyBeamDirection;

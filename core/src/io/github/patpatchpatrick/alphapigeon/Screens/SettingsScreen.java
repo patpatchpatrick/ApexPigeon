@@ -46,8 +46,6 @@ public class SettingsScreen implements Screen, MobileCallbacks {
     private boolean slidersInitialized = false;
 
     //Variables
-    private float settingsDeltaTime;
-    private float settingsStateTime;
     private final float MUSIC_VOLUME_SLIDER_X1 = 400;
     private final float MUSIC_VOLUME_SLIDER_Y1 = 300;
     private final float GAME_VOLUME_SLIDER_X1 = MUSIC_VOLUME_SLIDER_X1;
@@ -147,9 +145,6 @@ public class SettingsScreen implements Screen, MobileCallbacks {
 
     @Override
     public void render(float delta) {
-
-        settingsDeltaTime = Gdx.graphics.getDeltaTime();
-        settingsStateTime += settingsDeltaTime;
 
         // clear the screen with a dark blue color
         Gdx.gl.glClearColor(0, 0, 0.2f, 1);

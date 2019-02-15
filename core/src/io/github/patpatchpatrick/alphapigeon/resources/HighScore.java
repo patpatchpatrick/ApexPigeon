@@ -14,7 +14,6 @@ public class HighScore {
     public static float currentScore;
     public static float currentHighScore = 0;
     private String scoreString;
-    private BitmapFont scoreBitmapFont;
     private BitmapFont font12;
     FreeTypeFontGenerator generator;
     private Boolean pigeonHasNotCrashed = true;
@@ -24,7 +23,6 @@ public class HighScore {
         // set default currentScore and create and set up the font used for the high currentScore display
         currentScore = 0;
         scoreString = "Distance: 0";
-        scoreBitmapFont = new BitmapFont();
         generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/univers.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 14;
@@ -95,6 +93,7 @@ public class HighScore {
 
     public void dispose() {
         generator.dispose();
+        font12.dispose();
     }
 
     public void stopCounting() {

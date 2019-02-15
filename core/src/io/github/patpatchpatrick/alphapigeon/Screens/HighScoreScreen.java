@@ -40,10 +40,6 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
     // -- Input Multiplexer to handle both the scrollpane(stage) and screen input processors
     private InputMultiplexer inputMultiplexer = new InputMultiplexer();
 
-    //Variables
-    private float highScoreDeltaTime;
-    private float highScoreStateTime;
-
     //Textures and Buttons
     private Texture highScoreBackground;
     private Texture backButton;
@@ -105,7 +101,6 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
     private boolean scoresRequestNeeded = false;
 
     //Font Generator
-    private BitmapFont scoreBitmapFont;
     private BitmapFont scoreFont;
     FreeTypeFontGenerator generator;
 
@@ -151,7 +146,6 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
 
 
         //Initialize font generator
-        scoreBitmapFont = new BitmapFont();
         generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/univers.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 20;
@@ -173,9 +167,6 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
             playServices.showBannerAds(false);
         }
 
-        //REMOVE THIS!!!!
-        //createTestScroll();
-
 
     }
 
@@ -186,9 +177,6 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
 
     @Override
     public void render(float delta) {
-
-        highScoreDeltaTime = Gdx.graphics.getDeltaTime();
-        highScoreStateTime += highScoreDeltaTime;
 
         // clear the screen with a dark blue color
         Gdx.gl.glClearColor(0, 0, 0.2f, 1);
@@ -235,31 +223,6 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
 
     }
 
-    private void createTestScroll() {
-
-        ArrayList<String> testStrings = new ArrayList<String>();
-        testStrings.add(new String("NAME: Joe" + "\nRANK: 1 " + "\nSCORE: 95.22"));
-        testStrings.add(new String("NAME: Test blah balh !123*&^%" + "\nRANK: 1898237 " + "\nSCORE: 95.2222"));
-        testStrings.add(new String("NAME: Joe" + "\nRANK: 1 " + "\nSCORE: 95.22"));
-        testStrings.add(new String("NAME: Test blah balh !123*&^%" + "\nRANK: 1898237 " + "\nSCORE: 95.2222"));
-        testStrings.add(new String("NAME: Joe" + "\nRANK: 1 " + "\nSCORE: 95.22"));
-        testStrings.add(new String("NAME: Test blah balh !123*&^%" + "\nRANK: 1898237 " + "\nSCORE: 95.2222"));
-        testStrings.add(new String("NAME: Joe" + "\nRANK: 1 " + "\nSCORE: 95.22"));
-        testStrings.add(new String("NAME: Test blah balh !123*&^%" + "\nRANK: 1898237 " + "\nSCORE: 95.2222"));
-        testStrings.add(new String("NAME: Joe" + "\nRANK: 1 " + "\nSCORE: 95.22"));
-        testStrings.add(new String("NAME: Test blah balh !123*&^%" + "\nRANK: 1898237 " + "\nSCORE: 95.2222"));
-        testStrings.add(new String("NAME: Joe" + "\nRANK: 1 " + "\nSCORE: 95.22"));
-        testStrings.add(new String("NAME: Test blah balh !123*&^%" + "\nRANK: 1898237 " + "\nSCORE: 95.2222"));
-        testStrings.add(new String("NAME: Joe" + "\nRANK: 1 " + "\nSCORE: 95.22"));
-        testStrings.add(new String("NAME: Test blah balh !123*&^%" + "\nRANK: 1898237 " + "\nSCORE: 95.2222"));
-        testStrings.add(new String("NAME: Joe" + "\nRANK: 1 " + "\nSCORE: 95.22"));
-        testStrings.add(new String("NAME: Test blah balh !123*&^%" + "\nRANK: 1898237 " + "\nSCORE: 95.2222"));
-        testStrings.add(new String("NAME: Joe" + "\nRANK: 1 " + "\nSCORE: 95.22"));
-        testStrings.add(new String("NAME: Test blah balh !123*&^%" + "\nRANK: 1898237 " + "\nSCORE: 95.2222"));
-        createScrollPane(testStrings);
-
-
-    }
 
     private void startPlayServicesLeaderboardIntent() {
 
@@ -374,6 +337,9 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
         topDayButtonTexture.dispose();
         topWeekButtonTexture.dispose();
         topAllTimeButtonTexture.dispose();
+        googlePlayLeaderboardsButton.dispose();
+        generator.dispose();
+        scoreFont.dispose();
 
     }
 

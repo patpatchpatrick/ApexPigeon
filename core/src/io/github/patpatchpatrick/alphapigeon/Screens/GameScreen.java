@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -26,6 +27,7 @@ import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.Pigeon;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.Dodgeable;
+import io.github.patpatchpatrick.alphapigeon.dodgeables.Notifications;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.PowerUps;
 import io.github.patpatchpatrick.alphapigeon.levels.Gameplay;
 import io.github.patpatchpatrick.alphapigeon.resources.AccelerometerController;
@@ -66,7 +68,6 @@ public class GameScreen implements Screen {
     private float deltaTime;
     private Body pigeonBody;
     private Gameplay gameplay;
-    Box2DDebugRenderer debugRenderer;
     World world;
 
     //Variables
@@ -89,7 +90,6 @@ public class GameScreen implements Screen {
         this.databaseAndPreferenceManager = databaseAndPreferenceManager;
 
         world = new World(new Vector2(0, 0), true);
-        //debugRenderer = new Box2DDebugRenderer();
 
         // set initial time to 0
         stateTime = 0f;
@@ -117,7 +117,7 @@ public class GameScreen implements Screen {
         pigeonBody = this.pigeon.getBody();
 
         // Create the accelerometerController class and input processor to read user input
-        accelerometerController = new AccelerometerController(this.pigeon, this.camera);
+        accelerometerController = new AccelerometerController(this.pigeon);
         createInputProcessor();
 
         // initialize the gameplay class
@@ -456,6 +456,13 @@ public class GameScreen implements Screen {
                     dodgeable.reset();
                 }
                 dodgeables.resetSpawnTimes();
+                for (Sound sound : Sounds.activeSounds){
+                    //Stop all sounds currently playing
+                    sound.stop();
+                    Sounds.activeSounds.remove(sound);
+                }
+                //Reset all notifications that are active so they stop displaying
+                Notifications.ExclamationMark.resetNotifications();
                 Array<Body> bodies = new Array<Body>();
                 world.getBodies(bodies);
                 for (int i = 0; i < bodies.size; i++) {

@@ -37,10 +37,6 @@ public class GameOverScreen implements Screen {
     private float totalNumGames = 0;
     private boolean newHighScoreEarned = false;
 
-    //Variables
-    private float gameOverDeltaTime;
-    private float gameOverStateTime;
-
     //Textures
     private Texture gameOverBackground;
     private Texture newHighScoreTexture;
@@ -57,7 +53,6 @@ public class GameOverScreen implements Screen {
 
     //Font Generator
     private String gameOverString;
-    private BitmapFont scoreBitmapFont;
     private BitmapFont scoreFont;
     FreeTypeFontGenerator generator;
 
@@ -86,7 +81,6 @@ public class GameOverScreen implements Screen {
         newHighScoreTexture = new Texture(Gdx.files.internal("textures/gameoverscreen/NewHighScore.png"));
 
         //Initialize font generator
-        scoreBitmapFont = new BitmapFont();
         generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/univers.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 20;
@@ -134,9 +128,6 @@ public class GameOverScreen implements Screen {
 
     @Override
     public void render(float delta) {
-
-        gameOverDeltaTime = Gdx.graphics.getDeltaTime();
-        gameOverStateTime += gameOverDeltaTime;
 
         // clear the screen with a dark blue color
         Gdx.gl.glClearColor(0, 0, 0.2f, 1);
@@ -285,7 +276,8 @@ public class GameOverScreen implements Screen {
 
         gameOverBackground.dispose();
         newHighScoreTexture.dispose();
-
+        generator.dispose();
+        scoreFont.dispose();
     }
 
 

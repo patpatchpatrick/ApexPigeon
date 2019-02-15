@@ -223,6 +223,13 @@ public class Notifications {
             return false;
         }
 
+        public static void resetNotifications(){
+            notificationSpawned = false;
+            exclamationMarkLeftSpawned = false;
+            exclamationMarkTopSpawned = false;
+            exclamationMarkBottomSpawned = false;
+        }
+
 
     }
 

@@ -38,20 +38,20 @@ public abstract class Level {
     protected final float LEVEL_ONE_START_TIME = 0f;
     //L1W1 is only level 1 birds,  L1W2 is level 1 and 2 birds
     //Start time should be 0f and end time should be 40f
-    protected final float LEVEL_ONE_WAVE_1 = 5f;
-    protected final float LEVEL_ONE_END_TIME = 0f;
+    protected final float LEVEL_ONE_WAVE_1 = 10f;
+    protected final float LEVEL_ONE_END_TIME = 40f;
     //L2 is "easy" difficulty
     //End time should be 120f
     protected final float LEVEL_TWO_START_TIME = LEVEL_ONE_END_TIME;
-    protected final float LEVEL_TWO_END_TIME = 0f;
+    protected final float LEVEL_TWO_END_TIME = 120f;
     //L3 is "medium" difficulty
     //End time should be 180f
     protected final float LEVEL_THREE_START_TIME = LEVEL_TWO_END_TIME;
-    protected final float LEVEL_THREE_END_TIME = 0f;
+    protected final float LEVEL_THREE_END_TIME = 180f;
     //L4 is "hard" difficulty
     //End time should be 260f
     protected final float LEVEL_FOUR_START_TIME = LEVEL_THREE_END_TIME;
-    protected final float LEVEL_FOUR_END_TIME = 0f;
+    protected final float LEVEL_FOUR_END_TIME = 260f;
     //Level Final is "insane" difficulty.  It is a continuous level and the last level of the game
     protected final float LEVEL_FINAL_START_TIME = LEVEL_FOUR_END_TIME;
 
