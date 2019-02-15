@@ -105,11 +105,6 @@ public class LevelFinal extends Level {
             waveIsInitiated = false;
         }
 
-        if (totalGameTime - PowerUps.lastpowerUpShieldSpawnTime > PowerUps.randomSpawnIntervalTime) {
-            powerUps.spawnPowerUp(PowerUps.POWER_UP_TYPE_SHIELD);
-            powerUps.spawnPowerUp(PowerUps.POWER_UP_TYPE_SKULL);
-        }
-
 
     }
 

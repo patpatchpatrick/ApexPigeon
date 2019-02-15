@@ -114,9 +114,6 @@ public class LevelTwo extends Level {
 
         spawnBirds(RANDOM_WAVE_L1BIRD_SPAWN_DURATION, RANDOM_WAVE_L2BIRD_SPAWN_DURATION);
 
-        if (totalGameTime - PowerUps.lastpowerUpShieldSpawnTime > PowerUps.randomSpawnIntervalTime) {
-            powerUps.spawnPowerUp(PowerUps.POWER_UP_TYPE_SHIELD);
-        }
         if (totalGameTime - rockets.getLastRocketSpawnTime(2) > RANDOM_WAVE_ROCKETS_SPAWN_DURATION) {
             rockets.spawnRocket(2);
         }

@@ -117,15 +117,14 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
         bannerAdView = new AdView(this);
         bannerAdView.setAdSize(AdSize.BANNER);
 
-        //TODO replace with real ad!
-        bannerAdView.setAdUnitId(getString(R.string.app_ad_testad_id)); // Initialize main menu banner ad
+        bannerAdView.setAdUnitId(getString(R.string.app_ad_main_menu_screen_id)); // Initialize main menu banner ad
 
         AdRequest adRequest = new AdRequest.Builder().build();
         bannerAdView.loadAd(adRequest);
 
         //Create and load interstitial ad that plays after player loses game
         gameOverInterstitialAd = new InterstitialAd(this);
-        gameOverInterstitialAd.setAdUnitId(getString(R.string.app_ad_test_interstitial_ad_id)); //TODO replace with real ad!
+        gameOverInterstitialAd.setAdUnitId(getString(R.string.app_ad_game_over_screen_id));
         gameOverInterstitialAd.loadAd(new AdRequest.Builder().build());
         gameOverInterstitialAd.setAdListener(new AdListener() {
             @Override
