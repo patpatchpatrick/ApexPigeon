@@ -12,7 +12,7 @@ public class SettingsManager {
     public static boolean gameSoundsSettingIsOn = true;
     public static boolean touchSettingIsOn = true;
     public static boolean accelerometerSettingIsOn = true;
-    public static boolean adRemovalPurchased = false; //Setting for if user has purchased ad removal
+    public static boolean adRemovalPurchased = true; //Setting for if user has purchased ad removal  //TODO set to false if releasing on mobile device
     public static boolean fullScreenModeIsOn = false;
 
     //Floats for Sliders
@@ -63,6 +63,9 @@ public class SettingsManager {
             databaseAndPreferenceManager.toggleMusicOnOff(isOn);
             musicSettingIsOn = isOn;
             Sounds.toggleBackgroundMusic(isOn);
+        } else if(musicSettingIsOn != isOn && databaseAndPreferenceManager == null){
+            musicSettingIsOn = isOn;
+            Sounds.toggleBackgroundMusic(isOn);
         }
     }
 
@@ -72,6 +75,8 @@ public class SettingsManager {
 
         if (gameSoundsSettingIsOn != isOn && databaseAndPreferenceManager != null){
             databaseAndPreferenceManager.toggleGameSoundsOnOff(isOn);
+            gameSoundsSettingIsOn = isOn;
+        } else if(gameSoundsSettingIsOn != isOn && databaseAndPreferenceManager == null){
             gameSoundsSettingIsOn = isOn;
         }
 
@@ -84,6 +89,8 @@ public class SettingsManager {
         if (touchSettingIsOn != isOn && databaseAndPreferenceManager != null){
             databaseAndPreferenceManager.toggleTouchControlsOnOff(isOn);
             touchSettingIsOn = isOn;
+        } else if(touchSettingIsOn != isOn && databaseAndPreferenceManager == null){
+            touchSettingIsOn = isOn;
         }
 
     }
@@ -94,6 +101,8 @@ public class SettingsManager {
 
         if (accelerometerSettingIsOn != isOn && databaseAndPreferenceManager != null){
             databaseAndPreferenceManager.toggleAccelButtonOnOff(isOn);
+            accelerometerSettingIsOn = isOn;
+        } else if(accelerometerSettingIsOn != isOn && databaseAndPreferenceManager == null){
             accelerometerSettingIsOn = isOn;
         }
 
@@ -118,6 +127,8 @@ public class SettingsManager {
         if (gameVolume != value && databaseAndPreferenceManager != null){
             databaseAndPreferenceManager.toggleGameVolumeSlider(value);
             gameVolume = value;
+        } else if(gameVolume != value && databaseAndPreferenceManager == null){
+            gameVolume = value;
         }
 
     }
@@ -128,6 +139,8 @@ public class SettingsManager {
 
         if (touchSensitivity != value && databaseAndPreferenceManager != null){
             databaseAndPreferenceManager.toggleTouchSensitivity(value);
+            touchSensitivity = value;
+        } else if(touchSensitivity != value && databaseAndPreferenceManager == null){
             touchSensitivity = value;
         }
 
@@ -140,6 +153,8 @@ public class SettingsManager {
         if (accelSensitivity != value && databaseAndPreferenceManager != null){
             databaseAndPreferenceManager.toggleAccelSensitivity(value);
             accelSensitivity = value;
+        } else if(accelSensitivity != value && databaseAndPreferenceManager == null){
+            accelSensitivity = value;
         }
 
     }
@@ -150,6 +165,8 @@ public class SettingsManager {
 
         if (fullScreenModeIsOn != isOn && databaseAndPreferenceManager != null){
             databaseAndPreferenceManager.toggleFullScreenMode(isOn);
+            fullScreenModeIsOn = isOn;
+        } else if(fullScreenModeIsOn != isOn && databaseAndPreferenceManager == null){
             fullScreenModeIsOn = isOn;
         }
 

@@ -122,7 +122,7 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
         SettingsManager.updateSettings();
 
         //Set viewport to stretch or fit viewport depending on whether user has enabled full screen mode setting
-        if (SettingsManager.fullScreenModeIsOn){
+        if (SettingsManager.fullScreenModeIsOn) {
             viewport = new StretchViewport(GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT, camera);
         } else {
             viewport = new FitViewport(GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT, camera);
@@ -149,16 +149,19 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
         //Initialize background music after updating user settings (retrieving settings from mobile device db/prefs)
         Sounds.initializeBackgroundMusic();
 
-        if (playServices != null && !SettingsManager.adRemovalPurchased){
+        if (playServices != null && !SettingsManager.adRemovalPurchased) {
             //Show ads on main menu screen
             playServices.showBannerAds(true);
-        } else if (SettingsManager.adRemovalPurchased){
+        } else if (SettingsManager.adRemovalPurchased) {
             //If ad removal was purchased, do not show banner ads on the main menu screen
-            playServices.showBannerAds(false);
+            if (playServices != null) {
+                playServices.showBannerAds(false);
+            }
         }
 
 
-        Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
+        //TODO when releasinng on Android or mobile, re-enable this setting
+        //Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
 
 
     }
