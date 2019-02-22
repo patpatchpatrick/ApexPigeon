@@ -446,6 +446,7 @@ public class GameScreen implements Screen {
         // dispose of game disposables
         // set screen to game over screen
 
+
         Gdx.app.postRunnable(new Runnable() {
 
             @Override

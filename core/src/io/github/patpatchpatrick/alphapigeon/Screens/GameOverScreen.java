@@ -3,6 +3,7 @@ package io.github.patpatchpatrick.alphapigeon.Screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -15,6 +16,7 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.resources.DatabaseAndPreferenceManager;
@@ -51,10 +53,18 @@ public class GameOverScreen implements Screen {
     private final float BACK_BUTTON_Y1 = 3.0f;
     private final float BACK_BUTTON_Y2 = 10.5f;
 
-    //Font Generator
+    /**
+    //Font Generator for Non-HTML fonts
+     Free type font generator doesn't work for HTML, so bitmap font is used instead
+     These comments are kept here in case it is ever decided to use freetype font generator for mobile/desktop apps
     private String gameOverString;
     private BitmapFont scoreFont;
     FreeTypeFontGenerator generator;
+     **/
+
+    //HTML Fonts
+    private String gameOverString;
+    private BitmapFont font;
 
     public GameOverScreen(AlphaPigeon game, PlayServices playServices, DatabaseAndPreferenceManager databaseAndPreferenceManager, HighScore highScore) {
 
@@ -80,7 +90,10 @@ public class GameOverScreen implements Screen {
         gameOverBackground = new Texture(Gdx.files.internal("textures/gameoverscreen/GameOverScreen.png"));
         newHighScoreTexture = new Texture(Gdx.files.internal("textures/gameoverscreen/NewHighScore.png"));
 
-        //Initialize font generator
+        /**
+        //Initialize font generator for non-HTML
+         Free type font generator doesn't work for HTML, so bitmap font is used instead
+         These comments are kept here in case it is ever decided to use freetype font generator for mobile/desktop apps
         generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/univers.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 20;
@@ -90,16 +103,25 @@ public class GameOverScreen implements Screen {
         scoreFont.setColor(1.0f, 1.0f, 1.0f, 1.0f);
         scoreFont.getData().setScale(0.1f);
         scoreFont.setUseIntegerPositions(false);
+         **/
+
+        //Initialize HTML FONTS
+        font = new BitmapFont(Gdx.files.internal("fonts/arial-15.fnt"),
+                Gdx.files.internal("fonts/arial-15.png"), false);
+        font.getData().setScale(0.1f);
+        font.setUseIntegerPositions(false);
 
         //Handle submitting high currentScore to play services and to local databases
         handleLocalData();
         handlePlayServices();
 
         //Update the high currentScore string to be displayed
-        DecimalFormat df = new DecimalFormat("#.##");
-        DecimalFormat tgf = new DecimalFormat("#");
-        gameOverString = "Distance: " + df.format(highScore.currentScore) + " m"
-                + "\nHigh Score: " + df.format(HighScore.currentHighScore) + " m" + "\nTotal Games: " + tgf.format(totalNumGames);
+        //DecimalFormat df = new DecimalFormat("#.##");
+        //DecimalFormat tgf = new DecimalFormat("#");
+        float formattedScore = Math.round(highScore.currentScore * 100f) / 100f;
+        float  formattedHighScore = Math.round(highScore.currentHighScore * 100f) / 100f;
+        gameOverString = "Distance: " + formattedScore + " m"
+                + "\nHigh Score: " + formattedHighScore + " m" + "\nTotal Games: " + (int) totalNumGames;
 
         //Create input processor for user controls
         createInputProcessor();
@@ -141,7 +163,15 @@ public class GameOverScreen implements Screen {
         game.batch.begin();
 
         game.batch.draw(gameOverBackground, 0, 0, camera.viewportWidth, camera.viewportHeight);
+
+        /**
+         * Non-HTML font, for if freeTypeFontGenerator is used
         scoreFont.draw(game.batch, gameOverString, 29, 27);
+         **/
+
+        //HTML Font
+        font.draw(game.batch, gameOverString, 34, 27);
+
         //If a new high score was achieved, draw the new high score texture (then when the back button is pushed,
         //reset the newHighScoreEarned boolean to false
         if (newHighScoreEarned) {
@@ -275,9 +305,16 @@ public class GameOverScreen implements Screen {
     public void dispose() {
 
         gameOverBackground.dispose();
-        newHighScoreTexture.dispose();
+
+
+        /**
+         * NON-HTML Fonts
         generator.dispose();
         scoreFont.dispose();
+         **/
+
+        //HTML Fonts
+        font.dispose();
     }
 
 

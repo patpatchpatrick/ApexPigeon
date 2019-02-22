@@ -4,9 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeType;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 
 public class HighScore {
@@ -14,8 +16,16 @@ public class HighScore {
     public static float currentScore;
     public static float currentHighScore = 0;
     private String scoreString;
+
+    /**
+     * NON-HTML FONTS
+     * HTML doesn't support FreeTypeFontGenerator so must use bitmap instead
+     * These comments are in place in case it is ever decided to use freetype font generator for mobile/desktop applications
     private BitmapFont font12;
-    FreeTypeFontGenerator generator;
+    FreeTypeFontGenerator generator;**/
+
+    //HTML Fonts
+    private BitmapFont font;
     private Boolean pigeonHasNotCrashed = true;
 
     public HighScore() {
@@ -23,6 +33,11 @@ public class HighScore {
         // set default currentScore and create and set up the font used for the high currentScore display
         currentScore = 0;
         scoreString = "Distance: 0";
+
+        /**
+         * Iniitalize NON-HTML Fonts
+         * * HTML doesn't support FreeTypeFontGenerator so must use bitmap instead
+         *  These comments are in place in case it is ever decided to use freetype font generator for mobile/desktop applications
         generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/univers.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 14;
@@ -32,25 +47,41 @@ public class HighScore {
         font12.setColor(1.0f, 1.0f, 1.0f, 1.0f);
         font12.getData().setScale(0.1f);
         font12.setUseIntegerPositions(false);
+         **/
+
+        //Initialize HTML FONTS
+        font = new BitmapFont(Gdx.files.internal("fonts/arial-15.fnt"),
+                Gdx.files.internal("fonts/arial-15.png"), false);
+        font.getData().setScale(0.1f);
+        font.setUseIntegerPositions(false);
     }
+
 
     public void update(float deltaTime) {
         // increase currentScore
         // the currentScore is equal to the distance (meters) that the bird has traveled
         // if the pigeon has not crashed, keep increasing the currentScore
         // after the pigeon crashes, stop increasing currentScore
-        DecimalFormat df = new DecimalFormat("#.##");
+        //DecimalFormat df = new DecimalFormat("#.##");
+        float formattedScore = Math.round(currentScore * 100f) / 100f;
+
         if (pigeonHasNotCrashed) {
             currentScore = currentScore + GameVariables.pigeonSpeed * deltaTime;
-            scoreString = "Distance    " + df.format(currentScore) + "  m";
+            scoreString = "Distance    " + formattedScore + "  m";
         }
 
     }
 
     public void render(SpriteBatch batch) {
         // display currentScore
-        font12.draw(batch, scoreString, 60, 45);
 
+        /**
+         * Non-HTML Font
+        font12.draw(batch, scoreString, 60, 45);
+         **/
+
+        font.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+        font.draw(batch, scoreString, 60, 45);
     }
 
     public static void updateLocalGameStatisticsData(DatabaseAndPreferenceManager databaseAndPreferenceManager){
@@ -92,8 +123,15 @@ public class HighScore {
     }
 
     public void dispose() {
+
+        /**
+         * Non-HTML Fonts
         generator.dispose();
         font12.dispose();
+         **/
+
+        //HTML Fonts
+        font.dispose();
     }
 
     public void stopCounting() {

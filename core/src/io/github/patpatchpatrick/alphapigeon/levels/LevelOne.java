@@ -1,5 +1,7 @@
 package io.github.patpatchpatrick.alphapigeon.levels;
 
+import com.badlogic.gdx.math.MathUtils;
+
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.UFO;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.PowerUps;
@@ -27,7 +29,6 @@ public class LevelOne extends Level {
 
             if (totalGameTime - birds.getLastLevelOneBirdSpawnTime() > L1BIRD_SPAWN_DURATION_WAVE_0) {
                 birds.spawnLevelOneBird(totalGameTime);
-
             }
         } else if (totalGameTime >= LEVEL_ONE_WAVE_1 && totalGameTime < LEVEL_ONE_END_TIME) {
 

@@ -46,8 +46,17 @@ public class Pigeon {
     private Animation<TextureRegion> powerUpShieldAnimation;
 
     //Fonts and text to display on pigeon
+
+    /**
+     * Non-HTML Fonts
+     * HTML does not support freeTypeGenerator
+     * These comments are here for if freeTypeGenerator is ever used for mobile/desktop apps
     private BitmapFont pigeonFonts;
     FreeTypeFontGenerator pigeonFontGenerator;
+     **/
+
+    //HTML Fonts
+            private BitmapFont font;
 
     //Sound
     private Sound powerUpShieldSound = Sounds.powerUpShieldSound;
@@ -84,6 +93,8 @@ public class Pigeon {
         initializePowerUpShieldAnimation();
 
         //Initialize font pigeonFontGenerator for powerups
+        /**
+         * NON-HTML Fonts
         pigeonFontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/arcadeclassic.TTF"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 18;
@@ -92,6 +103,14 @@ public class Pigeon {
         pigeonFonts = pigeonFontGenerator.generateFont(parameter);
         pigeonFonts.setColor(Color.RED);
         pigeonFonts.getData().setScale(0.1f);
+         **/
+
+        //Initialize HTML FONTS
+        font = new BitmapFont(Gdx.files.internal("fonts/arial-15.fnt"),
+                Gdx.files.internal("fonts/arial-15.png"), false);
+        font.getData().setScale(0.1f);
+        font.setUseIntegerPositions(false);
+        font.setColor(Color.RED);
 
 
     }
@@ -255,7 +274,15 @@ public class Pigeon {
             TextureRegion powUpShieldCurrentFrame = powerUpShieldAnimation.getKeyFrame(stateTime, true);
             batch.draw(powUpShieldCurrentFrame, pigeonBody.getPosition().x - 2.5f, pigeonBody.getPosition().y - 2.5f, 0, 0, 15f, 10f, 1, 1, MathUtils.radiansToDegrees * pigeonBody.getAngle());
             // display power up remaining time
+
+            /**
+             * Non-HTML Font
             pigeonFonts.draw(batch, powerUpShieldTimeRemaining, pigeonBody.getPosition().x, pigeonBody.getPosition().y);
+             **/
+
+            //HTML Font
+            font.draw(batch, powerUpShieldTimeRemaining, pigeonBody.getPosition().x, pigeonBody.getPosition().y);
+
         }
 
     }
@@ -283,5 +310,8 @@ public class Pigeon {
         pigeonFlySheet.dispose();
         powerUpShieldSheet.dispose();
         powerUpShieldSound.dispose();
+
+        //HTML Font
+        font.dispose();
     }
 }

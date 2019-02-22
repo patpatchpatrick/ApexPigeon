@@ -100,9 +100,14 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
     //--By default is false, unless a button is changed, then a score request for new type of button is made
     private boolean scoresRequestNeeded = false;
 
-    //Font Generator
-    private BitmapFont scoreFont;
-    FreeTypeFontGenerator generator;
+    //Font Generator for Non-HTML
+    /**
+     * private BitmapFont scoreFont;
+     * FreeTypeFontGenerator generator;
+     **/
+
+    //HTML FONTS
+    private BitmapFont font;
 
     //ScrollPane
     private Stage stage;
@@ -128,7 +133,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
 
 
         //Set viewport to stretch or fit viewport depending on whether user has enabled full screen mode setting
-        if (SettingsManager.fullScreenModeIsOn){
+        if (SettingsManager.fullScreenModeIsOn) {
             viewport = new StretchViewport(GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT, camera);
         } else {
             viewport = new FitViewport(GameVariables.WORLD_WIDTH, GameVariables.WORLD_HEIGHT, camera);
@@ -145,16 +150,18 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
         googlePlayLeaderboardsButton = new Texture(Gdx.files.internal("textures/highscoresscreen/GooglePlayLeaderboardsButton.png"));
 
 
-        //Initialize font generator
-        generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/univers.ttf"));
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 20;
-        parameter.minFilter = Texture.TextureFilter.Linear;
-        parameter.magFilter = Texture.TextureFilter.Linear;
-        scoreFont = generator.generateFont(parameter);
-        scoreFont.setColor(1.0f, 1.0f, 1.0f, 1.0f);
-        scoreFont.getData().setScale(0.1f);
-        scoreFont.setUseIntegerPositions(false);
+        /**
+         //Initialize font generator (Non-HTML)
+         generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/univers.ttf"));
+         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+         parameter.size = 20;
+         parameter.minFilter = Texture.TextureFilter.Linear;
+         parameter.magFilter = Texture.TextureFilter.Linear;
+         scoreFont = generator.generateFont(parameter);
+         scoreFont.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+         scoreFont.getData().setScale(0.1f);
+         scoreFont.setUseIntegerPositions(false);**/
+
 
         //Request local scores from database by default
         createInitialScoreRequest();
@@ -162,7 +169,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
         //Create input processor for user controls
         createInputProcessor();
 
-        if (playServices != null){
+        if (playServices != null) {
             //Hide ads on high scores screen
             playServices.showBannerAds(false);
         }
@@ -338,8 +345,11 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
         topWeekButtonTexture.dispose();
         topAllTimeButtonTexture.dispose();
         googlePlayLeaderboardsButton.dispose();
+
+        /**
+         * //NON-HTML Font files
         generator.dispose();
-        scoreFont.dispose();
+        scoreFont.dispose();**/
 
     }
 
@@ -403,7 +413,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
             public boolean touchDown(int screenX, int screenY, int pointer, int button) {
                 //Get the mouse coordinates and unproject to the world coordinates
                 Vector3 mousePos = new Vector3(screenX, screenY, 0);
-                camera.unproject(mousePos, viewport.getScreenX(), viewport.getScreenY(),  viewport.getScreenWidth(), viewport.getScreenHeight());
+                camera.unproject(mousePos, viewport.getScreenX(), viewport.getScreenY(), viewport.getScreenWidth(), viewport.getScreenHeight());
 
                 //If the mouse is in bounds of the back button, go back to the main menu
                 if (mousePos.x > BACK_BUTTON_X1 && mousePos.x < BACK_BUTTON_X2 && mousePos.y > BACK_BUTTON_Y1 && mousePos.y < BACK_BUTTON_Y2) {
@@ -545,7 +555,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
         if (!scrollPaneCreated) {
 
             //Set the scrollpane viewport to be stretch or fit depending no whether user has enabled full screen mode
-            if (SettingsManager.fullScreenModeIsOn){
+            if (SettingsManager.fullScreenModeIsOn) {
                 scrollPaneViewport = new StretchViewport(800, 480);
             } else {
                 scrollPaneViewport = new FitViewport(800, 480);
@@ -595,7 +605,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
         scrollPaneCreated = true;
     }
 
-    private void resetScreen(){
+    private void resetScreen() {
         Gdx.app.postRunnable(new Runnable() {
 
             @Override
