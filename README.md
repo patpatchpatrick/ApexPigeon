@@ -1,5 +1,7 @@
 =======
 # Alpha Pigeon
+![Screenshots](https://raw.githubusercontent.com/patpatchpatrick/alphapigeon/master/docs/cover.png)
+
 <b>Arcade Game</b>
 
 
