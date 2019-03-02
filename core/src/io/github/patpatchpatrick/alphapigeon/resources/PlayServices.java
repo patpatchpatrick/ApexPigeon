@@ -11,7 +11,7 @@ public interface PlayServices {
     //Leaderboards
     public void signIn();
     public void signOut();
-    public void submitScore(long highScore);
+    public void submitScore(int highScore, String user);
     public void showLeaderboard();
     public void getPlayerCenteredScores();
     public void getTopScores(int scoreType);

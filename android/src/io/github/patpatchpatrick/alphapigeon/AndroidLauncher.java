@@ -25,44 +25,27 @@ import io.github.patpatchpatrick.alphapigeon.resources.MobileCallbacks;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
 
 import com.badlogic.gdx.backends.android.AndroidGraphics;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
-import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.games.AnnotatedData;
-import com.google.android.gms.games.Games;
-import com.google.android.gms.games.GamesClient;
-import com.google.android.gms.games.LeaderboardsClient;
-import com.google.android.gms.games.leaderboard.LeaderboardScore;
-import com.google.android.gms.games.leaderboard.LeaderboardScoreBuffer;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 
+
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
-import static com.google.android.gms.common.api.CommonStatusCodes.SIGN_IN_REQUIRED;
-import static com.google.android.gms.games.leaderboard.LeaderboardVariant.COLLECTION_PUBLIC;
-import static com.google.android.gms.games.leaderboard.LeaderboardVariant.TIME_SPAN_ALL_TIME;
-import static com.google.android.gms.games.leaderboard.LeaderboardVariant.TIME_SPAN_DAILY;
-import static com.google.android.gms.games.leaderboard.LeaderboardVariant.TIME_SPAN_WEEKLY;
+import javax.net.ssl.HttpsURLConnection;
+
+
 
 public class AndroidLauncher extends AndroidApplication implements PlayServices, DatabaseAndPreferenceManager {
 
     // Google Play Services Variables
-    private GoogleSignInClient mGoogleSignInClient;
+
     private int RC_SIGN_IN = 1;
-    private GoogleSignInAccount signedInAccount;
+
 
     // -- Leaderboard variables
     private static final int RC_LEADERBOARD_UI = 9004;
@@ -75,11 +58,9 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
     protected static ContentResolver contentResolver;
 
     //Google ads
-    private AdView bannerAdView; //AdView for Banner Ads
     private final int SHOW_OR_LOAD_INTERSTITIAL_ADS = 2;
     private final int SHOW_BANNER_ADS = 1;
     private final int HIDE_BANNER_ADS = 0;
-    private InterstitialAd gameOverInterstitialAd;
 
     //Google Billing
     private InAppBilling mInAppBilling;
@@ -110,29 +91,6 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
         // Create view for libgdx
         View gameView = initializeForView(new AlphaPigeon(this, this), config);
 
-        // Initialize mobile ads
-        MobileAds.initialize(this, getString(R.string.app_ad_id));
-
-        // Create and setup the AdMob view for the MainMenu Screen
-        bannerAdView = new AdView(this);
-        bannerAdView.setAdSize(AdSize.BANNER);
-
-        bannerAdView.setAdUnitId(getString(R.string.app_ad_main_menu_screen_id)); // Initialize main menu banner ad
-
-        AdRequest adRequest = new AdRequest.Builder().build();
-        bannerAdView.loadAd(adRequest);
-
-        //Create and load interstitial ad that plays after player loses game
-        gameOverInterstitialAd = new InterstitialAd(this);
-        gameOverInterstitialAd.setAdUnitId(getString(R.string.app_ad_game_over_screen_id));
-        gameOverInterstitialAd.loadAd(new AdRequest.Builder().build());
-        gameOverInterstitialAd.setAdListener(new AdListener() {
-            @Override
-            public void onAdClosed() {
-                super.onAdClosed();
-            }
-        });
-
         // Add the libgdx view
         layout.addView(gameView);
 
@@ -143,18 +101,12 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
         adParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         adParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
 
-        layout.addView(bannerAdView, adParams);
 
         // Hook it all up
         setContentView(layout);
 
         // Get the content resolver for database
         contentResolver = getContentResolver();
-
-
-        // Create the client used to sign in to Google services.
-        mGoogleSignInClient = GoogleSignIn.getClient(this,
-                new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN).build());
 
     }
 
@@ -163,102 +115,22 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
         //Handler to handle enabling and disabling ads on the UI thread
         @Override
         public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case SHOW_BANNER_ADS: {
-                    //Set banner ads to visible and resume ad processes
-                    bannerAdView.setVisibility(View.VISIBLE);
-                    bannerAdView.resume();
-                    break;
-                }
-                case HIDE_BANNER_ADS: {
-                    //Set banner ads to invisible and pause ad processes
-                    bannerAdView.setVisibility(View.GONE);
-                    bannerAdView.pause();
-                    break;
-                }
-                case SHOW_OR_LOAD_INTERSTITIAL_ADS: {
-                    //Show or load an interstitial ad
-                    if (gameOverInterstitialAd.isLoaded()) {
-                        gameOverInterstitialAd.show();
-                    } else {
-                        AdRequest interstitialRequest = new AdRequest.Builder().build();
-                        gameOverInterstitialAd.loadAd(interstitialRequest);
-                    }
-                    break;
-                }
-                case PURCHASE_AD_REMOVAL: {
-                    //Purchase ad removal
-                    mInAppBilling.launchAdRemovalPurchase();
-                    break;
-                }
-            }
+
         }
     };
 
 
     private void signInSilently() {
-        //GoogleSignInClient signInClient = GoogleSignIn.getClient(this,
-        // GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
-        mGoogleSignInClient.silentSignIn().addOnCompleteListener(this,
-                new OnCompleteListener<GoogleSignInAccount>() {
-                    @Override
-                    public void onComplete(@NonNull Task<GoogleSignInAccount> task) {
-                        if (task.isSuccessful()) {
-                            // The signed in account is stored in the task's result.
-                            signedInAccount = task.getResult();
-                            if (signedInAccount != null) {
-                                GamesClient gamesClient = Games.getGamesClient(AndroidLauncher.this, signedInAccount);
-                                gamesClient.setGravityForPopups(Gravity.TOP | Gravity.CENTER_HORIZONTAL);
-                                gamesClient.setViewForPopups(((AndroidGraphics) AndroidLauncher.this.getGraphics()).getView());
-                            }
-                        } else {
-                            // Player will need to sign-in explicitly using via UI if the silent sign-in fails
-                            // with exception code of SIGN_IN_REQUIRED
-                            ApiException signInFailException = (ApiException) task.getException();
-                            int exceptionStatusCode = signInFailException.getStatusCode();
-                            if (exceptionStatusCode == SIGN_IN_REQUIRED) {
-                                startSignInIntent();
-                            }
-                        }
-                    }
-                });
+
     }
 
     private void startSignInIntent() {
-        //Manually sign in if silent sign-in fails
-        Intent intent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(intent, RC_SIGN_IN);
+
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //Activity result for startSignInIntent method
-        //If signed in successfully, get signed in account, otherwise log result fail code
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RC_SIGN_IN) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            if (result.isSuccess()) {
-                // The signed in account is stored in the result.
-                // Set pop up notification for signed in account to display when user is signed in
-                signedInAccount = result.getSignInAccount();
-                if (signedInAccount != null) {
-                    GamesClient gamesClient = Games.getGamesClient(AndroidLauncher.this, signedInAccount);
-                    gamesClient.setGravityForPopups(Gravity.TOP | Gravity.CENTER_HORIZONTAL);
-                    gamesClient.setViewForPopups(((AndroidGraphics) AndroidLauncher.this.getGraphics()).getView());
-                }
-            } else {
-                int failCode = result.getStatus().getStatusCode();
-                Log.d("FAILCODE", "" + failCode);
-                Log.d("RESULT", "" + result.getStatus());
-                String message = result.getStatus().getStatusMessage();
-                if (message == null || message.isEmpty()) {
-                    message = getString(R.string.signin_other_error);
-                }
-                new AlertDialog.Builder(this).setMessage(message)
-                        .setNeutralButton(android.R.string.ok, null).show();
-            }
 
-        }
     }
 
 
@@ -292,160 +164,106 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
     @Override
     public void signOut() {
 
-        //Figure out when/if you need to allow the user to sign out
-
-        mGoogleSignInClient.signOut().addOnCompleteListener(this,
-                new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        // at this point, the user is signed out.
-                    }
-                });
 
     }
 
     @Override
-    public void submitScore(long highScore) {
+    public void submitScore(int highScore, String user) {
 
-        //Ensure user is signed in so game doesn't crash
-        if (GoogleSignIn.getLastSignedInAccount(this) != null) {
 
-            Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this))
-                    .submitScore((leaderboard), highScore);
+        //Submits a high score for a specific user
+        //Scores are submitted using the Dreamlo online leaderboard database using an HTTP GET Request
+
+        //Build the url get request string based on user and score
+        StringBuilder urlScoreReq = new StringBuilder("http://dreamlo.com/lb/XtrQXD_4BUGkPBmdz2WSUg3OwYKXHfZUqIcuUscCsXUw/add/");
+        urlScoreReq.append(user);
+        urlScoreReq.append("/");
+        urlScoreReq.append(highScore);
+        urlScoreReq.append("/");
+        String urlString = urlScoreReq.toString();
+
+        URL url = null;
+
+        //CREATE THE URL TO SUBMIT SCORE TO DREAMLO
+        try {
+            url = new URL(urlString);
+        } catch (MalformedURLException e) {
+            Log.e("URL", "Error in creating URL");
         }
+
+        InputStream stream = null;
+        HttpURLConnection connection = null;
+        String result = null;
+
+        try {
+            connection = (HttpURLConnection) url.openConnection();
+            // Timeout for reading InputStream arbitrarily set to 3000ms.
+            connection.setReadTimeout(3000);
+            // Timeout for connection.connect() arbitrarily set to 3000ms.
+            connection.setConnectTimeout(3000);
+            // For this use case, set HTTP method to GET.
+            connection.setRequestMethod("GET");
+            // Already true by default but setting just in case; needs to be true since this request
+            // is carrying an input (response) body.
+            connection.setDoInput(true);
+            // Open communications link (network traffic occurs here).
+            connection.connect();
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode != HttpsURLConnection.HTTP_OK) {
+                Log.e("URLConnectionExc", "Error Code: " + responseCode);
+                throw new IOException("HTTP error code: " + responseCode);
+            }
+            // Retrieve the response body as an InputStream.
+            stream = connection.getInputStream();
+            if (stream != null) {
+                InputStreamReader isr = new InputStreamReader(stream);
+                // Use InputStreamReader to get response from network
+                int data = isr.read();
+                while (data != -1){
+                    char current = (char) data;
+                    data = isr.read();
+                    Log.d("ScoreGET", "" + current);
+
+                }
+
+                stream.close();
+
+            }
+        } catch (Exception e) {
+            Log.d("ConnectException", "" + e);
+
+        } finally {
+            // Disconnect HTTP connection.
+
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+
 
     }
 
     @Override
     public void showLeaderboard() {
 
-        //Ensure user is signed in so game doesn't crash
-        if (GoogleSignIn.getLastSignedInAccount(this) != null) {
-
-            Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this))
-                    .getLeaderboardIntent(leaderboard)
-                    .addOnSuccessListener(new OnSuccessListener<Intent>() {
-                        @Override
-                        public void onSuccess(Intent intent) {
-                            startActivityForResult(intent, RC_LEADERBOARD_UI);
-                        }
-                    });
-        }
 
     }
 
     @Override
     public void getPlayerCenteredScores() {
 
-        //Get a list of player centered high scores and return it in ArrayList<String> format
-
-        //Ensure user is signed in so game doesn't crash
-        if (GoogleSignIn.getLastSignedInAccount(this) != null) {
-
-            Task<AnnotatedData<LeaderboardsClient.LeaderboardScores>> playerCenteredScoresTask =
-                    Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this))
-                            .loadPlayerCenteredScores(leaderboard, TIME_SPAN_ALL_TIME, COLLECTION_PUBLIC, 10, false);
-
-            playerCenteredScoresTask.addOnSuccessListener(new OnSuccessListener<AnnotatedData<LeaderboardsClient.LeaderboardScores>>() {
-                @Override
-                public void onSuccess(AnnotatedData<LeaderboardsClient.LeaderboardScores> leaderboardScoresAnnotatedData) {
-
-                    LeaderboardsClient.LeaderboardScores leaderboardScores = leaderboardScoresAnnotatedData.get();
-                    LeaderboardScoreBuffer leaderboardScoreBuffer = leaderboardScores.getScores();
-                    int count = 0;
-                    if (leaderboardScoreBuffer != null) {
-                        count = leaderboardScoreBuffer.getCount();
-                    }
-                    ArrayList<String> playerCenteredHighScores = new ArrayList<>();
-                    for (int i = 0; i < count; i++) {
-                        LeaderboardScore score = leaderboardScoreBuffer.get(i);
-                        String scoreString = "";
-                        scoreString += "Name: " + score.getScoreHolderDisplayName() +
-                                " Rank: " + score.getDisplayRank() + " Score: " + score.getDisplayScore();
-                        playerCenteredHighScores.add(scoreString);
-                    }
-                    leaderboardScoreBuffer.release();
-                    mobileCallbacks.requestedHighScoresReceived(playerCenteredHighScores);
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    handleException(e, getString(R.string.leaderboards_exception));
-                }
-            });
-
-        }
-
     }
 
     @Override
     public void getTopScores(int scoreType) {
 
-        //Get a list of top high scores and return it in ArrayList<String> format
-
-        int timeSpan;
-
-        //Determine time span to look up scores based on score type selected by user
-        switch (scoreType) {
-            case HighScoreScreen.GLOBAL_BUTTON_TOP_DAY:
-                timeSpan = TIME_SPAN_DAILY;
-                break;
-            case HighScoreScreen.GLOBAL_BUTTON_TOP_WEEK:
-                timeSpan = TIME_SPAN_WEEKLY;
-                break;
-            case HighScoreScreen.GLOBAL_BUTTON_TOP_ALLTIME:
-                timeSpan = TIME_SPAN_ALL_TIME;
-                break;
-            default:
-                timeSpan = TIME_SPAN_ALL_TIME;
-                break;
-        }
-
-
-        //Ensure user is signed in so game doesn't crash
-        if (GoogleSignIn.getLastSignedInAccount(this) != null) {
-
-            Task<AnnotatedData<LeaderboardsClient.LeaderboardScores>> topScoresTask =
-                    Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this))
-                            .loadTopScores(leaderboard, timeSpan, COLLECTION_PUBLIC, 20, false);
-
-            topScoresTask.addOnSuccessListener(new OnSuccessListener<AnnotatedData<LeaderboardsClient.LeaderboardScores>>() {
-                @Override
-                public void onSuccess(AnnotatedData<LeaderboardsClient.LeaderboardScores> leaderboardScoresAnnotatedData) {
-
-                    LeaderboardsClient.LeaderboardScores leaderboardScores = leaderboardScoresAnnotatedData.get();
-                    LeaderboardScoreBuffer leaderboardScoreBuffer = leaderboardScores.getScores();
-                    int count = 0;
-                    if (leaderboardScoreBuffer != null) {
-                        count = leaderboardScoreBuffer.getCount();
-                    }
-                    ArrayList<String> topHighScores = new ArrayList<>();
-                    for (int i = 0; i < count; i++) {
-                        LeaderboardScore score = leaderboardScoreBuffer.get(i);
-                        String scoreString = "";
-                        scoreString += "Name: " + score.getScoreHolderDisplayName() +
-                                " Rank: " + score.getDisplayRank() + " Score: " + score.getDisplayScore();
-                        topHighScores.add(scoreString);
-                    }
-                    leaderboardScoreBuffer.release();
-                    //Send callback to mobile device with scores requested
-                    mobileCallbacks.requestedHighScoresReceived(topHighScores);
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    handleException(e, getString(R.string.leaderboards_exception));
-                }
-            });
-
-        }
     }
 
     @Override
     public boolean isSignedIn() {
-        //Return false if the last signed in account is null
-        return GoogleSignIn.getLastSignedInAccount(this) != null;
 
+        return false;
     }
 
     @Override
@@ -504,10 +322,6 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
     private void handleException(Exception e, String details) {
         int status = 0;
 
-        if (e instanceof ApiException) {
-            ApiException apiException = (ApiException) e;
-            status = apiException.getStatusCode();
-        }
 
         String message = getString(R.string.status_exception_error, details, status, e);
 

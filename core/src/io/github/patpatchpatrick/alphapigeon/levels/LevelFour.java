@@ -7,7 +7,6 @@ import io.github.patpatchpatrick.alphapigeon.dodgeables.Dodgeables;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Notifications;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Notifications.ExclamationMark;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.Teleports;
-import sun.rmi.runtime.Log;
 
 public class LevelFour extends Level {
 
