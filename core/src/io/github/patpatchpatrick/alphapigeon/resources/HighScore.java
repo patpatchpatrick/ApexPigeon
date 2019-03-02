@@ -1,6 +1,7 @@
 package io.github.patpatchpatrick.alphapigeon.resources;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -63,11 +64,11 @@ public class HighScore {
         // if the pigeon has not crashed, keep increasing the currentScore
         // after the pigeon crashes, stop increasing currentScore
         //DecimalFormat df = new DecimalFormat("#.##");
-        float formattedScore = Math.round(currentScore * 100f) / 100f;
+        float formattedScore = (int) currentScore;
 
         if (pigeonHasNotCrashed) {
             currentScore = currentScore + GameVariables.pigeonSpeed * deltaTime;
-            scoreString = "Distance    " + formattedScore + "  m";
+            scoreString = "Distance    " + (int) formattedScore + "  m";
         }
 
     }
@@ -84,7 +85,7 @@ public class HighScore {
         font.draw(batch, scoreString, 60, 45);
     }
 
-    public static void updateLocalGameStatisticsData(DatabaseAndPreferenceManager databaseAndPreferenceManager){
+    public static void updateLocalGameStatisticsDataMobile(DatabaseAndPreferenceManager databaseAndPreferenceManager){
 
         //Update local game stats (high scores, total number of games, etc..) data for the user after a game is complete
         //Use the database manager to update local data
@@ -102,6 +103,26 @@ public class HighScore {
 
     }
 
+    public static void updateLocalGameStatisticsData(Preferences libgdxPrefs){
+
+        //Update local game stats (high scores, total number of games, etc..) data for the user after a game is complete
+        //Use the database manager to update local data
+
+        //Get the current high score from the libgdx preferences
+
+        HighScore.currentHighScore = libgdxPrefs.getFloat("highscore", 0);
+
+        //If the recent game score is greater than the high score, that score becomes the new high score
+        if (HighScore.currentScore  > HighScore.currentHighScore){
+            HighScore.currentHighScore = HighScore.currentScore;
+        }
+
+        //Insert the game round data into the sharedprefs
+        libgdxPrefs.putFloat("highscore", HighScore.currentHighScore);
+        libgdxPrefs.putFloat("totalnumgames", libgdxPrefs.getFloat("totalnumgames") + 1);
+
+    }
+
     public static boolean newHighScore(){
         //If the current High Score equals the current score, a new high score was reached this round
         return currentHighScore == currentScore;
@@ -114,7 +135,7 @@ public class HighScore {
                 //Format the currentScore for Google Play Services and submit the currentScore
                 //Google play services does not take decimals, so the score must be multiplied by 100
                 // to remove the decimal places
-                long highScoreFormatted = (long)(currentScore * 100);
+                int highScoreFormatted = (int)(currentScore);
                 playServices.submitScore(highScoreFormatted);
             }
             return true;

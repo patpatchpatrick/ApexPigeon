@@ -16,6 +16,11 @@ public class AlphaPigeon extends Game{
     private PlayServices playServices;
     private DatabaseAndPreferenceManager databaseAndPreferenceManager;
 
+    //Variable for if Libgdx prefs are used
+    //HTML and Desktop constructors will set this to true
+    //Android uses android shared prefs so will keep this as false
+    public static boolean useLibgdxPrefs = false;
+
     public AlphaPigeon(PlayServices playServices, DatabaseAndPreferenceManager databaseAndPreferenceManager){
         //ANDROID CONSTRUCTOR FOR GAME
         this.playServices =  playServices;
@@ -23,9 +28,15 @@ public class AlphaPigeon extends Game{
     }
 
     public AlphaPigeon(){
-        //DESKTOP CONSTRUCTOR FOR GAME
         this.playServices = null;
         this.databaseAndPreferenceManager = null;
+    }
+
+    public AlphaPigeon(Boolean useLibgdxPrefsCons){
+        //HTML/DESKTOP Constructor for GAME
+        this.playServices = null;
+        this.databaseAndPreferenceManager = null;
+        useLibgdxPrefs = useLibgdxPrefsCons;
     }
 
     @Override

@@ -476,27 +476,15 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
     }
 
     private void resetScreen() {
-        Gdx.app.postRunnable(new Runnable() {
-
-            @Override
-            public void run() {
-                dispose();
-                game.setScreen(new MainMenuScreen(game, playServices, databaseAndPreferenceManager));
-            }
-        });
+        dispose();
+        game.setScreen(new MainMenuScreen(game, playServices, databaseAndPreferenceManager));
     }
 
     private void removeAds() {
 
-        Gdx.app.postRunnable(new Runnable() {
-
-            @Override
-            public void run() {
-                if (playServices != null) {
-                    playServices.purchaseAdRemoval();
-                }
-            }
-        });
+        if (playServices != null) {
+            playServices.purchaseAdRemoval();
+        }
 
     }
 }

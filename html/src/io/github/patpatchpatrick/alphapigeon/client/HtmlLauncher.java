@@ -10,6 +10,7 @@ public class HtmlLauncher extends GwtApplication {
         // USE THIS CODE FOR A FIXED SIZE APPLICATION
         @Override
         public GwtApplicationConfiguration getConfig () {
+
                 return new GwtApplicationConfiguration(800, 480);
         }
         // END CODE FOR FIXED SIZE APPLICATION
@@ -46,6 +47,6 @@ public class HtmlLauncher extends GwtApplication {
 
         @Override
         public ApplicationListener createApplicationListener () {
-                return new AlphaPigeon();
+                return new AlphaPigeon(true);
         }
 }

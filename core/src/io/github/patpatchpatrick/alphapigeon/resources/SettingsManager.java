@@ -51,6 +51,10 @@ public class SettingsManager {
                 gameVolume = 0;
             }
 
+        } else {
+            if (!gameSoundsSettingIsOn){
+                gameVolume = 0;
+            }
         }
 
     }

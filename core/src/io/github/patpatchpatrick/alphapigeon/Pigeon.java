@@ -309,7 +309,6 @@ public class Pigeon {
     public void dispose() {
         pigeonFlySheet.dispose();
         powerUpShieldSheet.dispose();
-        powerUpShieldSound.dispose();
 
         //HTML Font
         font.dispose();

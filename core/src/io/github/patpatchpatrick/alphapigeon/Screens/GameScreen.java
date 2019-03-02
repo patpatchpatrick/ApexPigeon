@@ -167,6 +167,10 @@ public class GameScreen implements Screen {
             update();
         }
 
+        if (gameIsOver) {
+            gameOver();
+        }
+
         //debugRenderer.render(world, camera.combined);
         // tell the SpriteBatch to render in the
         // coordinate system specified by the camera
@@ -184,9 +188,6 @@ public class GameScreen implements Screen {
         }
         game.batch.end();
 
-        if (gameIsOver) {
-            gameOver();
-        }
 
 
     }
@@ -359,8 +360,8 @@ public class GameScreen implements Screen {
                         final Body fixtureAExplosionBody = fixtureABody;
                         final Body fixtureBExplosionBody = fixtureBBody;
                         if (fixtureA.getFilterData().categoryBits == GameVariables.CATEGORY_ROCKET) {
+                            //POST RUNNABLE
                             Gdx.app.postRunnable(new Runnable() {
-
                                 @Override
                                 public void run() {
                                     dodgeables.spawnRocketExplosion(fixtureBExplosionBody.getWorldCenter().x, fixtureBExplosionBody.getWorldCenter().y);
@@ -371,8 +372,8 @@ public class GameScreen implements Screen {
 
                         } else {
 
+                            //POST RUNNABLE
                             Gdx.app.postRunnable(new Runnable() {
-
                                 @Override
                                 public void run() {
                                     dodgeables.spawnRocketExplosion(fixtureAExplosionBody.getWorldCenter().x, fixtureAExplosionBody.getWorldCenter().y);
@@ -387,12 +388,12 @@ public class GameScreen implements Screen {
                 if (birdInvolvedInCollision) {
                     //if bird is involved in any collision, play a chirp sound
                     Gdx.app.postRunnable(new Runnable() {
-
                         @Override
                         public void run() {
                             Sounds.birdSound.play(SettingsManager.gameVolume);
                         }
                     });
+
                 }
 
 
@@ -446,7 +447,6 @@ public class GameScreen implements Screen {
         // dispose of game disposables
         // set screen to game over screen
 
-
         Gdx.app.postRunnable(new Runnable() {
 
             @Override
@@ -471,8 +471,12 @@ public class GameScreen implements Screen {
                 }
                 dispose();
                 game.setScreen(new GameOverScreen(game, playServices, databaseAndPreferenceManager, highScore));
+
             }
         });
+
+
+
 
 
     }

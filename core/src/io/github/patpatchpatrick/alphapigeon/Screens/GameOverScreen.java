@@ -5,18 +5,17 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.assets.loaders.AssetLoader;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
+import java.awt.TextField;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.resources.DatabaseAndPreferenceManager;
@@ -34,6 +33,10 @@ public class GameOverScreen implements Screen {
     private OrthographicCamera camera;
     private Viewport viewport;
     private InputProcessor inputProcessor;
+
+    //Prefs
+    //Used for HTML and Desktop versions of game
+    Preferences libgdxPrefs;
 
     //High Scores
     private float totalNumGames = 0;
@@ -141,6 +144,7 @@ public class GameOverScreen implements Screen {
         }
 
 
+
     }
 
     @Override
@@ -195,17 +199,26 @@ public class GameOverScreen implements Screen {
 
     private void handleLocalData() {
 
+
         if (databaseAndPreferenceManager != null) {
 
             //Insert game data for the recent game into the local database/shared prefs
-            HighScore.updateLocalGameStatisticsData(databaseAndPreferenceManager);
+            HighScore.updateLocalGameStatisticsDataMobile(databaseAndPreferenceManager);
 
             //Get the total number of games from the local database to display in the game over screen
             totalNumGames = databaseAndPreferenceManager.getTotalNumGames();
+        } else if (AlphaPigeon.useLibgdxPrefs){
+
+            //If using libgdx prefs (HTML/Desktop), get the totalNumberOfGames from the main prefs
+            //Update the high score in the libgdx prefs
+            libgdxPrefs = Gdx.app.getPreferences("alpha.pigeon.prefs");
+            HighScore.updateLocalGameStatisticsData(libgdxPrefs);
+            totalNumGames = libgdxPrefs.getFloat("totalnumgames", 0);
         }
 
 
     }
+
 
     private void update() {
     }
