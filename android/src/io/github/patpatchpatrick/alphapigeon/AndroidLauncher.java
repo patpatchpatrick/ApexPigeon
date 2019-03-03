@@ -25,15 +25,22 @@ import io.github.patpatchpatrick.alphapigeon.resources.MobileCallbacks;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
 
 import com.badlogic.gdx.backends.android.AndroidGraphics;
+import com.google.android.gms.ads.AdRequest;
 
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -58,6 +65,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
     protected static ContentResolver contentResolver;
 
     //Google ads
+    private final int GET_TOP_SCORES_FROM_NETWORK = 3;
     private final int SHOW_OR_LOAD_INTERSTITIAL_ADS = 2;
     private final int SHOW_BANNER_ADS = 1;
     private final int HIDE_BANNER_ADS = 0;
@@ -117,6 +125,8 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
         public void handleMessage(Message msg) {
 
         }
+
+
     };
 
 
@@ -170,7 +180,6 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
     @Override
     public void submitScore(int highScore, String user) {
 
-
         //Submits a high score for a specific user
         //Scores are submitted using the Dreamlo online leaderboard database using an HTTP GET Request
 
@@ -181,10 +190,9 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
         urlScoreReq.append(highScore);
         urlScoreReq.append("/");
         String urlString = urlScoreReq.toString();
-
         URL url = null;
 
-        //CREATE THE URL TO SUBMIT SCORE TO DREAMLO
+        //Build the URL to submit the score to Dreamlo
         try {
             url = new URL(urlString);
         } catch (MalformedURLException e) {
@@ -195,6 +203,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
         HttpURLConnection connection = null;
         String result = null;
 
+        //Complete the connection, submit the HTTP request to update the leaderboard online database
         try {
             connection = (HttpURLConnection) url.openConnection();
             // Timeout for reading InputStream arbitrarily set to 3000ms.
@@ -226,7 +235,6 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
                     Log.d("ScoreGET", "" + current);
 
                 }
-
                 stream.close();
 
             }
@@ -258,7 +266,131 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
     @Override
     public void getTopScores(int scoreType) {
 
+        //Get the top scores from the dreamlo online database using an HTTP GET request
+        //Scores are received in JSON format (max 1000 scores are stored on the network)
+        //Parse through the JSON, return each score in String format in an ArrayList, back to the
+        //game.  The game will display the scores on the HighScoresScreen
+
+        //Build the url to get JSON scores
+        StringBuilder urlScoreReq = new StringBuilder("http://dreamlo.com/lb/5c79d6943eba35041cb5f9e1/json/");
+        String urlString = urlScoreReq.toString();
+        URL url = null;
+
+        //Build the URL
+        try {
+            url = new URL(urlString);
+        } catch (MalformedURLException e) {
+            Log.e("URL", "Error in creating URL");
+        }
+
+        InputStream stream = null;
+        HttpURLConnection connection = null;
+        String highScoresJsonString = "";
+
+        //Connect to the network to retrieve the scores in JSON format
+        try {
+            connection = (HttpURLConnection) url.openConnection();
+            // Timeout for reading InputStream arbitrarily set to 3000ms.
+            connection.setReadTimeout(3000);
+            // Timeout for connection.connect() arbitrarily set to 3000ms.
+            connection.setConnectTimeout(3000);
+            // For this use case, set HTTP method to GET.
+            connection.setRequestMethod("GET");
+            // Already true by default but setting just in case; needs to be true since this request
+            // is carrying an input (response) body.
+            connection.setDoInput(true);
+            // Open communications link (network traffic occurs here).
+            connection.connect();
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode != HttpsURLConnection.HTTP_OK) {
+                Log.e("URLConnectionExc", "Error Code: " + responseCode);
+                throw new IOException("HTTP error code: " + responseCode);
+            }
+            // Retrieve the response body as an InputStream.
+            stream = connection.getInputStream();
+            if (stream != null) {
+
+                //Receive the JSON data in String format from the input stream
+                //The readFromStream class uses an inputStreamReader to build the String
+                highScoresJsonString = readFromStream(stream);
+                stream.close();
+            }
+
+
+        } catch (Exception e) {
+            Log.d("ConnectException", "" + e);
+
+        } finally {
+
+            // Disconnect HTTP connection.
+            if (connection != null) {
+                connection.disconnect();
+            }
+
+            //Parse the returned JSON and send back to game via callback if it isn't empty
+            parseTopScoresJSON(highScoresJsonString);
+
+        }
+
+
     }
+
+
+    private String readFromStream(InputStream inputStream) throws IOException {
+
+        //Class to return a string based on an inputstream for an http get request
+
+        StringBuilder output = new StringBuilder();
+        if (inputStream != null) {
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream, Charset.forName("UTF-8"));
+            BufferedReader reader = new BufferedReader(inputStreamReader);
+            String line = reader.readLine();
+            while (line != null) {
+                output.append(line);
+                line = reader.readLine();
+            }
+        }
+        return output.toString();
+    }
+
+    private void parseTopScoresJSON(String jsonString){
+
+        //Parse the JSON high scores and return them back to the game via a callback
+        //Return them in an ArrayList of Strings for each score (only max 1000 scores are received from network)
+
+        ArrayList<String> highScoresList = new ArrayList<>();
+
+        if (!jsonString.equals("")){
+
+            try {
+
+                Log.d("PARSINGYO", "b");
+                JSONObject highScoresJSON = new JSONObject(jsonString);
+                JSONObject dreamlo = highScoresJSON.getJSONObject("dreamlo");
+                JSONObject leaderboard = dreamlo.getJSONObject("leaderboard");
+                JSONArray entry = leaderboard.getJSONArray("entry");
+                for (int i = 0;  i < entry.length(); i++) {
+                    int rank = i+1;
+                    JSONObject score = entry.getJSONObject(i);
+                    String name = score.getString("name");
+                    String value = score.getString("score");
+                    highScoresList.add("" + rank + ". " + name + "  -  " + value + " m ");
+                }
+
+
+
+            } catch (JSONException e) {
+
+                Log.e("ScoreJsonParse", "Problem parsing the JSON scores", e);
+            }
+
+            mobileCallbacks.requestedHighScoresReceived(highScoresList);
+
+        }
+
+    }
+
 
     @Override
     public boolean isSignedIn() {
