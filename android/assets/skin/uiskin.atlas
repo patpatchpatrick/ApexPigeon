@@ -272,3 +272,10 @@ window
   orig: 45, 49
   offset: 0, 0
   index: -1
+yellow
+  rotate: false
+  xy: 910, 23
+  size: 2, 2
+  orig: 2, 2
+  offset: 0, 0
+  index: -1

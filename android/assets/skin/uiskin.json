@@ -3,7 +3,7 @@ com.badlogic.gdx.graphics.Color: {
 	green: { g: 1, a: 1 },
 	light_grey: { r: 0.8, g: 0.8, b: 0.8, a: 1 },
 	white: { r: 1, g: 1, b: 1, a: 1 },
-	red: { r: 1, a: 1 },
+	red: { r: 0.255, g: 0.192, b: 0, a: 1 },
 	light_blue: { r: 1, g: 1, b: 1, a: 1 },
 	grey: { r: 0.7, g: 0.7, b: 0.7, a: 1 },
 	dark_grey: { r: 0.4, g: 0.4, b: 0.4, a: 1 },
@@ -79,20 +79,20 @@ com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle: {
 com.badlogic.gdx.scenes.scene2d.ui.TextField$TextFieldStyle: {
 	default: {
 		font: commodore-64,
-		fontColor: { a: 1 },
-		background: white,
+		fontColor: { a: 1, b: 0.171, g: 0.139, r: 0.045 },
+		background: yellow,
 		cursor: cursor-black,
 		selection: light-blue,
 		messageFont: commodore-64,
-		messageFontColor: { a: 1, b: 0.8, g: 0.8, r: 0.8 }
+		messageFontColor: { a: 1, b: 0.171, g: 0.139, r: 0.045 }
 	},
 	nobg: {
 		font: commodore-64,
-		fontColor: { a: 1, b: 1, g: 1, r: 1 },
+		fontColor: { a: 1, b: 0.171, g: 0.139, r: 0.045 },
 		cursor: cursor,
 		selection: white,
 		messageFont: commodore-64,
-		messageFontColor: { a: 1, b: 0.8, g: 0.8, r: 0.8 }
+		messageFontColor: { a: 1, b: 0.171, g: 0.139, r: 0.045 }
 	}
 },
 com.badlogic.gdx.scenes.scene2d.ui.ScrollPane$ScrollPaneStyle: {
