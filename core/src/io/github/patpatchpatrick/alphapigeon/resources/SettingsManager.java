@@ -1,5 +1,8 @@
 package io.github.patpatchpatrick.alphapigeon.resources;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
+
 public class SettingsManager {
 
 
@@ -24,6 +27,11 @@ public class SettingsManager {
     public static float touchSensitivity = 0.5f;
     public static float accelSensitivity = 0.5f;
 
+    private static Preferences libgdxPrefs = Gdx.app.getPreferences("alpha.pigeon.prefs");
+
+    //Strings for User Name
+    public static String userName = "";
+
     public static void updateSettings(){
 
         //Fetch current settings from the mobile device database/preferences
@@ -46,6 +54,8 @@ public class SettingsManager {
             //Billing Settings
             adRemovalPurchased = databaseAndPreferenceManager.getAdRemovalPurchasedValue();
 
+            userName = libgdxPrefs.getString("userName", "");
+
             //If the game sounds setting is off, set game volume to 0
             if (!gameSoundsSettingIsOn){
                 gameVolume = 0;
@@ -55,6 +65,7 @@ public class SettingsManager {
             if (!gameSoundsSettingIsOn){
                 gameVolume = 0;
             }
+            userName = libgdxPrefs.getString("userName", "");
         }
 
     }
@@ -174,6 +185,11 @@ public class SettingsManager {
             fullScreenModeIsOn = isOn;
         }
 
+    }
+
+    public static void setUserName(String userInputtedName){
+
+        libgdxPrefs.putString("userName", userInputtedName);
     }
 
 

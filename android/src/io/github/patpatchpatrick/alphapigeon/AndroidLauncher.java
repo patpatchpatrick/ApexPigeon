@@ -259,7 +259,75 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
     }
 
     @Override
-    public void getPlayerCenteredScores() {
+    public void getPlayerCenteredScores(String user) {
+
+        //Get the individual player's score from the dreamlo online database using an HTTP GET request
+        //Scores are received in PIPE Delimited format
+        //Parse through the PIPE, return each score in String format in an ArrayList, back to the
+        //game.  The game will display the scores on the HighScoresScreen
+
+        //Build the url to get JSON scores
+        StringBuilder urlScoreReq = new StringBuilder("http://dreamlo.com/lb/5c79d6943eba35041cb5f9e1/pipe-get/");
+        urlScoreReq.append(user + "/");
+        String urlString = urlScoreReq.toString();
+        URL url = null;
+
+        //Build the URL
+        try {
+            url = new URL(urlString);
+        } catch (MalformedURLException e) {
+            Log.e("URL", "Error in creating URL");
+        }
+
+        InputStream stream = null;
+        HttpURLConnection connection = null;
+        String highScoresPipeString = "";
+
+        //Connect to the network to retrieve the scores in JSON format
+        try {
+            connection = (HttpURLConnection) url.openConnection();
+            // Timeout for reading InputStream arbitrarily set to 3000ms.
+            connection.setReadTimeout(3000);
+            // Timeout for connection.connect() arbitrarily set to 3000ms.
+            connection.setConnectTimeout(3000);
+            // For this use case, set HTTP method to GET.
+            connection.setRequestMethod("GET");
+            // Already true by default but setting just in case; needs to be true since this request
+            // is carrying an input (response) body.
+            connection.setDoInput(true);
+            // Open communications link (network traffic occurs here).
+            connection.connect();
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode != HttpsURLConnection.HTTP_OK) {
+                Log.e("URLConnectionExc", "Error Code: " + responseCode);
+                throw new IOException("HTTP error code: " + responseCode);
+            }
+            // Retrieve the response body as an InputStream.
+            stream = connection.getInputStream();
+            if (stream != null) {
+
+                //Receive the JSON data in String format from the input stream
+                //The readFromStream class uses an inputStreamReader to build the String
+                highScoresPipeString = readFromStream(stream);
+                stream.close();
+            }
+
+
+        } catch (Exception e) {
+            Log.d("ConnectException", "" + e);
+
+        } finally {
+
+            // Disconnect HTTP connection.
+            if (connection != null) {
+                connection.disconnect();
+            }
+
+            //Parse the returned PIPE and send back to game via callback if it isn't empty
+            parseTopScoresPipe(highScoresPipeString);
+
+        }
 
     }
 
@@ -388,6 +456,32 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
             mobileCallbacks.requestedHighScoresReceived(highScoresList);
 
         }
+
+    }
+
+    public void parseTopScoresPipe(String scoreString){
+
+        //Parse the JSON high scores and return them back to the game via a callback
+        //Return them in an ArrayList of Strings for each score (only max 1000 scores are received from network)
+
+        ArrayList<String> highScoresList = new ArrayList<>();
+
+        if (!scoreString.equals("")){
+
+            //Split the values delimited with the pipe
+            String[] value_split = scoreString.split("\\|");
+            highScoresList.add("Rank: " + (Integer.parseInt(value_split[5]) + 1) + "  -  " + value_split[0] + "  -  " + value_split[1] + " m ");
+
+            mobileCallbacks.requestedHighScoresReceived(highScoresList);
+
+        } else {
+
+            highScoresList.add("Score not in top 1000");
+            mobileCallbacks.requestedHighScoresReceived(highScoresList);
+
+        }
+
+
 
     }
 

@@ -136,7 +136,7 @@ public class HighScore {
                 //Google play services does not take decimals, so the score must be multiplied by 100
                 // to remove the decimal places
                 int highScoreFormatted = (int)(currentScore);
-                playServices.submitScore(highScoreFormatted, "Test0");
+                playServices.submitScore(highScoreFormatted, SettingsManager.userName);
             }
             return true;
         }

@@ -13,7 +13,7 @@ public interface PlayServices {
     public void signOut();
     public void submitScore(int highScore, String user);
     public void showLeaderboard();
-    public void getPlayerCenteredScores();
+    public void getPlayerCenteredScores(String user);
     public void getTopScores(int scoreType);
     public boolean isSignedIn();
 

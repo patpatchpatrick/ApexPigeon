@@ -295,7 +295,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
             case GLOBAL_BUTTON_RANK:
                 //Request player centered scores from play services
                 if (playServices != null) {
-                    playServices.getPlayerCenteredScores();
+                    playServices.getPlayerCenteredScores(SettingsManager.userName);
                 }
                 break;
             case LOCAL_BUTTON:

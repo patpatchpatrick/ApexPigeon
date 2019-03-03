@@ -2,6 +2,7 @@ package io.github.patpatchpatrick.alphapigeon.Screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
@@ -11,6 +12,9 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -99,6 +103,16 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
     private float levelTwoBirdTwoXPosition = 0;
     private float levelTwoBirdTwoYPosition = 0;
 
+    //TextField
+    //Variables needed for text field input
+    // -- Input Multiplexer to handle both the textfield(stage) and screen input processors
+    private TextField userNameTextField;
+    private InputMultiplexer inputMultiplexer = new InputMultiplexer();
+    private Stage stage;
+    private Viewport textFieldViewport;
+    private Boolean textFieldCreated = false;
+    private Skin textFieldSkin;
+
 
     public MainMenuScreen(AlphaPigeon game, PlayServices playServices, DatabaseAndPreferenceManager databaseAndPreferenceManager) {
 
@@ -159,6 +173,7 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
             }
         }
 
+        createTextField();
 
         //TODO when releasinng on Android or mobile, re-enable this setting
         //Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
@@ -214,7 +229,13 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
         }
 
 
-        Gdx.input.setInputProcessor(inputProcessor);
+        //Gdx.input.setInputProcessor(inputProcessor);
+
+        // render scrollPane for high scores
+        if (textFieldCreated) {
+            stage.draw();
+            stage.act();
+        }
 
         game.batch.end();
 
@@ -486,5 +507,54 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
             playServices.purchaseAdRemoval();
         }
 
+    }
+
+    private void createTextField() {
+
+        if (!textFieldCreated) {
+
+            //Set the textfield viewport to be stretch or fit depending no whether user has enabled full screen mode
+            if (SettingsManager.fullScreenModeIsOn) {
+                textFieldViewport = new StretchViewport(800, 480);
+            } else {
+                textFieldViewport = new FitViewport(800, 480);
+            }
+
+
+            stage = new Stage(textFieldViewport);
+            textFieldSkin = new Skin(Gdx.files.internal("skin/uiskin.json"));
+
+        } else {
+            stage.clear();
+        }
+
+
+        //Create a new text field and update the textfield to contain the user's name from the shared preferences by default
+        userNameTextField = new TextField(SettingsManager.userName, textFieldSkin);
+        userNameTextField.setFillParent(true);
+        userNameTextField.setTextFieldListener(new TextField.TextFieldListener() {
+            @Override
+            public void keyTyped(TextField textField, char c) {
+
+                //Update the user's username in the shared prefs when it is changed
+                SettingsManager.setUserName(userNameTextField.getText());
+
+            }
+        });
+
+        stage.addActor(userNameTextField);
+
+        //stage.setDebugAll(true);
+
+
+        //When stage is created, set input processor to be a multiplexer to look at both screen and stage controls
+        if (!textFieldCreated) {
+            inputMultiplexer.addProcessor(inputProcessor);
+            inputMultiplexer.addProcessor(stage);
+
+            Gdx.input.setInputProcessor(inputMultiplexer);
+        }
+
+        textFieldCreated = true;
     }
 }
