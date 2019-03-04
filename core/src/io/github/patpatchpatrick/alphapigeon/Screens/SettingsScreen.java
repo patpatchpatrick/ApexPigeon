@@ -492,11 +492,6 @@ public class SettingsScreen implements Screen, MobileCallbacks {
     }
 
     @Override
-    public void requestedHighScoresReceived(ArrayList<String> playerCenteredHighScores) {
-
-    }
-
-    @Override
     public void requestedLocalScoresReceived(ArrayList<String> localScores) {
 
     }

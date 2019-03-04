@@ -1,12 +1,14 @@
 package io.github.patpatchpatrick.alphapigeon.resources;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Net;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeType;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.net.HttpRequestBuilder;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -22,8 +24,9 @@ public class HighScore {
      * NON-HTML FONTS
      * HTML doesn't support FreeTypeFontGenerator so must use bitmap instead
      * These comments are in place in case it is ever decided to use freetype font generator for mobile/desktop applications
-    private BitmapFont font12;
-    FreeTypeFontGenerator generator;**/
+     * private BitmapFont font12;
+     * FreeTypeFontGenerator generator;
+     **/
 
     //HTML Fonts
     private BitmapFont font;
@@ -39,15 +42,15 @@ public class HighScore {
          * Iniitalize NON-HTML Fonts
          * * HTML doesn't support FreeTypeFontGenerator so must use bitmap instead
          *  These comments are in place in case it is ever decided to use freetype font generator for mobile/desktop applications
-        generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/univers.ttf"));
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 14;
-        parameter.minFilter = Texture.TextureFilter.Linear;
-        parameter.magFilter = Texture.TextureFilter.Linear;
-        font12 = generator.generateFont(parameter);
-        font12.setColor(1.0f, 1.0f, 1.0f, 1.0f);
-        font12.getData().setScale(0.1f);
-        font12.setUseIntegerPositions(false);
+         generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/univers.ttf"));
+         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+         parameter.size = 14;
+         parameter.minFilter = Texture.TextureFilter.Linear;
+         parameter.magFilter = Texture.TextureFilter.Linear;
+         font12 = generator.generateFont(parameter);
+         font12.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+         font12.getData().setScale(0.1f);
+         font12.setUseIntegerPositions(false);
          **/
 
         //Initialize HTML FONTS
@@ -78,14 +81,14 @@ public class HighScore {
 
         /**
          * Non-HTML Font
-        font12.draw(batch, scoreString, 60, 45);
+         font12.draw(batch, scoreString, 60, 45);
          **/
 
         font.setColor(1.0f, 1.0f, 1.0f, 1.0f);
         font.draw(batch, scoreString, 60, 45);
     }
 
-    public static void updateLocalGameStatisticsDataMobile(DatabaseAndPreferenceManager databaseAndPreferenceManager){
+    public static void updateLocalGameStatisticsDataMobile(DatabaseAndPreferenceManager databaseAndPreferenceManager) {
 
         //Update local game stats (high scores, total number of games, etc..) data for the user after a game is complete
         //Use the database manager to update local data
@@ -94,7 +97,7 @@ public class HighScore {
         HighScore.currentHighScore = databaseAndPreferenceManager.getHighScore();
 
         //If the recent game score is greater than the high score, that score becomes the new high score
-        if (HighScore.currentScore  > HighScore.currentHighScore){
+        if (HighScore.currentScore > HighScore.currentHighScore) {
             HighScore.currentHighScore = HighScore.currentScore;
         }
 
@@ -103,7 +106,7 @@ public class HighScore {
 
     }
 
-    public static void updateLocalGameStatisticsData(Preferences libgdxPrefs){
+    public static void updateLocalGameStatisticsData(Preferences libgdxPrefs) {
 
         //Update local game stats (high scores, total number of games, etc..) data for the user after a game is complete
         //Use the database manager to update local data
@@ -113,7 +116,7 @@ public class HighScore {
         HighScore.currentHighScore = libgdxPrefs.getFloat("highscore", 0);
 
         //If the recent game score is greater than the high score, that score becomes the new high score
-        if (HighScore.currentScore  > HighScore.currentHighScore){
+        if (HighScore.currentScore > HighScore.currentHighScore) {
             HighScore.currentHighScore = HighScore.currentScore;
         }
 
@@ -123,21 +126,33 @@ public class HighScore {
 
     }
 
-    public static boolean newHighScore(){
+    public static boolean newHighScore() {
         //If the current High Score equals the current score, a new high score was reached this round
         return currentHighScore == currentScore;
     }
 
-    public static boolean submitNewHighScore(PlayServices playServices){
-        //Submit high score to play services if there is a high score (and return true), otherwise return false
-        if (newHighScore()){
-            if (playServices != null){
-                //Format the currentScore for Google Play Services and submit the currentScore
-                //Google play services does not take decimals, so the score must be multiplied by 100
-                // to remove the decimal places
-                int highScoreFormatted = (int)(currentScore);
-                playServices.submitScore(highScoreFormatted, SettingsManager.userName);
-            }
+    public static boolean submitNewHighScore(Net.HttpResponseListener listener) {
+
+        //Submit high score to network if there is a high score (and return true), otherwise return false
+        if (newHighScore()) {
+
+            //Format the high score for the dreamlo leaderboard and submit the score via HTTP Get Request
+            int highScoreFormatted = (int) (currentScore);
+
+            //Build the url to submit a new high score to network
+            StringBuilder urlScoreReq = new StringBuilder("http://dreamlo.com/lb/XtrQXD_4BUGkPBmdz2WSUg3OwYKXHfZUqIcuUscCsXUw/add/");
+            urlScoreReq.append(SettingsManager.userName.trim());
+            urlScoreReq.append("/");
+            urlScoreReq.append(highScoreFormatted);
+            urlScoreReq.append("/");
+            String urlString = urlScoreReq.toString();
+
+            //Submit the score (the GameOverScreen handles the HTTP response)
+            HttpRequestBuilder requestBuilder = new HttpRequestBuilder();
+            Net.HttpRequest httpRequest = requestBuilder.newRequest().method(Net.HttpMethods.GET).url(urlString).build();
+            Gdx.net.sendHttpRequest(httpRequest, listener);
+
+
             return true;
         }
         return false;
@@ -147,8 +162,8 @@ public class HighScore {
 
         /**
          * Non-HTML Fonts
-        generator.dispose();
-        font12.dispose();
+         generator.dispose();
+         font12.dispose();
          **/
 
         //HTML Fonts
@@ -158,7 +173,6 @@ public class HighScore {
     public void stopCounting() {
         this.pigeonHasNotCrashed = false;
     }
-
 
 
 }

@@ -6,7 +6,7 @@ import com.badlogic.gdx.Preferences;
 public class SettingsManager {
 
 
-    //Class to manage settings and updates to settings via mobile device database/preferences
+    //Class to manage settings and updates to settings via database/preferences
 
     public static DatabaseAndPreferenceManager databaseAndPreferenceManager;
 
@@ -32,166 +32,140 @@ public class SettingsManager {
     //Strings for User Name
     public static String userName = "";
 
-    public static void updateSettings(){
+    public static void updateSettings() {
 
-        //Fetch current settings from the mobile device database/preferences
+        //Fetch current settings from the database/shared preferences
 
-        if (databaseAndPreferenceManager != null){
+        //Buttons
+        musicSettingIsOn = libgdxPrefs.getBoolean("isMusicOn", true);
+        gameSoundsSettingIsOn = libgdxPrefs.getBoolean("isGameSoundOn", true);
+        touchSettingIsOn = libgdxPrefs.getBoolean("isTouchOn", true);
+        accelerometerSettingIsOn = libgdxPrefs.getBoolean("isAccelOn", true);
+        fullScreenModeIsOn = libgdxPrefs.getBoolean("isFullScreenOn", false);
 
-            //Buttons
-            musicSettingIsOn = databaseAndPreferenceManager.isMusicOn();
-            gameSoundsSettingIsOn = databaseAndPreferenceManager.isGameSoundsOn();
-            touchSettingIsOn = databaseAndPreferenceManager.isTouchControlsOn();
-            accelerometerSettingIsOn = databaseAndPreferenceManager.isAccelButtonOn();
-            fullScreenModeIsOn = databaseAndPreferenceManager.isFullScreenModeOn();
+        //Sliders
+        musicVolume = libgdxPrefs.getFloat("musicVolume", 0.5f);
+        gameVolume = libgdxPrefs.getFloat("gameVolume", 0.5f);
+        touchSensitivity = libgdxPrefs.getFloat("touchSensitivity", 0.5f);
+        accelSensitivity = libgdxPrefs.getFloat("accelSensitivity", 0.5f);
 
-            //Sliders
-            musicVolume = databaseAndPreferenceManager.getMusicVolumeSliderValue();
-            gameVolume = databaseAndPreferenceManager.getGameVolumeSliderValue();
-            touchSensitivity = databaseAndPreferenceManager.getTouchSensitivitySliderValue();
-            accelSensitivity = databaseAndPreferenceManager.getAccelSensitivitySliderValue();
+        //Billing Settings
+        adRemovalPurchased = libgdxPrefs.getBoolean("adRemovalPurchased", true);
 
-            //Billing Settings
-            adRemovalPurchased = databaseAndPreferenceManager.getAdRemovalPurchasedValue();
+        userName = libgdxPrefs.getString("userName", "");
 
-            userName = libgdxPrefs.getString("userName", "");
-
-            //If the game sounds setting is off, set game volume to 0
-            if (!gameSoundsSettingIsOn){
-                gameVolume = 0;
-            }
-
-        } else {
-            if (!gameSoundsSettingIsOn){
-                gameVolume = 0;
-            }
-            userName = libgdxPrefs.getString("userName", "");
+        //If the game sounds setting is off, set game volume to 0
+        if (!gameSoundsSettingIsOn) {
+            gameVolume = 0;
         }
+
 
     }
 
-    public static void toggleMusicSetting(Boolean isOn){
+    public static void toggleMusicSetting(Boolean isOn) {
 
-        //If the setting changed, update the mobile device preferences
+        //If the setting changed, update the preferences
 
-        if (musicSettingIsOn != isOn && databaseAndPreferenceManager != null){
-            databaseAndPreferenceManager.toggleMusicOnOff(isOn);
-            musicSettingIsOn = isOn;
-            Sounds.toggleBackgroundMusic(isOn);
-        } else if(musicSettingIsOn != isOn && databaseAndPreferenceManager == null){
+        if (musicSettingIsOn != isOn) {
+            libgdxPrefs.putBoolean("isMusicOn", isOn).flush();
             musicSettingIsOn = isOn;
             Sounds.toggleBackgroundMusic(isOn);
         }
     }
 
-    public static void toggleGameSoundsSetting(Boolean isOn){
+    public static void toggleGameSoundsSetting(Boolean isOn) {
 
-        //If the setting changed, update the mobile device preferences
+        //If the setting changed, update the preferences
 
-        if (gameSoundsSettingIsOn != isOn && databaseAndPreferenceManager != null){
-            databaseAndPreferenceManager.toggleGameSoundsOnOff(isOn);
-            gameSoundsSettingIsOn = isOn;
-        } else if(gameSoundsSettingIsOn != isOn && databaseAndPreferenceManager == null){
+        if (gameSoundsSettingIsOn != isOn) {
+            libgdxPrefs.putBoolean("isGameSoundOn", isOn).flush();
             gameSoundsSettingIsOn = isOn;
         }
 
     }
 
-    public static void toggleTouchSetting(Boolean isOn){
+    public static void toggleTouchSetting(Boolean isOn) {
 
-        //If the setting changed, update the mobile device preferences
+        //If the setting changed, update the preferences
 
-        if (touchSettingIsOn != isOn && databaseAndPreferenceManager != null){
-            databaseAndPreferenceManager.toggleTouchControlsOnOff(isOn);
-            touchSettingIsOn = isOn;
-        } else if(touchSettingIsOn != isOn && databaseAndPreferenceManager == null){
+        if (touchSettingIsOn != isOn) {
+            libgdxPrefs.putBoolean("isTouchOn", isOn).flush();
             touchSettingIsOn = isOn;
         }
 
     }
 
-    public static void toggleAccelerometerSetting(Boolean isOn){
+    public static void toggleAccelerometerSetting(Boolean isOn) {
 
-        //If the setting changed, update the mobile device preferences
+        //If the setting changed, update the preferences
 
-        if (accelerometerSettingIsOn != isOn && databaseAndPreferenceManager != null){
-            databaseAndPreferenceManager.toggleAccelButtonOnOff(isOn);
-            accelerometerSettingIsOn = isOn;
-        } else if(accelerometerSettingIsOn != isOn && databaseAndPreferenceManager == null){
+        if (accelerometerSettingIsOn != isOn) {
+            libgdxPrefs.putBoolean("isAccelOn", isOn).flush();
             accelerometerSettingIsOn = isOn;
         }
 
     }
 
-    public static void toggleMusicVolumeSetting(float value){
+    public static void toggleMusicVolumeSetting(float value) {
 
-        //If the setting changed, update the mobile device preferences
+        //If the setting changed, update the preferences
 
-        if (musicVolume != value && databaseAndPreferenceManager != null){
-            databaseAndPreferenceManager.toggleMusicVolumeSlider(value);
+        if (musicVolume != value) {
+            libgdxPrefs.putFloat("musicVolume", value).flush();
             musicVolume = value;
             Sounds.setBackgroundMusicVolume(value);
         }
 
     }
 
-    public static void toggleGameVolumeSetting(float value){
+    public static void toggleGameVolumeSetting(float value) {
 
-        //If the setting changed, update the mobile device preferences
+        //If the setting changed, update the preferences
 
-        if (gameVolume != value && databaseAndPreferenceManager != null){
-            databaseAndPreferenceManager.toggleGameVolumeSlider(value);
-            gameVolume = value;
-        } else if(gameVolume != value && databaseAndPreferenceManager == null){
+        if (gameVolume != value) {
+            libgdxPrefs.putFloat("gameVolume", value).flush();
             gameVolume = value;
         }
 
     }
 
-    public static void toggleTouchSensitivitySetting(float value){
+    public static void toggleTouchSensitivitySetting(float value) {
 
-        //If the setting changed, update the mobile device preferences
+        //If the setting changed, update the preferences
 
-        if (touchSensitivity != value && databaseAndPreferenceManager != null){
-            databaseAndPreferenceManager.toggleTouchSensitivity(value);
-            touchSensitivity = value;
-        } else if(touchSensitivity != value && databaseAndPreferenceManager == null){
+        if (touchSensitivity != value) {
+            libgdxPrefs.putFloat("touchSensitivity", value).flush();
             touchSensitivity = value;
         }
 
     }
 
-    public static void toggleAccelSensitivitySetting(float value){
+    public static void toggleAccelSensitivitySetting(float value) {
 
-        //If the setting changed, update the mobile device preferences
+        //If the setting changed, update the preferences
 
-        if (accelSensitivity != value && databaseAndPreferenceManager != null){
-            databaseAndPreferenceManager.toggleAccelSensitivity(value);
-            accelSensitivity = value;
-        } else if(accelSensitivity != value && databaseAndPreferenceManager == null){
+        if (accelSensitivity != value) {
+            libgdxPrefs.putFloat("accelSensitivity", value).flush();
             accelSensitivity = value;
         }
 
     }
 
-    public static void toggleFullScreenSetting(boolean isOn){
+    public static void toggleFullScreenSetting(boolean isOn) {
 
         //If the setting changed, update the mobile device preferences
 
-        if (fullScreenModeIsOn != isOn && databaseAndPreferenceManager != null){
-            databaseAndPreferenceManager.toggleFullScreenMode(isOn);
-            fullScreenModeIsOn = isOn;
-        } else if(fullScreenModeIsOn != isOn && databaseAndPreferenceManager == null){
+        if (fullScreenModeIsOn != isOn) {
+            libgdxPrefs.putBoolean("isFullScreenOn", isOn).flush();
             fullScreenModeIsOn = isOn;
         }
 
     }
 
-    public static void setUserName(String userInputtedName){
+    public static void setUserName(String userInputtedName) {
 
-        libgdxPrefs.putString("userName", userInputtedName);
+        libgdxPrefs.putString("userName", userInputtedName).flush();
     }
-
 
 
 }

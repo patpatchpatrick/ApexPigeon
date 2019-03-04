@@ -3,6 +3,7 @@ package io.github.patpatchpatrick.alphapigeon.Screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.Net;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.loaders.AssetLoader;
@@ -25,7 +26,7 @@ import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
 import io.github.patpatchpatrick.alphapigeon.resources.SettingsManager;
 import io.github.patpatchpatrick.alphapigeon.resources.Sounds;
 
-public class GameOverScreen implements Screen {
+public class GameOverScreen implements Screen, Net.HttpResponseListener {
 
     private AlphaPigeon game;
     private PlayServices playServices;
@@ -190,10 +191,9 @@ public class GameOverScreen implements Screen {
 
     private void handlePlayServices() {
 
-        //Check if there is a new high score and if so, submit it to google play services
+        //Check if there is a new high score and if so, submit it to the network leaderboard
         //If there is a new high score, newHighScoreEarned is set to true
-        newHighScoreEarned = HighScore.submitNewHighScore(playServices);
-
+        newHighScoreEarned = HighScore.submitNewHighScore( this);
 
     }
 
@@ -331,4 +331,18 @@ public class GameOverScreen implements Screen {
     }
 
 
+    @Override
+    public void handleHttpResponse(Net.HttpResponse httpResponse) {
+
+    }
+
+    @Override
+    public void failed(Throwable t) {
+
+    }
+
+    @Override
+    public void cancelled() {
+
+    }
 }

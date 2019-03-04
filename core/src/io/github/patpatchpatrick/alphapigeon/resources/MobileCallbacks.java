@@ -7,8 +7,6 @@ public interface MobileCallbacks {
 
     //Interface to receive callbacks from mobile devices
 
-    public void requestedHighScoresReceived(ArrayList<String> playerCenteredHighScores);
-
     public void requestedLocalScoresReceived(ArrayList<String> localScores);
 
     public void appResumed();

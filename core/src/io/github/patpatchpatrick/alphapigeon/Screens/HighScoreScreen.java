@@ -4,18 +4,21 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.Net;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.net.HttpRequestBuilder;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -28,8 +31,10 @@ import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.MobileCallbacks;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
 import io.github.patpatchpatrick.alphapigeon.resources.SettingsManager;
+import sun.rmi.runtime.Log;
 
-public class HighScoreScreen implements Screen, MobileCallbacks {
+
+public class HighScoreScreen implements Screen, MobileCallbacks, Net.HttpResponseListener {
 
     private AlphaPigeon game;
     private OrthographicCamera camera;
@@ -43,12 +48,6 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
     //Textures and Buttons
     private Texture highScoreBackground;
     private Texture backButton;
-    //--Google Play Leaderboards Button
-    private Texture googlePlayLeaderboardsButton;
-    private final float GOOGLE_PLAY_LEADERBOARDS_BUTTON_X1 = 71.6f;
-    private final float GOOGLE_PLAY_LEADERBOARDS_BUTTON_Y1 = 41.5f;
-    private final float GOOGLE_PLAY_LEADERBOARDS_BUTTON_WIDTH = 5.0f;
-    private final float GOOGLE_PLAY_LEADERBOARDS_BUTTON_HEIGHT = 4.1f;
     //--Back button
     private final float BACK_BUTTON_WIDTH = 15.8f;
     private final float BACK_BUTTON_HEIGHT = 8.4f;
@@ -147,7 +146,6 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
         topDayButtonTexture = new Texture(Gdx.files.internal("textures/highscoresscreen/RankTopButtonTopDay.png"));
         topWeekButtonTexture = new Texture(Gdx.files.internal("textures/highscoresscreen/RankTopButtonTopWeek.png"));
         topAllTimeButtonTexture = new Texture(Gdx.files.internal("textures/highscoresscreen/RankTopButtonTopAllTime.png"));
-        googlePlayLeaderboardsButton = new Texture(Gdx.files.internal("textures/highscoresscreen/GooglePlayLeaderboardsButton.png"));
 
 
         /**
@@ -211,8 +209,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
         game.batch.begin();
 
         game.batch.draw(backButton, BACK_BUTTON_X1, BACK_BUTTON_Y1, BACK_BUTTON_WIDTH, BACK_BUTTON_HEIGHT);
-        game.batch.draw(googlePlayLeaderboardsButton, GOOGLE_PLAY_LEADERBOARDS_BUTTON_X1, GOOGLE_PLAY_LEADERBOARDS_BUTTON_Y1,
-                GOOGLE_PLAY_LEADERBOARDS_BUTTON_WIDTH, GOOGLE_PLAY_LEADERBOARDS_BUTTON_HEIGHT);
+
         //Render global or local button, depending on which is pushed
         if (currentButtonSelected != LOCAL_BUTTON) {
             //If local button is not selected, draw the global buttons
@@ -227,15 +224,6 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
 
         update();
 
-
-    }
-
-
-    private void startPlayServicesLeaderboardIntent() {
-
-        if (playServices != null) {
-            playServices.showLeaderboard();
-        }
 
     }
 
@@ -275,28 +263,24 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
 
         switch (currentButtonSelected) {
             case GLOBAL_BUTTON_TOP_DAY:
-                //Request top scores from play services leaderboard
-                if (playServices != null) {
-                    playServices.getTopScores(currentButtonSelected);
-                }
+                //Request top scores from the network
+                //When scores are received, high score scrollpane is updated with values
+                retrieveTopScores();
                 break;
             case GLOBAL_BUTTON_TOP_WEEK:
-                //Request top scores from play services leaderboard
-                if (playServices != null) {
-                    playServices.getTopScores(currentButtonSelected);
-                }
+                //Request top scores from the network
+                //When scores are received, high score scrollpane is updated with values
+                retrieveTopScores();
                 break;
             case GLOBAL_BUTTON_TOP_ALLTIME:
-                //Request top scores from play services leaderboard
-                if (playServices != null) {
-                    playServices.getTopScores(currentButtonSelected);
-                }
+                //Request top scores from the network
+                //When scores are received, high score scrollpane is updated with values
+                retrieveTopScores();
                 break;
             case GLOBAL_BUTTON_RANK:
-                //Request player centered scores from play services
-                if (playServices != null) {
-                    playServices.getPlayerCenteredScores(SettingsManager.userName);
-                }
+                //Request player score and rank from network
+                //When score is received, high score scrollpane is updated with value
+                retrievePlayerScoreAndRank();
                 break;
             case LOCAL_BUTTON:
                 //Request player local scores from the mobile device database
@@ -305,9 +289,99 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
                 }
                 break;
             default:
-                // code block
+                // default
         }
 
+
+    }
+
+    private void retrievePlayerScoreAndRank() {
+
+        //Return if user name is not formatted properly or if empty
+        String user = SettingsManager.userName.trim();
+        if (user == "" || user.isEmpty()) {
+            return;
+        }
+
+        //Build the url to get scores for a particular user
+        StringBuilder urlScoreReq = new StringBuilder("http://dreamlo.com/lb/5c79d6943eba35041cb5f9e1/pipe-get/");
+        urlScoreReq.append(user + "/");
+        String urlString = urlScoreReq.toString();
+
+        HttpRequestBuilder requestBuilder = new HttpRequestBuilder();
+        Net.HttpRequest httpRequest = requestBuilder.newRequest().method(Net.HttpMethods.GET).url(urlString).build();
+        Gdx.net.sendHttpRequest(httpRequest, this);
+
+    }
+
+    private void retrieveTopScores() {
+
+        //Get the top scores from the dreamlo online database using an HTTP GET request
+        //Scores are received in JSON format (max 1000 scores are stored on the network)
+        //Parse through the JSON, return each score in String format in an ArrayList, back to the
+        //game.  The game will display the scores on the HighScoresScreen
+
+        //Build the url to get JSON scores
+        StringBuilder urlScoreReq = new StringBuilder("http://dreamlo.com/lb/5c79d6943eba35041cb5f9e1/json/");
+        String urlString = urlScoreReq.toString();
+
+        HttpRequestBuilder requestBuilder = new HttpRequestBuilder();
+        Net.HttpRequest httpRequest = requestBuilder.newRequest().method(Net.HttpMethods.GET).url(urlString).build();
+        Gdx.net.sendHttpRequest(httpRequest, this);
+
+    }
+
+    private void parseHttpScoresResponse(String scoreString) {
+
+        //Parse the HTTP response from the network to display high scores
+        //If the user queried the top scores, the response will be in JSON format
+        //If the user queried their own rank, the response will be a pipe delimited string
+        //After parsing the HTTP response, update the scrollpane on the HighScoreScreen to show the scores
+
+        //Determine if the response is in JSON format
+        boolean isJSON = scoreString.charAt(0) == '{';
+        boolean isPipeDelimited = !isJSON;
+
+        ArrayList<String> highScoresList = new ArrayList<>();
+
+        if (isPipeDelimited) {
+            if (!scoreString.equals("") && !scoreString.isEmpty()) {
+
+                String[] value_split = scoreString.split("\\|");
+                highScoresList.add("Rank: " + (Integer.parseInt(value_split[5].trim()) + 1) + "\nName: " + value_split[0] + "\nScore: " + value_split[1]);
+                highScoresReceived(highScoresList);
+
+            } else {
+
+                highScoresList.add("Score not in top 1000");
+                highScoresReceived(highScoresList);
+
+            }
+        } else if (isJSON) {
+
+            if (!scoreString.equals("") && !scoreString.isEmpty()) {
+
+                JsonReader json = new JsonReader();
+                Gdx.app.log("BLAH", "JS" + scoreString);
+                JsonValue base = json.parse(scoreString);
+                JsonValue dreamlo = base.get("dreamlo");
+                Gdx.app.log("DREAMLO", "" + dreamlo);
+                JsonValue leaderboard = dreamlo.get("leaderboard");
+                JsonValue entries = leaderboard.get("entry");
+                for (int i = 0; i < entries.size; i++) {
+                    int rank = i + 1;
+                    JsonValue score = entries.get(i);
+                    String name = score.getString("name");
+                    String value = score.getString("score");
+                    Gdx.app.log("Entry", "" + rank + ". " + name + "  -  " + value + " m ");
+                    highScoresList.add("" + rank + ". " + name + "  -  " + value + " m ");
+                }
+
+                highScoresReceived(highScoresList);
+
+            }
+
+        }
 
     }
 
@@ -344,29 +418,22 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
         topDayButtonTexture.dispose();
         topWeekButtonTexture.dispose();
         topAllTimeButtonTexture.dispose();
-        googlePlayLeaderboardsButton.dispose();
 
         /**
          * //NON-HTML Font files
-        generator.dispose();
-        scoreFont.dispose();**/
+         generator.dispose();
+         scoreFont.dispose();**/
 
     }
 
-    @Override
-    public void requestedHighScoresReceived(final ArrayList<String> playerCenteredHighScores) {
 
-        //Callback received from mobile device for global high scores (player centered)
-        //If received, set the scrollPane to show global scores (player centered)
-
+    public void highScoresReceived(final ArrayList<String> playerCenteredHighScores) {
         Gdx.app.postRunnable(new Runnable() {
             @Override
             public void run() {
                 createScrollPane(playerCenteredHighScores);
             }
         });
-
-
     }
 
     @Override
@@ -422,13 +489,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
                         game.setScreen(new MainMenuScreen(game, playServices, databaseAndPreferenceManager));
                         return true;
                     }
-                } else if (mousePos.x > GOOGLE_PLAY_LEADERBOARDS_BUTTON_X1 && mousePos.x < GOOGLE_PLAY_LEADERBOARDS_BUTTON_X1 + GOOGLE_PLAY_LEADERBOARDS_BUTTON_WIDTH && mousePos.y > GOOGLE_PLAY_LEADERBOARDS_BUTTON_Y1 && mousePos.y < GOOGLE_PLAY_LEADERBOARDS_BUTTON_Y1 + GOOGLE_PLAY_LEADERBOARDS_BUTTON_HEIGHT) {
-                    if (button == Input.Buttons.LEFT) {
-                        //Google play leaderboards button pushed, open leaderboards intent if play services is not null
-                        startPlayServicesLeaderboardIntent();
-                        return true;
-                    }
-                } else if (mousePos.x > LOCAL_BUTTON_X1 && mousePos.x < LOCAL_BUTTON_ENDPOINT && mousePos.y > GLOBAL_AND_LOCAL_BUTTON_Y1 && mousePos.y < GLOBAL_AND_LOCAL_BUTTON_Y1 + GLOBAL_LOCAL_BUTTON_HEIGHT) {
+                }  else if (mousePos.x > LOCAL_BUTTON_X1 && mousePos.x < LOCAL_BUTTON_ENDPOINT && mousePos.y > GLOBAL_AND_LOCAL_BUTTON_Y1 && mousePos.y < GLOBAL_AND_LOCAL_BUTTON_Y1 + GLOBAL_LOCAL_BUTTON_HEIGHT) {
                     if (button == Input.Buttons.LEFT) {
                         //Local button pushed
                         if (currentButtonSelected != LOCAL_BUTTON) {
@@ -616,4 +677,20 @@ public class HighScoreScreen implements Screen, MobileCallbacks {
         });
     }
 
+    @Override
+    public void handleHttpResponse(Net.HttpResponse httpResponse) {
+
+        parseHttpScoresResponse(httpResponse.getResultAsString());
+
+    }
+
+    @Override
+    public void failed(Throwable t) {
+
+    }
+
+    @Override
+    public void cancelled() {
+
+    }
 }
