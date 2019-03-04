@@ -112,6 +112,13 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
     private Viewport textFieldViewport;
     private Boolean textFieldCreated = false;
     private Skin textFieldSkin;
+    //Enter Name Texture that displays when textField is empty
+    private Texture enterNameTexture;
+    private final float ENTER_NAME_WIDTH = 15.9f;
+    private final float ENTER_NAME_HEIGHT = 8.7f;
+    private final float ENTER_NAME_X1 = 1f;
+    private final float ENTER_NAME_Y1 = 3f;
+    private boolean userNameIsEmpty = SettingsManager.userName == "" || SettingsManager.userName.isEmpty();
 
 
     public MainMenuScreen(AlphaPigeon game, PlayServices playServices, DatabaseAndPreferenceManager databaseAndPreferenceManager) {
@@ -144,11 +151,12 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
 
 
         // Load textures
-        mainMenuBackground = new Texture(Gdx.files.internal("textures/MainMenuScreen.png"));
-        mainMenuLogoAndText = new Texture(Gdx.files.internal("textures/MainMenuScreenTransparent.png"));
+        mainMenuBackground = new Texture(Gdx.files.internal("textures/mainmenuscreen/MainMenuScreen.png"));
+        mainMenuLogoAndText = new Texture(Gdx.files.internal("textures/mainmenuscreen/MainMenuScreenTransparent.png"));
         soundOnIcon = new Texture(Gdx.files.internal("textures/icons/SoundOnIcon.png"));
         soundOffIcon = new Texture(Gdx.files.internal("textures/icons/SoundOffIcon.png"));
         adRemoval = new Texture(Gdx.files.internal("textures/icons/AdRemoval.png"));
+        enterNameTexture = new Texture(Gdx.files.internal("textures/mainmenuscreen/EnterName.png"));
 
 
         initializeLevelOneBirdAnimation();
@@ -216,6 +224,22 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
         game.batch.draw(levelTwoCurrentFrame, levelTwoBirdTwoXPosition, levelTwoBirdTwoYPosition, 0, 0, LevelTwoBird.WIDTH, LevelTwoBird.HEIGHT, 1, 1, 0);
         game.batch.draw(mainMenuLogoAndText, 0, 0, camera.viewportWidth, camera.viewportHeight);
 
+        //If the user has not entered a username, display the "Enter Name" image on the screen
+        if (userNameIsEmpty){
+            game.batch.draw(enterNameTexture, ENTER_NAME_X1, ENTER_NAME_Y1, ENTER_NAME_WIDTH, ENTER_NAME_HEIGHT);
+        }
+
+        game.batch.end();
+
+
+        //Render user name text entry field
+        if (textFieldCreated) {
+            stage.draw();
+            stage.act();
+        }
+
+        game.batch.begin();
+
         //If sound is on, draw the sound on icon, otherwise draw sound off icon
         if (SettingsManager.musicSettingIsOn) {
             game.batch.draw(soundOnIcon, SOUND_BUTTON_X1, SOUND_BUTTON_Y1, SOUND_ICON_WIDTH, SOUND_ICON_HEIGHT);
@@ -228,14 +252,6 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
             game.batch.draw(adRemoval, AD_REMOVAL_X1, AD_REMOVAL_Y1, AD_REMOVAL_WIDTH, AD_REMOVAL_HEIGHT);
         }
 
-
-        //Gdx.input.setInputProcessor(inputProcessor);
-
-        // render scrollPane for high scores
-        if (textFieldCreated) {
-            stage.draw();
-            stage.act();
-        }
 
         game.batch.end();
 
@@ -277,6 +293,7 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
         soundOnIcon.dispose();
         soundOffIcon.dispose();
         adRemoval.dispose();
+        enterNameTexture.dispose();
     }
 
     private void update() {
@@ -536,8 +553,13 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
             @Override
             public void keyTyped(TextField textField, char c) {
 
+                //Trim the spaces off the end of the user name
+                String userNameString = userNameTextField.getText().trim();
+
                 //Update the user's username in the shared prefs when it is changed
-                SettingsManager.setUserName(userNameTextField.getText());
+                SettingsManager.setUserName(userNameString);
+
+                userNameIsEmpty = userNameString == "" || userNameString.isEmpty();
 
             }
         });
@@ -556,5 +578,6 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
         }
 
         textFieldCreated = true;
+
     }
 }
