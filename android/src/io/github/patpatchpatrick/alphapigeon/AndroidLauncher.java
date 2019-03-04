@@ -102,7 +102,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
         // Add the libgdx view
         layout.addView(gameView);
 
-        // Add the AdMob view
+        // Add the Ad view
         RelativeLayout.LayoutParams adParams =
                 new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
                         RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -129,15 +129,6 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
 
     };
 
-
-    private void signInSilently() {
-
-    }
-
-    private void startSignInIntent() {
-
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -147,10 +138,6 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
     @Override
     protected void onResume() {
         super.onResume();
-        //When the app resumes, sign back in
-        if (!isSignedIn()) {
-            signInSilently();
-        }
 
         //Callback to libgdx game to let it know that the android app has resumed
         //The game will resize the screen appropriately, if this callback isn't used then there are
@@ -163,18 +150,6 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
     @Override
     protected void onStart() {
         super.onStart();
-        //gameHelper.onStart(this); // You will be logged in to google play services as soon as you open app , i,e on start
-    }
-
-    @Override
-    public void signIn() {
-        signInSilently();
-    }
-
-    @Override
-    public void signOut() {
-
-
     }
 
     @Override
@@ -201,7 +176,6 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
 
         InputStream stream = null;
         HttpURLConnection connection = null;
-        String result = null;
 
         //Complete the connection, submit the HTTP request to update the leaderboard online database
         try {
@@ -266,7 +240,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
         //Parse through the PIPE, return each score in String format in an ArrayList, back to the
         //game.  The game will display the scores on the HighScoresScreen
 
-        //Build the url to get JSON scores
+        //Build the url to get scores for a particular user
         StringBuilder urlScoreReq = new StringBuilder("http://dreamlo.com/lb/5c79d6943eba35041cb5f9e1/pipe-get/");
         urlScoreReq.append(user + "/");
         String urlString = urlScoreReq.toString();
@@ -283,7 +257,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
         HttpURLConnection connection = null;
         String highScoresPipeString = "";
 
-        //Connect to the network to retrieve the scores in JSON format
+        //Connect to the network to retrieve the scores in PIPE format
         try {
             connection = (HttpURLConnection) url.openConnection();
             // Timeout for reading InputStream arbitrarily set to 3000ms.
@@ -307,7 +281,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
             stream = connection.getInputStream();
             if (stream != null) {
 
-                //Receive the JSON data in String format from the input stream
+                //Receive the PIPE data in String format from the input stream
                 //The readFromStream class uses an inputStreamReader to build the String
                 highScoresPipeString = readFromStream(stream);
                 stream.close();
@@ -433,7 +407,6 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
 
             try {
 
-                Log.d("PARSINGYO", "b");
                 JSONObject highScoresJSON = new JSONObject(jsonString);
                 JSONObject dreamlo = highScoresJSON.getJSONObject("dreamlo");
                 JSONObject leaderboard = dreamlo.getJSONObject("leaderboard");
@@ -461,7 +434,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
 
     public void parseTopScoresPipe(String scoreString){
 
-        //Parse the JSON high scores and return them back to the game via a callback
+        //Parse the PIPE delimited high scores and return them back to the game via a callback
         //Return them in an ArrayList of Strings for each score (only max 1000 scores are received from network)
 
         ArrayList<String> highScoresList = new ArrayList<>();
@@ -483,13 +456,6 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
 
 
 
-    }
-
-
-    @Override
-    public boolean isSignedIn() {
-
-        return false;
     }
 
     @Override
@@ -518,13 +484,13 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
     @Override
     protected void onStop() {
         super.onStop();
-        //gameHelper.onStop();
     }
 
 
     @Override
     public void insert(float highScore, float lastScore) {
 
+        //Insert a high score into the local sqlite database
         DatabaseHandler.insert(this, highScore, lastScore);
 
     }
@@ -532,6 +498,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
     @Override
     public void queryHighScores() {
 
+        //Query high scores from local sqlite database
         DatabaseHandler.query(mobileCallbacks);
     }
 
@@ -544,29 +511,6 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices,
     public float getTotalNumGames() {
         return DatabaseHandler.getTotalNumberOfGames(this);
     }
-
-    private void handleException(Exception e, String details) {
-        int status = 0;
-
-
-        String message = getString(R.string.status_exception_error, details, status, e);
-
-        new AlertDialog.Builder(this)
-                .setMessage(message)
-                .setNeutralButton(android.R.string.ok, null)
-                .show();
-    }
-
-    private void hideSystemUi() {
-        getWindow().getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_IMMERSIVE);
-    }
-
 
     @Override
     public void toggleMusicOnOff(Boolean isOn) {

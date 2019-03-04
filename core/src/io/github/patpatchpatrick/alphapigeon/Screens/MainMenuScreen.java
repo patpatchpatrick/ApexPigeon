@@ -162,10 +162,6 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
         initializeLevelOneBirdAnimation();
         initializeLevelTwoBirdAnimation();
 
-        if (playServices != null) {
-            playServices.signIn();
-        }
-
         createInputProcessor();
 
         //Initialize background music after updating user settings (retrieving settings from mobile device db/prefs)

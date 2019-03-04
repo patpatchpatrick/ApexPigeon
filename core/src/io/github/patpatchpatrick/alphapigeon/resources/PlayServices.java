@@ -9,13 +9,10 @@ public interface PlayServices {
     public void setMobileCallbacks(MobileCallbacks mobileCallbacks);
 
     //Leaderboards
-    public void signIn();
-    public void signOut();
     public void submitScore(int highScore, String user);
     public void showLeaderboard();
     public void getPlayerCenteredScores(String user);
     public void getTopScores(int scoreType);
-    public boolean isSignedIn();
 
     //Ads
     public void showBannerAds(boolean show); //Enable or disable banner ads in mobile device
