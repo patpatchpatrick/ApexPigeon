@@ -37,7 +37,6 @@ public class DatabaseHandler {
         values.put(ScoresEntry.COLUMN_SCORES_NUM_GAMES_PLAYED, numOfGames);
         Uri uri = AndroidLauncher.contentResolver.insert(ScoresEntry.CONTENT_URI, values);
 
-        Log.d("URIYO", "" + uri);
 
 
     }

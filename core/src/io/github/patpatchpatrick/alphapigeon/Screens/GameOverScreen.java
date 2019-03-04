@@ -6,7 +6,6 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Net;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.assets.loaders.AssetLoader;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -16,10 +15,8 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import java.awt.TextField;
-
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
-import io.github.patpatchpatrick.alphapigeon.resources.DatabaseAndPreferenceManager;
+import io.github.patpatchpatrick.alphapigeon.resources.DatabaseManager;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.HighScore;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
@@ -30,14 +27,10 @@ public class GameOverScreen implements Screen, Net.HttpResponseListener {
 
     private AlphaPigeon game;
     private PlayServices playServices;
-    private DatabaseAndPreferenceManager databaseAndPreferenceManager;
+    private DatabaseManager databaseManager;
     private OrthographicCamera camera;
     private Viewport viewport;
     private InputProcessor inputProcessor;
-
-    //Prefs
-    //Used for HTML and Desktop versions of game
-    Preferences libgdxPrefs;
 
     //High Scores
     private float totalNumGames = 0;
@@ -57,25 +50,16 @@ public class GameOverScreen implements Screen, Net.HttpResponseListener {
     private final float BACK_BUTTON_Y1 = 3.0f;
     private final float BACK_BUTTON_Y2 = 10.5f;
 
-    /**
-    //Font Generator for Non-HTML fonts
-     Free type font generator doesn't work for HTML, so bitmap font is used instead
-     These comments are kept here in case it is ever decided to use freetype font generator for mobile/desktop apps
-    private String gameOverString;
-    private BitmapFont scoreFont;
-    FreeTypeFontGenerator generator;
-     **/
-
-    //HTML Fonts
+    //Fonts
     private String gameOverString;
     private BitmapFont font;
 
-    public GameOverScreen(AlphaPigeon game, PlayServices playServices, DatabaseAndPreferenceManager databaseAndPreferenceManager, HighScore highScore) {
+    public GameOverScreen(AlphaPigeon game, PlayServices playServices, DatabaseManager databaseManager, HighScore highScore) {
 
 
         this.game = game;
         this.playServices = playServices;
-        this.databaseAndPreferenceManager = databaseAndPreferenceManager;
+        this.databaseManager = databaseManager;
 
         // create the camera
         camera = new OrthographicCamera();
@@ -94,30 +78,14 @@ public class GameOverScreen implements Screen, Net.HttpResponseListener {
         gameOverBackground = new Texture(Gdx.files.internal("textures/gameoverscreen/GameOverScreen.png"));
         newHighScoreTexture = new Texture(Gdx.files.internal("textures/gameoverscreen/NewHighScore.png"));
 
-        /**
-        //Initialize font generator for non-HTML
-         Free type font generator doesn't work for HTML, so bitmap font is used instead
-         These comments are kept here in case it is ever decided to use freetype font generator for mobile/desktop apps
-        generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/univers.ttf"));
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 20;
-        parameter.minFilter = Texture.TextureFilter.Linear;
-        parameter.magFilter = Texture.TextureFilter.Linear;
-        scoreFont = generator.generateFont(parameter);
-        scoreFont.setColor(1.0f, 1.0f, 1.0f, 1.0f);
-        scoreFont.getData().setScale(0.1f);
-        scoreFont.setUseIntegerPositions(false);
-         **/
-
-        //Initialize HTML FONTS
+        //Initialize FONTS
         font = new BitmapFont(Gdx.files.internal("fonts/arial-15.fnt"),
                 Gdx.files.internal("fonts/arial-15.png"), false);
         font.getData().setScale(0.1f);
         font.setUseIntegerPositions(false);
 
-        //Handle submitting high currentScore to play services and to local databases
-        handleLocalData();
-        handlePlayServices();
+        //Handle submitting high score to network and database/libgdx preferences
+        checkForNewHighScoreAndUpdateNetworkAndDatabase();
 
         //Update the high currentScore string to be displayed
         //DecimalFormat df = new DecimalFormat("#.##");
@@ -169,12 +137,7 @@ public class GameOverScreen implements Screen, Net.HttpResponseListener {
 
         game.batch.draw(gameOverBackground, 0, 0, camera.viewportWidth, camera.viewportHeight);
 
-        /**
-         * Non-HTML font, for if freeTypeFontGenerator is used
-        scoreFont.draw(game.batch, gameOverString, 29, 27);
-         **/
-
-        //HTML Font
+        //Font
         font.draw(game.batch, gameOverString, 34, 27);
 
         //If a new high score was achieved, draw the new high score texture (then when the back button is pushed,
@@ -189,33 +152,11 @@ public class GameOverScreen implements Screen, Net.HttpResponseListener {
 
     }
 
-    private void handlePlayServices() {
+    private void checkForNewHighScoreAndUpdateNetworkAndDatabase() {
 
-        //Check if there is a new high score and if so, submit it to the network leaderboard
-        //If there is a new high score, newHighScoreEarned is set to true
-        newHighScoreEarned = HighScore.submitNewHighScore( this);
-
-    }
-
-    private void handleLocalData() {
-
-
-        if (databaseAndPreferenceManager != null) {
-
-            //Insert game data for the recent game into the local database/shared prefs
-            HighScore.updateLocalGameStatisticsDataMobile(databaseAndPreferenceManager);
-
-            //Get the total number of games from the local database to display in the game over screen
-            totalNumGames = databaseAndPreferenceManager.getTotalNumGames();
-        } else if (AlphaPigeon.useLibgdxPrefs){
-
-            //If using libgdx prefs (HTML/Desktop), get the totalNumberOfGames from the main prefs
-            //Update the high score in the libgdx prefs
-            libgdxPrefs = Gdx.app.getPreferences("alpha.pigeon.prefs");
-            HighScore.updateLocalGameStatisticsData(libgdxPrefs);
-            totalNumGames = libgdxPrefs.getFloat("totalnumgames", 0);
-        }
-
+            //Update the local data and network to account for recent game played
+            newHighScoreEarned = HighScore.checkForNewHighScoreAndUpdateNetworkAndDatabase(databaseManager, this);
+            totalNumGames = SettingsManager.totalNumGames;
 
     }
 
@@ -258,7 +199,7 @@ public class GameOverScreen implements Screen, Net.HttpResponseListener {
                         newHighScoreEarned = false; //Reset the high score
                         Sounds.newHighScoreSound.stop(); //Stop playing the high score sound
                         dispose();
-                        game.setScreen(new MainMenuScreen(game, playServices, databaseAndPreferenceManager));
+                        game.setScreen(new MainMenuScreen(game, playServices, databaseManager));
                         return true;
                     }
                 }
@@ -319,14 +260,7 @@ public class GameOverScreen implements Screen, Net.HttpResponseListener {
 
         gameOverBackground.dispose();
 
-
-        /**
-         * NON-HTML Fonts
-        generator.dispose();
-        scoreFont.dispose();
-         **/
-
-        //HTML Fonts
+        //Fonts
         font.dispose();
     }
 

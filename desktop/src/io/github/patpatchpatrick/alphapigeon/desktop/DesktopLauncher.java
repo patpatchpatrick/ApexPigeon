@@ -10,6 +10,6 @@ public class DesktopLauncher {
 		config.title = "AlphaPigeon";
 		config.width = 800;
 		config.height = 480;
-		new LwjglApplication(new AlphaPigeon(true), config);
+		new LwjglApplication(new AlphaPigeon(), config);
 	}
 }

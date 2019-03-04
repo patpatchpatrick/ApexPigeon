@@ -1,16 +1,10 @@
 package io.github.patpatchpatrick.alphapigeon;
 
-import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -19,35 +13,12 @@ import android.widget.RelativeLayout;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 
-import io.github.patpatchpatrick.alphapigeon.Screens.HighScoreScreen;
-import io.github.patpatchpatrick.alphapigeon.resources.DatabaseAndPreferenceManager;
+import io.github.patpatchpatrick.alphapigeon.resources.DatabaseManager;
 import io.github.patpatchpatrick.alphapigeon.resources.MobileCallbacks;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
 
-import com.badlogic.gdx.backends.android.AndroidGraphics;
-import com.google.android.gms.ads.AdRequest;
 
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-
-import javax.net.ssl.HttpsURLConnection;
-
-
-
-public class AndroidLauncher extends AndroidApplication implements PlayServices, DatabaseAndPreferenceManager {
+public class AndroidLauncher extends AndroidApplication implements PlayServices, DatabaseManager {
 
     // Google Play Services Variables
 

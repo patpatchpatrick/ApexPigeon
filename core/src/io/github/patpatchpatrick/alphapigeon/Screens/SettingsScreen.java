@@ -23,7 +23,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import java.util.ArrayList;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
-import io.github.patpatchpatrick.alphapigeon.resources.DatabaseAndPreferenceManager;
+import io.github.patpatchpatrick.alphapigeon.resources.DatabaseManager;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.MobileCallbacks;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
@@ -35,7 +35,7 @@ public class SettingsScreen implements Screen, MobileCallbacks {
     private OrthographicCamera camera;
     private Viewport viewport;
     private PlayServices playServices;
-    private DatabaseAndPreferenceManager databaseAndPreferenceManager;
+    private DatabaseManager databaseManager;
     private InputProcessor inputProcessorScreen;
     // -- Input Multiplexer to handle both the stage/sliders and screen input processors
     private InputMultiplexer inputMultiplexer = new InputMultiplexer();
@@ -93,10 +93,10 @@ public class SettingsScreen implements Screen, MobileCallbacks {
     private final float BACK_BUTTON_Y1 = 3.0f;
     private final float BACK_BUTTON_Y2 = 10.5f;
 
-    public SettingsScreen(AlphaPigeon game, PlayServices playServices, DatabaseAndPreferenceManager databaseAndPreferenceManager) {
+    public SettingsScreen(AlphaPigeon game, PlayServices playServices, DatabaseManager databaseManager) {
         this.game = game;
         this.playServices = playServices;
-        this.databaseAndPreferenceManager = databaseAndPreferenceManager;
+        this.databaseManager = databaseManager;
 
         if (playServices != null) {
             //Set the current device mobile callbacks to include this screen specific interface so
@@ -265,7 +265,7 @@ public class SettingsScreen implements Screen, MobileCallbacks {
                 if (mousePos.x > BACK_BUTTON_X1 && mousePos.x < BACK_BUTTON_X2 && mousePos.y > BACK_BUTTON_Y1 && mousePos.y < BACK_BUTTON_Y2) {
                     if (button == Input.Buttons.LEFT) {
                         dispose();
-                        game.setScreen(new MainMenuScreen(game, playServices, databaseAndPreferenceManager));
+                        game.setScreen(new MainMenuScreen(game, playServices, databaseManager));
                         return true;
                     }
                 } else if (mousePos.x > MUSIC_BUTTON_X1 && mousePos.x < MUSIC_BUTTON_X1 + ON_OFF_BUTTON_WIDTH && mousePos.y > MUSIC_BUTTON_Y1 && mousePos.y < MUSIC_BUTTON_Y1 + ON_OFF_BUTTON_HEIGHT) {
@@ -508,7 +508,7 @@ public class SettingsScreen implements Screen, MobileCallbacks {
             @Override
             public void run() {
                 dispose();
-                game.setScreen(new SettingsScreen(game, playServices, databaseAndPreferenceManager));
+                game.setScreen(new SettingsScreen(game, playServices, databaseManager));
             }
         });
     }

@@ -8,7 +8,7 @@ public class SettingsManager {
 
     //Class to manage settings and updates to settings via database/preferences
 
-    public static DatabaseAndPreferenceManager databaseAndPreferenceManager;
+    public static DatabaseManager databaseManager;
 
     //Booleans for Settings
     public static boolean musicSettingIsOn = true;
@@ -26,6 +26,10 @@ public class SettingsManager {
     public static float gameVolume = 0.5f;
     public static float touchSensitivity = 0.5f;
     public static float accelSensitivity = 0.5f;
+
+    //Floats for Other Stats
+    public static float totalNumGames = 0;
+    public static float highScore = 0;
 
     private static Preferences libgdxPrefs = Gdx.app.getPreferences("alpha.pigeon.prefs");
 
@@ -48,6 +52,10 @@ public class SettingsManager {
         gameVolume = libgdxPrefs.getFloat("gameVolume", 0.5f);
         touchSensitivity = libgdxPrefs.getFloat("touchSensitivity", 0.5f);
         accelSensitivity = libgdxPrefs.getFloat("accelSensitivity", 0.5f);
+
+        //Other stats
+        totalNumGames = libgdxPrefs.getFloat("totalnumgames", 0);
+        highScore = libgdxPrefs.getFloat("highscore", 0);
 
         //Billing Settings
         adRemovalPurchased = libgdxPrefs.getBoolean("adRemovalPurchased", true);
@@ -159,6 +167,18 @@ public class SettingsManager {
             libgdxPrefs.putBoolean("isFullScreenOn", isOn).flush();
             fullScreenModeIsOn = isOn;
         }
+
+    }
+
+    public static void increaseTotalNumGames(){
+
+        libgdxPrefs.putFloat("totalnumgames", libgdxPrefs.getFloat("totalnumgames") + 1).flush();
+
+    }
+
+    public static void setHighScore(float score){
+
+        libgdxPrefs.putFloat("highscore", score);
 
     }
 

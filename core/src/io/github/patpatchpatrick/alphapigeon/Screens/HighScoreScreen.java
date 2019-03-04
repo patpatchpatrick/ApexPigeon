@@ -26,12 +26,11 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import java.util.ArrayList;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
-import io.github.patpatchpatrick.alphapigeon.resources.DatabaseAndPreferenceManager;
+import io.github.patpatchpatrick.alphapigeon.resources.DatabaseManager;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.MobileCallbacks;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
 import io.github.patpatchpatrick.alphapigeon.resources.SettingsManager;
-import sun.rmi.runtime.Log;
 
 
 public class HighScoreScreen implements Screen, MobileCallbacks, Net.HttpResponseListener {
@@ -40,7 +39,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks, Net.HttpRespons
     private OrthographicCamera camera;
     private Viewport viewport;
     private PlayServices playServices;
-    private DatabaseAndPreferenceManager databaseAndPreferenceManager;
+    private DatabaseManager databaseManager;
     private InputProcessor inputProcessorScreen;
     // -- Input Multiplexer to handle both the scrollpane(stage) and screen input processors
     private InputMultiplexer inputMultiplexer = new InputMultiplexer();
@@ -99,13 +98,8 @@ public class HighScoreScreen implements Screen, MobileCallbacks, Net.HttpRespons
     //--By default is false, unless a button is changed, then a score request for new type of button is made
     private boolean scoresRequestNeeded = false;
 
-    //Font Generator for Non-HTML
-    /**
-     * private BitmapFont scoreFont;
-     * FreeTypeFontGenerator generator;
-     **/
 
-    //HTML FONTS
+    //FONTS
     private BitmapFont font;
 
     //ScrollPane
@@ -115,11 +109,11 @@ public class HighScoreScreen implements Screen, MobileCallbacks, Net.HttpRespons
     private Skin scrollableSkin;
 
 
-    public HighScoreScreen(AlphaPigeon game, PlayServices playServices, DatabaseAndPreferenceManager databaseAndPreferenceManager) {
+    public HighScoreScreen(AlphaPigeon game, PlayServices playServices, DatabaseManager databaseManager) {
 
         this.game = game;
         this.playServices = playServices;
-        this.databaseAndPreferenceManager = databaseAndPreferenceManager;
+        this.databaseManager = databaseManager;
         if (playServices != null) {
             playServices.setMobileCallbacks(this);
         }
@@ -146,20 +140,6 @@ public class HighScoreScreen implements Screen, MobileCallbacks, Net.HttpRespons
         topDayButtonTexture = new Texture(Gdx.files.internal("textures/highscoresscreen/RankTopButtonTopDay.png"));
         topWeekButtonTexture = new Texture(Gdx.files.internal("textures/highscoresscreen/RankTopButtonTopWeek.png"));
         topAllTimeButtonTexture = new Texture(Gdx.files.internal("textures/highscoresscreen/RankTopButtonTopAllTime.png"));
-
-
-        /**
-         //Initialize font generator (Non-HTML)
-         generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/univers.ttf"));
-         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-         parameter.size = 20;
-         parameter.minFilter = Texture.TextureFilter.Linear;
-         parameter.magFilter = Texture.TextureFilter.Linear;
-         scoreFont = generator.generateFont(parameter);
-         scoreFont.setColor(1.0f, 1.0f, 1.0f, 1.0f);
-         scoreFont.getData().setScale(0.1f);
-         scoreFont.setUseIntegerPositions(false);**/
-
 
         //Request local scores from database by default
         createInitialScoreRequest();
@@ -247,14 +227,19 @@ public class HighScoreScreen implements Screen, MobileCallbacks, Net.HttpRespons
 
     private void createInitialScoreRequest() {
 
-        //Get player centered high scores to initiate the high scores menu
+        //Initiate the high score menu by showing local scores
+        //For Android/mobile devices, show scores from local SQlite DB
+        //Otherwise, show high score from libgdx preferences
 
-        if (databaseAndPreferenceManager != null) {
+        if (databaseManager != null) {
 
             requestScores();
 
-        }
+        } else {
 
+            showLocalScores();
+
+        }
     }
 
     private void requestScores() {
@@ -283,15 +268,29 @@ public class HighScoreScreen implements Screen, MobileCallbacks, Net.HttpRespons
                 retrievePlayerScoreAndRank();
                 break;
             case LOCAL_BUTTON:
-                //Request player local scores from the mobile device database
-                if (databaseAndPreferenceManager != null) {
-                    databaseAndPreferenceManager.queryHighScores();
+                //Show the local high scores
+                //If using Android/Mobile device, show the list of all scores from mobile device SQlite DB
+                //Otherwise, show high scores from libgdx preferences
+                if (databaseManager != null) {
+                    databaseManager.queryHighScores();
+                } else {
+                    showLocalScores();
                 }
                 break;
             default:
                 // default
         }
 
+
+    }
+
+    private void showLocalScores() {
+
+        //Show local high score (from libgdx preferences) in the scrollpane
+
+        ArrayList<String> highScoresList = new ArrayList<>();
+        highScoresList.add("High Score:  " + (int) SettingsManager.highScore + " m ");
+        highScoresReceived(highScoresList);
 
     }
 
@@ -338,7 +337,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks, Net.HttpRespons
         //If the user queried their own rank, the response will be a pipe delimited string
         //After parsing the HTTP response, update the scrollpane on the HighScoreScreen to show the scores
 
-        //Determine if the response is in JSON format
+        //Determine if the response is in JSON format or Pipe Delimited format
         boolean isJSON = scoreString.charAt(0) == '{';
         boolean isPipeDelimited = !isJSON;
 
@@ -362,10 +361,8 @@ public class HighScoreScreen implements Screen, MobileCallbacks, Net.HttpRespons
             if (!scoreString.equals("") && !scoreString.isEmpty()) {
 
                 JsonReader json = new JsonReader();
-                Gdx.app.log("BLAH", "JS" + scoreString);
                 JsonValue base = json.parse(scoreString);
                 JsonValue dreamlo = base.get("dreamlo");
-                Gdx.app.log("DREAMLO", "" + dreamlo);
                 JsonValue leaderboard = dreamlo.get("leaderboard");
                 JsonValue entries = leaderboard.get("entry");
                 for (int i = 0; i < entries.size; i++) {
@@ -373,7 +370,6 @@ public class HighScoreScreen implements Screen, MobileCallbacks, Net.HttpRespons
                     JsonValue score = entries.get(i);
                     String name = score.getString("name");
                     String value = score.getString("score");
-                    Gdx.app.log("Entry", "" + rank + ". " + name + "  -  " + value + " m ");
                     highScoresList.add("" + rank + ". " + name + "  -  " + value + " m ");
                 }
 
@@ -418,11 +414,6 @@ public class HighScoreScreen implements Screen, MobileCallbacks, Net.HttpRespons
         topDayButtonTexture.dispose();
         topWeekButtonTexture.dispose();
         topAllTimeButtonTexture.dispose();
-
-        /**
-         * //NON-HTML Font files
-         generator.dispose();
-         scoreFont.dispose();**/
 
     }
 
@@ -486,10 +477,10 @@ public class HighScoreScreen implements Screen, MobileCallbacks, Net.HttpRespons
                 if (mousePos.x > BACK_BUTTON_X1 && mousePos.x < BACK_BUTTON_X2 && mousePos.y > BACK_BUTTON_Y1 && mousePos.y < BACK_BUTTON_Y2) {
                     if (button == Input.Buttons.LEFT) {
                         dispose();
-                        game.setScreen(new MainMenuScreen(game, playServices, databaseAndPreferenceManager));
+                        game.setScreen(new MainMenuScreen(game, playServices, databaseManager));
                         return true;
                     }
-                }  else if (mousePos.x > LOCAL_BUTTON_X1 && mousePos.x < LOCAL_BUTTON_ENDPOINT && mousePos.y > GLOBAL_AND_LOCAL_BUTTON_Y1 && mousePos.y < GLOBAL_AND_LOCAL_BUTTON_Y1 + GLOBAL_LOCAL_BUTTON_HEIGHT) {
+                } else if (mousePos.x > LOCAL_BUTTON_X1 && mousePos.x < LOCAL_BUTTON_ENDPOINT && mousePos.y > GLOBAL_AND_LOCAL_BUTTON_Y1 && mousePos.y < GLOBAL_AND_LOCAL_BUTTON_Y1 + GLOBAL_LOCAL_BUTTON_HEIGHT) {
                     if (button == Input.Buttons.LEFT) {
                         //Local button pushed
                         if (currentButtonSelected != LOCAL_BUTTON) {
@@ -672,7 +663,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks, Net.HttpRespons
             @Override
             public void run() {
                 dispose();
-                game.setScreen(new HighScoreScreen(game, playServices, databaseAndPreferenceManager));
+                game.setScreen(new HighScoreScreen(game, playServices, databaseManager));
             }
         });
     }

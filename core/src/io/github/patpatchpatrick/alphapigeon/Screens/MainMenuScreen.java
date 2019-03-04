@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBird;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelTwoBird;
-import io.github.patpatchpatrick.alphapigeon.resources.DatabaseAndPreferenceManager;
+import io.github.patpatchpatrick.alphapigeon.resources.DatabaseManager;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.MobileCallbacks;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
@@ -38,7 +38,7 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
     private Texture mainMenuBackground;
     private Texture mainMenuLogoAndText;
     private PlayServices playServices;
-    private DatabaseAndPreferenceManager databaseAndPreferenceManager;
+    private DatabaseManager databaseManager;
 
     //Input Processor
     private InputProcessor inputProcessor;
@@ -121,11 +121,11 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
     private boolean userNameIsEmpty = SettingsManager.userName == "" || SettingsManager.userName.isEmpty();
 
 
-    public MainMenuScreen(AlphaPigeon game, PlayServices playServices, DatabaseAndPreferenceManager databaseAndPreferenceManager) {
+    public MainMenuScreen(AlphaPigeon game, PlayServices playServices, DatabaseManager databaseManager) {
 
         this.game = game;
         this.playServices = playServices;
-        this.databaseAndPreferenceManager = databaseAndPreferenceManager;
+        this.databaseManager = databaseManager;
         //Set mobile callbacks on this screen to receive any callbacks from mobile device
         if (playServices != null) {
             playServices.setMobileCallbacks(this);
@@ -429,19 +429,19 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
                 if (mousePos.x > PLAY_BUTTON_X1 && mousePos.x < PLAY_BUTTON_X2 && mousePos.y > PLAY_BUTTON_Y1 && mousePos.y < PLAY_BUTTON_Y2) {
                     if (button == Input.Buttons.LEFT) {
                         dispose();
-                        game.setScreen(new GameScreen(game, playServices, databaseAndPreferenceManager));
+                        game.setScreen(new GameScreen(game, playServices, databaseManager));
                         return true;
                     }
                 } else if (mousePos.x > HIGH_SCORES_BUTTON_X1 && mousePos.x < HIGH_SCORES_BUTTON_X2 && mousePos.y > HIGH_SCORES_BUTTON_Y1 && mousePos.y < HIGH_SCORES_BUTTON_Y2) {
                     if (button == Input.Buttons.LEFT) {
                         dispose();
-                        game.setScreen(new HighScoreScreen(game, playServices, databaseAndPreferenceManager));
+                        game.setScreen(new HighScoreScreen(game, playServices, databaseManager));
                         return true;
                     }
                 } else if (mousePos.x > SETTINGS_BUTTON_X1 && mousePos.x < SETTINGS_BUTTON_X2 && mousePos.y > SETTINGS_BUTTON_Y1 && mousePos.y < SETTINGS_BUTTON_Y2) {
                     if (button == Input.Buttons.LEFT) {
                         dispose();
-                        game.setScreen(new SettingsScreen(game, playServices, databaseAndPreferenceManager));
+                        game.setScreen(new SettingsScreen(game, playServices, databaseManager));
                         return true;
                     }
                 } else if (mousePos.x > SOUND_BUTTON_X1 && mousePos.x < SOUND_BUTTON_X1 + SOUND_ICON_WIDTH &&
@@ -506,7 +506,7 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
 
     private void resetScreen() {
         dispose();
-        game.setScreen(new MainMenuScreen(game, playServices, databaseAndPreferenceManager));
+        game.setScreen(new MainMenuScreen(game, playServices, databaseManager));
     }
 
     private void removeAds() {

@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
@@ -32,7 +31,7 @@ import io.github.patpatchpatrick.alphapigeon.dodgeables.PowerUps;
 import io.github.patpatchpatrick.alphapigeon.levels.Gameplay;
 import io.github.patpatchpatrick.alphapigeon.resources.AccelerometerController;
 import io.github.patpatchpatrick.alphapigeon.resources.BodyData;
-import io.github.patpatchpatrick.alphapigeon.resources.DatabaseAndPreferenceManager;
+import io.github.patpatchpatrick.alphapigeon.resources.DatabaseManager;
 import io.github.patpatchpatrick.alphapigeon.resources.GameVariables;
 import io.github.patpatchpatrick.alphapigeon.resources.HighScore;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
@@ -54,7 +53,7 @@ public class GameScreen implements Screen {
     public State state = State.RUN;
     private boolean gameIsOver = false;
     private PlayServices playServices;
-    private DatabaseAndPreferenceManager databaseAndPreferenceManager;
+    private DatabaseManager databaseManager;
     private InputProcessor inputProcessor;
 
     private OrthographicCamera camera;
@@ -84,10 +83,10 @@ public class GameScreen implements Screen {
     private final float PAUSE_RESUME_BUTTON_X1 = 0.8f;
     private final float PAUSE_RESUME_BUTTON_Y1 = 44.4f;
 
-    public GameScreen(AlphaPigeon game, PlayServices playServices, DatabaseAndPreferenceManager databaseAndPreferenceManager) {
+    public GameScreen(AlphaPigeon game, PlayServices playServices, DatabaseManager databaseManager) {
         this.game = game;
         this.playServices = playServices;
-        this.databaseAndPreferenceManager = databaseAndPreferenceManager;
+        this.databaseManager = databaseManager;
 
         world = new World(new Vector2(0, 0), true);
 
@@ -470,7 +469,7 @@ public class GameScreen implements Screen {
                     world.destroyBody(bodies.get(i));
                 }
                 dispose();
-                game.setScreen(new GameOverScreen(game, playServices, databaseAndPreferenceManager, highScore));
+                game.setScreen(new GameOverScreen(game, playServices, databaseManager, highScore));
 
             }
         });
