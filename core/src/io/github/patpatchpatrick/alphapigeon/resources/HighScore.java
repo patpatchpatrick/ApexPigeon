@@ -94,7 +94,7 @@ public class HighScore {
             int highScoreFormatted = (int) (currentScore);
 
             //Build the url to submit a new high score to network
-            StringBuilder urlScoreReq = new StringBuilder("http://dreamlo.com/lb/XtrQXD_4BUGkPBmdz2WSUg3OwYKXHfZUqIcuUscCsXUw/add/");
+            StringBuilder urlScoreReq = new StringBuilder("https://dreamlo.com/lb/XtrQXD_4BUGkPBmdz2WSUg3OwYKXHfZUqIcuUscCsXUw/add/");
             urlScoreReq.append(SettingsManager.userName.trim());
             urlScoreReq.append("/");
             urlScoreReq.append(highScoreFormatted);

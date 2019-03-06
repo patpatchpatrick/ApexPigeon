@@ -545,7 +545,13 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
             public void keyTyped(TextField textField, char c) {
 
                 //Trim the spaces off the end of the user name
+                //Ensure there are no asteriks in the user name (asteriks are not allowed for online leaderboard)
                 String userNameString = userNameTextField.getText().trim();
+                if (userNameString.indexOf('*') != -1){
+                    userNameString = "";
+                    userNameTextField.setText(userNameString);
+                }
+
 
                 //Update the user's username in the shared prefs when it is changed
                 SettingsManager.setUserName(userNameString);
