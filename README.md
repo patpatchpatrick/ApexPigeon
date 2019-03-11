@@ -6,11 +6,11 @@
 
 <b>[Download Android Version</b>](https://www.amazon.com/Patrick-Doyle-Alpha-Pigeon/dp/B07PJXBS25/ref=sr_1_1?keywords=alpha+pigeon&qid=1552340070&s=mobile-apps&sr=1-1)
 
-*Disaster has struck.  While the other birds fly away, you fly towards it.
+* Disaster has struck.  While the other birds fly away, you fly towards it.
 
-*Earn global high scores.  Try and top the online leaderboard and beat your peers!
+* Earn global high scores.  Try and top the online leaderboard and beat your peers!
 
-*Fly as far as possible while dodging objects along the way.
+* Fly as far as possible while dodging objects along the way.
 
 ![Screenshots](https://raw.githubusercontent.com/patpatchpatrick/alphapigeon/master/docs/gameplay1.gif)
 ![Screenshots](https://raw.githubusercontent.com/patpatchpatrick/alphapigeon/master/docs/gameplay2.gif)
