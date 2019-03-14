@@ -264,7 +264,7 @@ public class UFOs {
 
     public void update() {
 
-        float currentTimeInMillis = Gameplay.totalGameTime;
+        float currentTime = Gameplay.totalGameTime;
 
 
         //Update all ufos
@@ -274,7 +274,7 @@ public class UFOs {
         //After the energy ball width matches the beam width, it is fully charged and ready spawn an energy beam object
         for (UFO ufo : activeUFOs) {
             if (!ufo.energyBallIsSpawned) {
-                if (currentTimeInMillis - ufo.spawnTime > ENERGY_BALL_TIME_BEFORE_SPAWN) {
+                if (currentTime - ufo.spawnTime > ENERGY_BALL_TIME_BEFORE_SPAWN) {
                     //Spawn an energy ball after a set amount of time (seconds) if it is not spawned
                     spawnEnergyBalls(ufo);
                 }
