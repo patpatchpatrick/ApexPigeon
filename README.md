@@ -26,7 +26,7 @@ The Libgdx framework comes with a "Core" module along with modules for Desktop, 
 
 ## Screens
 
-The game was built using only four main screens for simplicity sake.  A main menu screen, a game screen (primary screen which houses the gameplay), a high score screen and a settings screen.  The user can select which screen they want to access from the main menu.  Each screen also provides access to the main menu screen via a back arrow button. There is a fifth screen, game over screen, that is shown when the Pigeon crashes.  
+The game was built using only four main screens for simplicity sake.  A main menu screen, a game screen (primary screen which houses the gameplay), a high score screen and a settings screen.  The user can select which screen they want to access from the main menu.  Each screen also provides access to the main menu screen via a back arrow button. There is a fifth screen, game over screen, that is shown when the Pigeon crashes.  
 
 ![Screenshots](https://raw.githubusercontent.com/patpatchpatrick/alphapigeon/master/docs/readmeimg/RMImageOne.png)
 
@@ -47,7 +47,7 @@ The creation process for a dodgeable object looked like so:
 2. Use Physics Body Editor Tool to outline the collision skeleton of the object and generate a JSON Box2D object
 3. Create a new class in the game to represent the sprite (LevelTwoBird, in this case)
 4. Within the new dodgeable class, create a new Box2D body within constructor method.  The Box2D body is created using several Box2D tools (BodyDefs and Fixtures) which I won't go into detail on, and is generated using the JSON file from step 2.    
-5. Create a sprite sheet image for the object (using Photoshop) for the animation of the object.  The animation is created using the Libgdx TextureRegion class which I won't get into detail on.     
+5. Create a sprite sheet image for the object (using Photoshop) for the animation of the object.  The animation is created using the Libgdx TextureRegion class which I won't get into detail on.    
 The primary Pigeon object itself was created using the same process, but instead of extending the "Dodgeable" abstract class and being part of the "Dodgeables" class, the Pigeon has it's own class since it has special functionality being the primary user-controlled sprite in the game.
 
 *Physics Body Editor Tool for "Level Two Bird"*
@@ -67,7 +67,7 @@ The primary Pigeon object itself was created using the same process, but instead
 User input for all screens in the game are controlled using an "InputProcessor" and/or the mobile device accelerometer (if the game is played on a mobile device).  An InputProcessor is essentially a Libgdx class which reads and provides the user input so that it can be used to manipulate objects in the game accordingly.  The accelerometer is the tool that reads which direction the mobile device is tilted and the angle that it is tilted.  An AccelerometerController class was created to help process accelerometer input for the game. 
 
 
-The Alpha Pigeon game uses very simple user controls.  The keyboard, mouse or accelerometer (if using a mobile device) can be used to control the direction that the Pigeon moves.  If a key is pressed, a constant force is applied to the center of the Pigeon object's body depending on which key was pressed.  If the mouse is clicked on the screen, a constant force is applied to the Pigeon object.  The force's magnitude and angle are calculated using a vector between the Pigeon's location and the click location.  If the mobile device is tilted and the accelerometer is being used, a force is applied to the Pigeon proportional to the tilt of the accelerometer.  The accelerometer input is adjusted based on the orientation of the particular mobile device.  (Note: there is a SettingsScreen which allows the user to enable/disable the accelerometer and touch input as well as adjust the input sensitivity) Examples of the input control setup can be seen below:
+The Alpha Pigeon game uses very simple user controls.  The keyboard, mouse or accelerometer (if using a mobile device) can be used to control the direction that the Pigeon moves.  If a key is pressed, a constant force is applied to the center of the Pigeon object's body depending on which key was pressed.  If the mouse is clicked on the screen, a constant force is applied to the Pigeon object.  The force's magnitude and angle are calculated using a vector between the Pigeon's location and the click location.  If the mobile device is tilted and the accelerometer is being used, a force is applied to the Pigeon proportional to the tilt of the accelerometer.  The accelerometer input is adjusted based on the orientation of the particular mobile device.  (Note: there is a SettingsScreen which allows the user to enable/disable the accelerometer and touch input as well as adjust the input sensitivity)  Examples of the input control setup can be seen below:
 
 *Input Processor (Keys)*
 
@@ -190,7 +190,7 @@ Collisions are detected using a contactListener, one of Box2D's helpful tools.  
 Every object in the game is instantiated using a categoryBit and a maskBit.   A categoryBit is essentially a way to group different types of object based on how they should handle collisions.  For example, a Meteor dodgeable/enemy has a categoryBit of CATEGORY_METEOR, which is a short.  Each enemy/dodgeable has it's own categoryBit.
 
 
-A maskBit represents how each object should handle collisions with other objects (i.e. other categoryBits).  For example, a Meteor dodgeable has a maskBit of CATEGORY_PIGEON | CATEGORY_LEVEL_ONE_BIRD | CATEGORY_LEVEL_TWO_BIRD.What this means, is that a Meteor object can come into contact with only a pigeon, level one bird, or level two bird.  It cannot contact any other enemies (i.e. it cannot collide or exert forces on any other objects).  
+A maskBit represents how each object should handle collisions with other objects (i.e. other categoryBits).  For example, a Meteor dodgeable has a maskBit of CATEGORY_PIGEON | CATEGORY_LEVEL_ONE_BIRD | CATEGORY_LEVEL_TWO_BIRD. What this means, is that a Meteor object can come into contact with only a pigeon, level one bird, or level two bird.  It cannot contact any other enemies (i.e. it cannot collide or exert forces on any other objects).  
 
 
 Different objects/enemies in the game have different categoryBits and maskBits depending on how they should physically interact with other objects (see screenshot below, these variables are all stored in the GameVariables class).  It is important to note that a contact will only occur if an object's body has a maskBit applied that allows for contact with the object's categoryBit with which it collides.
@@ -203,7 +203,7 @@ If two objects are able to contact one another, then the contactListener within 
 
 Boolean logic is used at the bottom of the  beginContact method to determine how to handle the type of contact that occurred.  Many different scenarios can occur depending on what type of contact has occurred (e.g.  Pigeon can receive a powerUp, Pigeon can be teleported, Other Enemies can be killed if the Pigeon is powered up with a shield) but most importantly, if the Pigeon does not have a shield and comes into contact with any enemy, the game is officially over and the gameOver() method is called.  
 
-![Screenshots](https://raw.githubusercontent.com/patpatchpatrick/alphapigeon/master/docs/readmeimg/RMImageTwentyThree.png)
+![Screenshots](https://raw.githubusercontent.com/patpatchpatrick/alphapigeon/master/docs/readmeimg/RMImageTwentyThree.PNG)
 
 
 When the game is over, the GameOverScreen displays.  
@@ -220,7 +220,7 @@ Keeping track of the score in the game is relatively straight forward.  A HighSc
 
 #### Check if New High Score
 	
-When the game is over, the checkForNewHighScoreAndUpdateNetworkAndDatabase() method is called and does exactly what the method title states, it checks if there is a new High Score and updates preferences/database/network accordingly. When the game is over, firstly, the current High Score is grabbed via the SettingsManager.  The SettingsManager pulls the score from the Preferences.  If the currentScore that the user attained is greater than the current high score, then the currentScore becomes the new current high score and a new high score was earned.
+When the game is over, the checkForNewHighScoreAndUpdateNetworkAndDatabase() method is called and does exactly what the method title states, it checks if there is a new High Score and updates preferences/database/network accordingly. When the game is over, firstly, the current High Score is grabbed via the SettingsManager.  The SettingsManager pulls the score from the Preferences.  If the currentScore that the user attained is greater than the current high score, then the currentScore becomes the new current high score and a new high score was earned.
 
 
 The high score is then added to the shared preferences and database (in the Android module of the game, an SQLite database is used to keep track of all scores using a Provider.  I will not go into details on how this is done but please see the Android module for details). 
@@ -237,11 +237,11 @@ An online database called DreamLo is used to keep track of high scores for the g
 
 The user's name is retrieved using a TextField within the MainMenuScreen.  When the game is launched, the user is prompted to enter their name.  This name is then stored in the SettingsManager Preferences after it is entered by the user.  I'm not going to detail the code here, since it is relatively straight forward.  It can be seen within the MainMenuScreen class.
 
-![Screenshots](https://raw.githubusercontent.com/patpatchpatrick/alphapigeon/master/docs/readmeimg/RMImageTwentySeven.png)
+![Screenshots](https://raw.githubusercontent.com/patpatchpatrick/alphapigeon/master/docs/readmeimg/RMImageTwentySeven.PNG)
  
 #### HighScoresScreen and Retrieving High Scores from Leaderboard / Network
 
-The online leaderboard and user scores can be seen using the HighScoresScreen which can be accessed via the main menu.  The user can either use the Local button to see the local scores (scores from SettingsManager Preferences or scores from the Android Database) or they can use the Global button to see the global scores from the network.If the user clicks the "Rank" button, they will see their current Rank on the leaderboard and their current score.  If they click the "Top" button, they will see the Global top 1000 scores for all players.  These scores are retrieved using an HTTP Get Request and HttpResponseListener.  Depending on which button is clicked, the appropriate method and corresponding Http GET Request is called, and the HttpResponseListener will return the response. 
+The online leaderboard and user scores can be seen using the HighScoresScreen which can be accessed via the main menu.  The user can either use the Local button to see the local scores (scores from SettingsManager Preferences or scores from the Android Database) or they can use the Global button to see the global scores from the network.  If the user clicks the "Rank" button, they will see their current Rank on the leaderboard and their current score.  If they click the "Top" button, they will see the Global top 1000 scores for all players.  These scores are retrieved using an HTTP Get Request and HttpResponseListener.  Depending on which button is clicked, the appropriate method and corresponding Http GET Request is called, and the HttpResponseListener will return the response. 
 
 ![Screenshots](https://raw.githubusercontent.com/patpatchpatrick/alphapigeon/master/docs/readmeimg/RMImageTwentyEight.png)
 
@@ -313,7 +313,7 @@ Creating an HTML/GWT version of the game ended up being a major challenge.  HTML
 
 I had a really unique UFO enemy/dodgeable that I used in my game.  Each UFO had the ability to shoot an energy beam in any direction.  The energy beam originates as an energy ball that slowly grows over time until it eventually becomes an energy beam.  This was an interesting and fun challenge to set up from both a rendering perspective and an object perspective.  
 	
-![Screenshots](https://raw.githubusercontent.com/patpatchpatrick/alphapigeon/master/docs/readmeimg/RMImageThirtyEight.GIF)
+![Screenshots](https://raw.githubusercontent.com/patpatchpatrick/alphapigeon/master/docs/gameplay1.gif)
 	
 For all UFOs, I created an Array of EnergyBalls and EnergyBeams associated with each UFO that could be used to track the balls/beams linked to the UFO.  Then, using the initialization/spawn parameters for the UFO I could determine how many balls/beams to generate for each UFO and in which direction they should spawn. 
 	
