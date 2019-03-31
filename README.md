@@ -1,12 +1,12 @@
 =======
-# Alpha Pigeon - Arcade "Runner" Game
+# Apex Pigeon - Arcade "Runner" Game
 ![Screenshots](https://raw.githubusercontent.com/patpatchpatrick/alphapigeon/master/docs/cover.png)
 
 [<b>Play Online</b>](https://patpatchpatrick.itch.io/alpha-pigeon)
 
 <b>[Download Android Version</b>](https://www.amazon.com/Patrick-Doyle-Alpha-Pigeon/dp/B07PJXBS25/ref=sr_1_1?keywords=alpha+pigeon&qid=1552340070&s=mobile-apps&sr=1-1)
 
-* Disaster has struck.  While the other birds fly away, you fly towards it.
+* Disaster has struck.  While the other birds fly away, you (the Apex Pigeon) fly towards it.
 
 * Fly as far as possible while dodging objects along the way.
 
@@ -67,7 +67,7 @@ The primary Pigeon object itself was created using the same process, but instead
 User input for all screens in the game are controlled using an "InputProcessor" and/or the mobile device accelerometer (if the game is played on a mobile device).  An InputProcessor is essentially a Libgdx class which reads and provides the user input so that it can be used to manipulate objects in the game accordingly.  The accelerometer is the tool that reads which direction the mobile device is tilted and the angle that it is tilted.  An AccelerometerController class was created to help process accelerometer input for the game. 
 
 
-The Alpha Pigeon game uses very simple user controls.  The keyboard, mouse or accelerometer (if using a mobile device) can be used to control the direction that the Pigeon moves.  If a key is pressed, a constant force is applied to the center of the Pigeon object's body depending on which key was pressed.  If the mouse is clicked on the screen, a constant force is applied to the Pigeon object.  The force's magnitude and angle are calculated using a vector between the Pigeon's location and the click location.  If the mobile device is tilted and the accelerometer is being used, a force is applied to the Pigeon proportional to the tilt of the accelerometer.  The accelerometer input is adjusted based on the orientation of the particular mobile device.  (Note: there is a SettingsScreen which allows the user to enable/disable the accelerometer and touch input as well as adjust the input sensitivity)  Examples of the input control setup can be seen below:
+The Apex Pigeon game uses very simple user controls.  The keyboard, mouse or accelerometer (if using a mobile device) can be used to control the direction that the Pigeon moves.  If a key is pressed, a constant force is applied to the center of the Pigeon object's body depending on which key was pressed.  If the mouse is clicked on the screen, a constant force is applied to the Pigeon object.  The force's magnitude and angle are calculated using a vector between the Pigeon's location and the click location.  If the mobile device is tilted and the accelerometer is being used, a force is applied to the Pigeon proportional to the tilt of the accelerometer.  The accelerometer input is adjusted based on the orientation of the particular mobile device.  (Note: there is a SettingsScreen which allows the user to enable/disable the accelerometer and touch input as well as adjust the input sensitivity)  Examples of the input control setup can be seen below:
 
 *Input Processor (Keys)*
 
@@ -178,7 +178,7 @@ When the dodgeables update() method is run, the update() method for all of the g
 
 Arrays are also used to keep track of the active dodgeables.  Arrays are used slightly differently than the pools.  They are primarily used to keep track of all Active Dodgeables for purposes of in-game powerups.  For example, there is an 'in-game' powerUp that immediately destroys all active enemies.  An Active Dodgeables Array can be used to intuitively destroy all active enemies and free them to be reused in  their respective pools.  For more details on how this works, please check out the powerUp() method of the Pigeon class.   
 
-As mentioned above, when a dodgeable is spawned, it is obtained from a Pool and subsequently initialized using the object's init() method.  This will provide the spawn parameters to the object.  All the dodgeable enemies in the Alpha Pigeon game are unique and are initialized in different ways, but most objects are initialized by applying a force to the center of the object's body to accelerate it across the screen.  For example, LevelOneBirds are initialized in a random vertical position and receive a horizontal force applied to them to accelerate them across the screen.  The force with which they are accelerated is generated using a "force multiplier" which is a method used to ensure that the LevelOneBird's speed proportionally increases as the Pigeon's speed increases over time.  This gives the illusion that the Pigeon is flying faster using the magic of relative velocity.  
+As mentioned above, when a dodgeable is spawned, it is obtained from a Pool and subsequently initialized using the object's init() method.  This will provide the spawn parameters to the object.  All the dodgeable enemies in the Apex Pigeon game are unique and are initialized in different ways, but most objects are initialized by applying a force to the center of the object's body to accelerate it across the screen.  For example, LevelOneBirds are initialized in a random vertical position and receive a horizontal force applied to them to accelerate them across the screen.  The force with which they are accelerated is generated using a "force multiplier" which is a method used to ensure that the LevelOneBird's speed proportionally increases as the Pigeon's speed increases over time.  This gives the illusion that the Pigeon is flying faster using the magic of relative velocity.  
  
 ![Screenshots](https://raw.githubusercontent.com/patpatchpatrick/alphapigeon/master/docs/readmeimg/RMImageTwentyOne.png)
 
