@@ -2,7 +2,7 @@
 # Apex Pigeon - Arcade "Runner" Game
 ![Screenshots](https://raw.githubusercontent.com/patpatchpatrick/alphapigeon/master/docs/cover.png)
 
-[<b>Play Online</b>](https://patpatchpatrick.itch.io/alpha-pigeon)
+[<b>Play Online (Use Firefox or Edge if Chrome Does Not Work)</b>](https://patpatchpatrick.itch.io/alpha-pigeon)
 
 <b>[Download Android Version</b>](https://www.amazon.com/Patrick-Doyle-Alpha-Pigeon/dp/B07PJXBS25/ref=sr_1_1?keywords=alpha+pigeon&qid=1552340070&s=mobile-apps&sr=1-1)
 
