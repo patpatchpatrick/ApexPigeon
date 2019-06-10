@@ -303,7 +303,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks, Net.HttpRespons
         }
 
         //Build the url to get scores for a particular user
-        StringBuilder urlScoreReq = new StringBuilder("https://dreamlo.com/lb/5c79d6943eba35041cb5f9e1/pipe-get/");
+        StringBuilder urlScoreReq = new StringBuilder("http://dreamlo.com/lb/5c79d6943eba35041cb5f9e1/pipe-get/");
         urlScoreReq.append(user + "/");
         String urlString = urlScoreReq.toString();
 
@@ -321,8 +321,10 @@ public class HighScoreScreen implements Screen, MobileCallbacks, Net.HttpRespons
         //game.  The game will display the scores on the HighScoresScreen
 
         //Build the url to get JSON scores
-        StringBuilder urlScoreReq = new StringBuilder("https://dreamlo.com/lb/5c79d6943eba35041cb5f9e1/json/");
+        StringBuilder urlScoreReq = new StringBuilder("http://dreamlo.com/lb/5c79d6943eba35041cb5f9e1/json/");
         String urlString = urlScoreReq.toString();
+
+        System.out.println("Requesting TOP SCORES!");
 
         HttpRequestBuilder requestBuilder = new HttpRequestBuilder();
         Net.HttpRequest httpRequest = requestBuilder.newRequest().method(Net.HttpMethods.GET).url(urlString).build();
@@ -671,6 +673,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks, Net.HttpRespons
     @Override
     public void handleHttpResponse(Net.HttpResponse httpResponse) {
 
+        System.out.println("HTTP RESPONSE RECEIVED");
         parseHttpScoresResponse(httpResponse.getResultAsString());
 
     }
@@ -678,6 +681,9 @@ public class HighScoreScreen implements Screen, MobileCallbacks, Net.HttpRespons
     @Override
     public void failed(Throwable t) {
 
+        System.out.println("HTTP FAILED");
+        System.out.println(t.getCause());
+        System.out.println(t.getMessage());
     }
 
     @Override

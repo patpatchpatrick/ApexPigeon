@@ -94,12 +94,16 @@ public class HighScore {
             int highScoreFormatted = (int) (currentScore);
 
             //Build the url to submit a new high score to network
-            StringBuilder urlScoreReq = new StringBuilder("https://dreamlo.com/lb/XtrQXD_4BUGkPBmdz2WSUg3OwYKXHfZUqIcuUscCsXUw/add/");
+            StringBuilder urlScoreReq = new StringBuilder("http://dreamlo.com/lb/XtrQXD_4BUGkPBmdz2WSUg3OwYKXHfZUqIcuUscCsXUw/add/");
+            System.out.println("URL SCORE!");
+            System.out.println(urlScoreReq);
             urlScoreReq.append(SettingsManager.userName.trim());
             urlScoreReq.append("/");
             urlScoreReq.append(highScoreFormatted);
             urlScoreReq.append("/");
             String urlString = urlScoreReq.toString();
+            System.out.println("URL SCORE!");
+            System.out.println(urlScoreReq);
 
             //Submit the score (the GameOverScreen handles the HTTP response)
             HttpRequestBuilder requestBuilder = new HttpRequestBuilder();
