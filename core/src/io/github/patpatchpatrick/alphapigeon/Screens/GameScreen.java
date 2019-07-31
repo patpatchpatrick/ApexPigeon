@@ -110,7 +110,7 @@ public class GameScreen implements Screen {
 
         // initialize game resources
         this.scrollingBackground = new ScrollingBackground();
-        this.highScore = new HighScore();
+        this.highScore = new HighScore(game);
         this.pigeon = new Pigeon(world, game, this);
         this.dodgeables = new Dodgeables(this.pigeon, world, game, camera);
         pigeonBody = this.pigeon.getBody();

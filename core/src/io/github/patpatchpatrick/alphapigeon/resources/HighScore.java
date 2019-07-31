@@ -6,9 +6,12 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.net.HttpRequestBuilder;
 
+import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
+
 
 public class HighScore {
 
+    public AlphaPigeon game;
     public static float currentScore;
     public static float currentHighScore = 0;
     private String scoreString;
@@ -18,8 +21,9 @@ public class HighScore {
     private BitmapFont font;
     private Boolean pigeonHasNotCrashed = true;
 
-    public HighScore() {
+    public HighScore(AlphaPigeon game) {
 
+        this.game = game;
         // set default currentScore and create and set up the font used for the high currentScore display
         currentScore = 0;
         scoreString = "Distance: 0";
@@ -54,7 +58,7 @@ public class HighScore {
         font.draw(batch, scoreString, 60, 45);
     }
 
-    public static boolean checkForNewHighScoreAndUpdateNetworkAndDatabase(DatabaseManager databaseManager, Net.HttpResponseListener listener) {
+    public static boolean checkForNewHighScoreAndUpdateNetworkAndDatabase(AlphaPigeon game, DatabaseManager databaseManager) {
 
         //Update local game stats (high scores, total number of games, etc..) data for the user after a game is complete
         //For Android/Mobile devices, use the database manager to insert score history into mobile SQLITE db
@@ -79,36 +83,20 @@ public class HighScore {
         SettingsManager.increaseTotalNumGames();
 
         //Update leaderboard via network HTTP get request if there was a new high score
-        boolean newHighScoreSubmitted = submitNewHighScoreToNetwork(listener);
+        boolean newHighScoreSubmitted = submitNewHighScoreToNetwork(game);
 
         return newHighScoreSubmitted;
 
     }
 
-    private static boolean submitNewHighScoreToNetwork(Net.HttpResponseListener listener) {
+    private static boolean submitNewHighScoreToNetwork(AlphaPigeon game) {
 
         //Submit high score to network if there is a high score (and return true), otherwise return false
         if (newHighScore) {
 
             //Format the high score for the dreamlo leaderboard and submit the score via HTTP Get Request
-            int highScoreFormatted = (int) (currentScore);
-
-            //Build the url to submit a new high score to network
-            StringBuilder urlScoreReq = new StringBuilder("http://dreamlo.com/lb/XtrQXD_4BUGkPBmdz2WSUg3OwYKXHfZUqIcuUscCsXUw/add/");
-            System.out.println("URL SCORE!");
-            System.out.println(urlScoreReq);
-            urlScoreReq.append(SettingsManager.userName.trim());
-            urlScoreReq.append("/");
-            urlScoreReq.append(highScoreFormatted);
-            urlScoreReq.append("/");
-            String urlString = urlScoreReq.toString();
-            System.out.println("URL SCORE!");
-            System.out.println(urlScoreReq);
-
-            //Submit the score (the GameOverScreen handles the HTTP response)
-            HttpRequestBuilder requestBuilder = new HttpRequestBuilder();
-            Net.HttpRequest httpRequest = requestBuilder.newRequest().method(Net.HttpMethods.GET).url(urlString).build();
-            Gdx.net.sendHttpRequest(httpRequest, listener);
+            long highScoreFormatted = (long) (currentScore * 100);
+            game.appleGameCenter.submitScoreToLeaderboard(highScoreFormatted);
 
             //Reset the high score boolean
             newHighScore = false;

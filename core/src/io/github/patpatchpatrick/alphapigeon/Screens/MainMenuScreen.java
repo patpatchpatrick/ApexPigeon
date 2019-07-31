@@ -434,8 +434,8 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
                     }
                 } else if (mousePos.x > HIGH_SCORES_BUTTON_X1 && mousePos.x < HIGH_SCORES_BUTTON_X2 && mousePos.y > HIGH_SCORES_BUTTON_Y1 && mousePos.y < HIGH_SCORES_BUTTON_Y2) {
                     if (button == Input.Buttons.LEFT) {
-                        dispose();
-                        game.setScreen(new HighScoreScreen(game, playServices, databaseManager));
+                        //If High Scores Button is chosen, display the Apple GameCenter High Scores UI
+                        game.appleGameCenter.showHighScoresUI();
                         return true;
                     }
                 } else if (mousePos.x > SETTINGS_BUTTON_X1 && mousePos.x < SETTINGS_BUTTON_X2 && mousePos.y > SETTINGS_BUTTON_Y1 && mousePos.y < SETTINGS_BUTTON_Y2) {

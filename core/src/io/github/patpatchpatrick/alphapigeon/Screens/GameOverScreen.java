@@ -85,7 +85,7 @@ public class GameOverScreen implements Screen, Net.HttpResponseListener {
         font.setUseIntegerPositions(false);
 
         //Handle submitting high score to network and database/libgdx preferences
-        checkForNewHighScoreAndUpdateNetworkAndDatabase();
+        checkForNewHighScoreAndUpdateNetworkAndDatabase(game);
 
         //Update the high currentScore string to be displayed
         //DecimalFormat df = new DecimalFormat("#.##");
@@ -152,10 +152,10 @@ public class GameOverScreen implements Screen, Net.HttpResponseListener {
 
     }
 
-    private void checkForNewHighScoreAndUpdateNetworkAndDatabase() {
+    private void checkForNewHighScoreAndUpdateNetworkAndDatabase(AlphaPigeon game) {
 
             //Update the local data and network to account for recent game played
-            newHighScoreEarned = HighScore.checkForNewHighScoreAndUpdateNetworkAndDatabase(databaseManager, this);
+            newHighScoreEarned = HighScore.checkForNewHighScoreAndUpdateNetworkAndDatabase(game, databaseManager);
             totalNumGames = SettingsManager.totalNumGames;
 
     }

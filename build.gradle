@@ -22,6 +22,7 @@ allprojects {
     ext {
         appName = "AlphaPigeon"
         gdxVersion = '1.9.8'
+        gamesvcsVersion = '1.0.0'
         roboVMVersion = '2.3.7'
         box2DLightsVersion = '1.4'
         ashleyVersion = '1.7.0'
@@ -45,6 +46,7 @@ project(":desktop") {
         compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.ashley:ashley:1.7.0"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+        compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-desktop:$gamesvcsVersion"
         
     }
 }
@@ -80,6 +82,7 @@ project(":android") {
         implementation "com.google.android.gms:play-services-auth:16.0.0"
         implementation 'com.google.android.gms:play-services-ads:17.1.1'
         implementation 'com.android.billingclient:billing:1.2'
+        compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-android:$gamesvcsVersion"
         
     }
 }
@@ -98,6 +101,7 @@ project(":ios") {
         compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-ios"
         compile "com.badlogicgames.ashley:ashley:1.7.0"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-ios"
+        compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-ios-gamecenter:$gamesvcsVersion"
         
     }
 }
@@ -129,6 +133,7 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+        compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-core:$gamesvcsVersion"
         
     }
 }

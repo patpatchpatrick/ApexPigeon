@@ -89,8 +89,8 @@ public class HighScoreScreen implements Screen, MobileCallbacks, Net.HttpRespons
     //--Button selected will determine type of score and request to make from network/databases
     public static final int LOCAL_BUTTON = 2;
     public static final int GLOBAL_BUTTON_RANK = 3;
-    public static final int GLOBAL_BUTTON_TOP_DAY = 4;
-    public static final int GLOBAL_BUTTON_TOP_WEEK = 5;
+    //public static final int GLOBAL_BUTTON_TOP_DAY = 4;
+    //public static final int GLOBAL_BUTTON_TOP_WEEK = 5;
     public static final int GLOBAL_BUTTON_TOP_ALLTIME = 6;
     private int currentButtonSelected = LOCAL_BUTTON;
 
@@ -137,8 +137,8 @@ public class HighScoreScreen implements Screen, MobileCallbacks, Net.HttpRespons
         globalButtonTexture = new Texture(Gdx.files.internal("textures/highscoresscreen/GlobalLocalButtonsGSelected.png"));
         localButtonTexture = new Texture(Gdx.files.internal("textures/highscoresscreen/GlobalLocalButtonsLSelected.png"));
         rankButtonTexture = new Texture(Gdx.files.internal("textures/highscoresscreen/RankTopButtonRank.png"));
-        topDayButtonTexture = new Texture(Gdx.files.internal("textures/highscoresscreen/RankTopButtonTopDay.png"));
-        topWeekButtonTexture = new Texture(Gdx.files.internal("textures/highscoresscreen/RankTopButtonTopWeek.png"));
+        //topDayButtonTexture = new Texture(Gdx.files.internal("textures/highscoresscreen/RankTopButtonTopDay.png"));
+        //topWeekButtonTexture = new Texture(Gdx.files.internal("textures/highscoresscreen/RankTopButtonTopWeek.png"));
         topAllTimeButtonTexture = new Texture(Gdx.files.internal("textures/highscoresscreen/RankTopButtonTopAllTime.png"));
 
         //Request local scores from database by default
@@ -247,16 +247,16 @@ public class HighScoreScreen implements Screen, MobileCallbacks, Net.HttpRespons
         //Request scores from network or database depending on the button selected and type of scores needed
 
         switch (currentButtonSelected) {
-            case GLOBAL_BUTTON_TOP_DAY:
+        /*    case GLOBAL_BUTTON_TOP_DAY:
                 //Request top scores from the network
                 //When scores are received, high score scrollpane is updated with values
                 retrieveTopScores();
-                break;
-            case GLOBAL_BUTTON_TOP_WEEK:
+                break; */
+          /*  case GLOBAL_BUTTON_TOP_WEEK:
                 //Request top scores from the network
                 //When scores are received, high score scrollpane is updated with values
                 retrieveTopScores();
-                break;
+                break; */
             case GLOBAL_BUTTON_TOP_ALLTIME:
                 //Request top scores from the network
                 //When scores are received, high score scrollpane is updated with values
@@ -321,6 +321,10 @@ public class HighScoreScreen implements Screen, MobileCallbacks, Net.HttpRespons
         //game.  The game will display the scores on the HighScoresScreen
 
         //Build the url to get JSON scores
+
+        game.appleGameCenter.showHighScoresUI();
+
+        /*
         StringBuilder urlScoreReq = new StringBuilder("http://dreamlo.com/lb/5c79d6943eba35041cb5f9e1/json/");
         String urlString = urlScoreReq.toString();
 
@@ -328,7 +332,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks, Net.HttpRespons
 
         HttpRequestBuilder requestBuilder = new HttpRequestBuilder();
         Net.HttpRequest httpRequest = requestBuilder.newRequest().method(Net.HttpMethods.GET).url(urlString).build();
-        Gdx.net.sendHttpRequest(httpRequest, this);
+        Gdx.net.sendHttpRequest(httpRequest, this);*/
 
     }
 
@@ -413,8 +417,8 @@ public class HighScoreScreen implements Screen, MobileCallbacks, Net.HttpRespons
         globalButtonTexture.dispose();
         localButtonTexture.dispose();
         rankButtonTexture.dispose();
-        topDayButtonTexture.dispose();
-        topWeekButtonTexture.dispose();
+      //  topDayButtonTexture.dispose();
+      //  topWeekButtonTexture.dispose();
         topAllTimeButtonTexture.dispose();
 
     }
@@ -518,14 +522,14 @@ public class HighScoreScreen implements Screen, MobileCallbacks, Net.HttpRespons
                     if (button == Input.Buttons.LEFT) {
                         //Top button pushed
                         //If the current button pushed does not equal any of the top score buttons, push the TOP_DAY button by default
-                        if (currentButtonSelected != GLOBAL_BUTTON_TOP_DAY && currentButtonSelected != GLOBAL_BUTTON_TOP_WEEK && currentButtonSelected != GLOBAL_BUTTON_TOP_ALLTIME) {
+                        if (currentButtonSelected != GLOBAL_BUTTON_TOP_ALLTIME) {
                             //If the button changes, a new score request is needed and will be made in the update method
                             scoresRequestNeeded = true;
-                            currentButtonSelected = GLOBAL_BUTTON_TOP_DAY;
+                            currentButtonSelected = GLOBAL_BUTTON_TOP_ALLTIME;
                         }
                         return true;
                     }
-                } else if (mousePos.x > DAY_BUTTON_X1 && mousePos.x < DAY_BUTTON_ENDPOINT && mousePos.y > DAY_WEEK_ALLTIME_BUTTON_Y1 && mousePos.y < RANK_AND_TOP_BUTTON_Y1) {
+                } /*else if (mousePos.x > DAY_BUTTON_X1 && mousePos.x < DAY_BUTTON_ENDPOINT && mousePos.y > DAY_WEEK_ALLTIME_BUTTON_Y1 && mousePos.y < RANK_AND_TOP_BUTTON_Y1) {
                     if (button == Input.Buttons.LEFT) {
                         //Top day button pushed
                         if (currentButtonSelected != GLOBAL_BUTTON_TOP_DAY) {
@@ -545,7 +549,7 @@ public class HighScoreScreen implements Screen, MobileCallbacks, Net.HttpRespons
                         currentButtonSelected = GLOBAL_BUTTON_TOP_WEEK;
                         return true;
                     }
-                } else if (mousePos.x > ALL_TIME_BUTTON_X1 && mousePos.x < ALL_TIME_BUTTON_ENDPOINT && mousePos.y > DAY_WEEK_ALLTIME_BUTTON_Y1 && mousePos.y < RANK_AND_TOP_BUTTON_Y1) {
+                } */else if (mousePos.x > ALL_TIME_BUTTON_X1 && mousePos.x < ALL_TIME_BUTTON_ENDPOINT && mousePos.y > DAY_WEEK_ALLTIME_BUTTON_Y1 && mousePos.y < RANK_AND_TOP_BUTTON_Y1) {
                     if (button == Input.Buttons.LEFT) {
                         //Top all time button pushed
                         if (currentButtonSelected != GLOBAL_BUTTON_TOP_ALLTIME) {
@@ -590,10 +594,10 @@ public class HighScoreScreen implements Screen, MobileCallbacks, Net.HttpRespons
         //Depending on the current button selected, return corresponding button texture
 
         switch (currentButtonSelected) {
-            case GLOBAL_BUTTON_TOP_DAY:
+           /* case GLOBAL_BUTTON_TOP_DAY:
                 return topDayButtonTexture;
             case GLOBAL_BUTTON_TOP_WEEK:
-                return topWeekButtonTexture;
+                return topWeekButtonTexture;*/
             case GLOBAL_BUTTON_TOP_ALLTIME:
                 return topAllTimeButtonTexture;
             case GLOBAL_BUTTON_RANK:

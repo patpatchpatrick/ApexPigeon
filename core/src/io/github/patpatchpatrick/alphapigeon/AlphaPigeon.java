@@ -4,15 +4,21 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
+import de.golfgl.gdxgamesvcs.IGameServiceListener;
+import de.golfgl.gdxgamesvcs.NoGameServiceClient;
 import io.github.patpatchpatrick.alphapigeon.Screens.MainMenuScreen;
+import io.github.patpatchpatrick.alphapigeon.resources.AppleGameCenterManager;
 import io.github.patpatchpatrick.alphapigeon.resources.DatabaseManager;
 import io.github.patpatchpatrick.alphapigeon.resources.PlayServices;
 import io.github.patpatchpatrick.alphapigeon.resources.SettingsManager;
 import io.github.patpatchpatrick.alphapigeon.resources.Sounds;
+import de.golfgl.gdxgamesvcs.IGameServiceClient;
 
 public class AlphaPigeon extends Game{
     public SpriteBatch batch;
     public BitmapFont font;
+    protected IGameServiceClient gsClient;
+    public AppleGameCenterManager appleGameCenter;
     private PlayServices playServices;
     private DatabaseManager databaseManager;
 
@@ -31,11 +37,24 @@ public class AlphaPigeon extends Game{
     @Override
     public void create() {
 
+        initializeAppleGameServices();
+
         batch = new SpriteBatch();
         font = new BitmapFont();
         //Set the mobile device database and pref manager on the SettingsManager class
         SettingsManager.databaseManager = databaseManager;
         this.setScreen(new MainMenuScreen(this, playServices, databaseManager));
+
+    }
+
+    private void initializeAppleGameServices(){
+        //Initialize game service client for Apple Game Center
+        if (gsClient == null){
+            gsClient = new NoGameServiceClient();
+        }
+
+       appleGameCenter = new AppleGameCenterManager(gsClient);
+
 
     }
 
@@ -47,6 +66,18 @@ public class AlphaPigeon extends Game{
     @Override
     public void resize(int width, int height) {
 
+    }
+
+    @Override
+    public void pause() {
+        super.pause();
+        appleGameCenter.gsClient.pauseSession();
+    }
+
+    @Override
+    public void resume() {
+        super.resume();
+        appleGameCenter.gsClient.resumeSession();
     }
 
     @Override
