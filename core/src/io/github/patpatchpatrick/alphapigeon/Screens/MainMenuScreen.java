@@ -21,8 +21,6 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.util.ArrayList;
 
-import de.tomgrill.gdxdialogs.core.dialogs.GDXButtonDialog;
-import de.tomgrill.gdxdialogs.core.listener.ButtonClickListener;
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBird;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelTwoBird;

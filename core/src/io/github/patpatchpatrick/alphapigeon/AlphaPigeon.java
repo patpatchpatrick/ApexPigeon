@@ -4,7 +4,6 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-import de.golfgl.gdxgamesvcs.IGameServiceListener;
 import de.golfgl.gdxgamesvcs.NoGameServiceClient;
 import de.tomgrill.gdxdialogs.core.GDXDialogs;
 import de.tomgrill.gdxdialogs.core.GDXDialogsSystem;

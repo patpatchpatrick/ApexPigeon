@@ -9,7 +9,6 @@ import de.golfgl.gdxgamesvcs.IGameServiceListener;
 import de.golfgl.gdxgamesvcs.leaderboard.IFetchLeaderBoardEntriesResponseListener;
 import de.golfgl.gdxgamesvcs.leaderboard.ILeaderBoardEntry;
 import de.tomgrill.gdxdialogs.core.dialogs.GDXButtonDialog;
-import de.tomgrill.gdxdialogs.core.listener.ButtonClickListener;
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 
 public class AppleGameCenterManager {
@@ -19,6 +18,7 @@ public class AppleGameCenterManager {
     public AlphaPigeon game;
     public IFetchLeaderBoardEntriesResponseListener gsLeaderboardListener;
 
+    //Handle calls to Apple Game Center
     public AppleGameCenterManager(AlphaPigeon game, IGameServiceClient client){
         this.game = game;
         this.gsClient = client;
@@ -65,6 +65,7 @@ public class AppleGameCenterManager {
 
     public void submitScoreToLeaderboard(long score){
 
+        //Post high score to leaderboard
         Gdx.app.log(gsClient.getPlayerDisplayName(), gsClient.getGameServiceId());
         gsClient.submitToLeaderboard("apx1", score, "Test");
 
