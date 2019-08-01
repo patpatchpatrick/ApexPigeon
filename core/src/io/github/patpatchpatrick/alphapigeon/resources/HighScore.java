@@ -1,10 +1,10 @@
 package io.github.patpatchpatrick.alphapigeon.resources;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Net;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.net.HttpRequestBuilder;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 
@@ -19,6 +19,7 @@ public class HighScore {
 
     //Fonts
     private BitmapFont font;
+    FreeTypeFontGenerator generator;
     private Boolean pigeonHasNotCrashed = true;
 
     public HighScore(AlphaPigeon game) {
@@ -29,8 +30,14 @@ public class HighScore {
         scoreString = "Distance: 0";
 
         //Initialize FONTS
-        font = new BitmapFont(Gdx.files.internal("fonts/arial-15.fnt"),
-                Gdx.files.internal("fonts/arial-15.png"), false);
+
+        generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/univers.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = 14;
+        parameter.minFilter = Texture.TextureFilter.Linear;
+        parameter.magFilter = Texture.TextureFilter.Linear;
+        font = generator.generateFont(parameter);
+        font.setColor(1.0f, 1.0f, 1.0f, 1.0f);
         font.getData().setScale(0.1f);
         font.setUseIntegerPositions(false);
     }
@@ -52,9 +59,8 @@ public class HighScore {
     }
 
     public void render(SpriteBatch batch) {
-        // display currentScore
 
-        font.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+        // display currentScore
         font.draw(batch, scoreString, 60, 45);
     }
 

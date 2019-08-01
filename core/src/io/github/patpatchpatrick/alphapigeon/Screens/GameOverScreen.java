@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
@@ -52,7 +53,8 @@ public class GameOverScreen implements Screen, Net.HttpResponseListener {
 
     //Fonts
     private String gameOverString;
-    private BitmapFont font;
+    private BitmapFont scoreFont;
+    FreeTypeFontGenerator generator;
 
     public GameOverScreen(AlphaPigeon game, PlayServices playServices, DatabaseManager databaseManager, HighScore highScore) {
 
@@ -78,11 +80,16 @@ public class GameOverScreen implements Screen, Net.HttpResponseListener {
         gameOverBackground = new Texture(Gdx.files.internal("textures/gameoverscreen/GameOverScreen.png"));
         newHighScoreTexture = new Texture(Gdx.files.internal("textures/gameoverscreen/NewHighScore.png"));
 
-        //Initialize FONTS
-        font = new BitmapFont(Gdx.files.internal("fonts/arial-15.fnt"),
-                Gdx.files.internal("fonts/arial-15.png"), false);
-        font.getData().setScale(0.1f);
-        font.setUseIntegerPositions(false);
+        //Initialize font generator
+        generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/univers.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = 20;
+        parameter.minFilter = Texture.TextureFilter.Linear;
+        parameter.magFilter = Texture.TextureFilter.Linear;
+        scoreFont = generator.generateFont(parameter);
+        scoreFont.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+        scoreFont.getData().setScale(0.1f);
+        scoreFont.setUseIntegerPositions(false);
 
         //Handle submitting high score to network and database/libgdx preferences
         checkForNewHighScoreAndUpdateNetworkAndDatabase(game);
@@ -138,7 +145,7 @@ public class GameOverScreen implements Screen, Net.HttpResponseListener {
         game.batch.draw(gameOverBackground, 0, 0, camera.viewportWidth, camera.viewportHeight);
 
         //Font
-        font.draw(game.batch, gameOverString, 34, 27);
+        scoreFont.draw(game.batch, gameOverString, 29, 30);
 
         //If a new high score was achieved, draw the new high score texture (then when the back button is pushed,
         //reset the newHighScoreEarned boolean to false
@@ -261,7 +268,7 @@ public class GameOverScreen implements Screen, Net.HttpResponseListener {
         gameOverBackground.dispose();
 
         //Fonts
-        font.dispose();
+        scoreFont.dispose();
     }
 
 

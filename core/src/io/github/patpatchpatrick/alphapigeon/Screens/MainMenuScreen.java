@@ -21,6 +21,8 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.util.ArrayList;
 
+import de.tomgrill.gdxdialogs.core.dialogs.GDXButtonDialog;
+import de.tomgrill.gdxdialogs.core.listener.ButtonClickListener;
 import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelOneBird;
 import io.github.patpatchpatrick.alphapigeon.dodgeables.MovingObjects.LevelTwoBird;
@@ -179,8 +181,7 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
 
         createTextField();
 
-        //TODO when releasinng on Android or mobile, re-enable this setting
-        //Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
+        Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
 
 
     }
@@ -219,20 +220,8 @@ public class MainMenuScreen implements Screen, MobileCallbacks {
         game.batch.draw(levelTwoCurrentFrame, levelTwoBirdXPosition, levelTwoBirdYPosition, 0, 0, LevelTwoBird.WIDTH, LevelTwoBird.HEIGHT, 1, 1, 0);
         game.batch.draw(levelTwoCurrentFrame, levelTwoBirdTwoXPosition, levelTwoBirdTwoYPosition, 0, 0, LevelTwoBird.WIDTH, LevelTwoBird.HEIGHT, 1, 1, 0);
         game.batch.draw(mainMenuLogoAndText, 0, 0, camera.viewportWidth, camera.viewportHeight);
-
-        //If the user has not entered a username, display the "Enter Name" image on the screen
-        if (userNameIsEmpty){
-            game.batch.draw(enterNameTexture, ENTER_NAME_X1, ENTER_NAME_Y1, ENTER_NAME_WIDTH, ENTER_NAME_HEIGHT);
-        }
-
         game.batch.end();
 
-
-        //Render user name text entry field
-        if (textFieldCreated) {
-            stage.draw();
-            stage.act();
-        }
 
         game.batch.begin();
 

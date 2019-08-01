@@ -20,7 +20,7 @@ allprojects {
 
     version = '1.0'
     ext {
-        appName = "AlphaPigeon"
+        appName = "ApexPigeon"
         gdxVersion = '1.9.8'
         gamesvcsVersion = '1.0.0'
         roboVMVersion = '2.3.7'
@@ -47,6 +47,7 @@ project(":desktop") {
         compile "com.badlogicgames.ashley:ashley:1.7.0"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
         compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-desktop:$gamesvcsVersion"
+        compile "de.tomgrill.gdxdialogs:gdx-dialogs-desktop:1.3.0"
         
     }
 }
@@ -102,6 +103,7 @@ project(":ios") {
         compile "com.badlogicgames.ashley:ashley:1.7.0"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-ios"
         compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-ios-gamecenter:$gamesvcsVersion"
+        compile "de.tomgrill.gdxdialogs:gdx-dialogs-ios:1.3.0"
         
     }
 }
@@ -134,7 +136,9 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
         compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-core:$gamesvcsVersion"
-        
+        compile "de.tomgrill.gdxdialogs:gdx-dialogs-core:1.3.0"
+
+
     }
 }
 

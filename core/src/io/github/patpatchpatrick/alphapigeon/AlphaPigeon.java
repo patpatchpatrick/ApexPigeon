@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import de.golfgl.gdxgamesvcs.IGameServiceListener;
 import de.golfgl.gdxgamesvcs.NoGameServiceClient;
+import de.tomgrill.gdxdialogs.core.GDXDialogs;
+import de.tomgrill.gdxdialogs.core.GDXDialogsSystem;
 import io.github.patpatchpatrick.alphapigeon.Screens.MainMenuScreen;
 import io.github.patpatchpatrick.alphapigeon.resources.AppleGameCenterManager;
 import io.github.patpatchpatrick.alphapigeon.resources.DatabaseManager;
@@ -19,6 +21,7 @@ public class AlphaPigeon extends Game{
     public BitmapFont font;
     protected IGameServiceClient gsClient;
     public AppleGameCenterManager appleGameCenter;
+    public GDXDialogs dialogs;
     private PlayServices playServices;
     private DatabaseManager databaseManager;
 
@@ -38,6 +41,7 @@ public class AlphaPigeon extends Game{
     public void create() {
 
         initializeAppleGameServices();
+        dialogs = GDXDialogsSystem.install();
 
         batch = new SpriteBatch();
         font = new BitmapFont();
@@ -53,7 +57,7 @@ public class AlphaPigeon extends Game{
             gsClient = new NoGameServiceClient();
         }
 
-       appleGameCenter = new AppleGameCenterManager(gsClient);
+       appleGameCenter = new AppleGameCenterManager(this, gsClient);
 
 
     }

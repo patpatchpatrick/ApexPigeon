@@ -8,14 +8,19 @@ import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.gdxgamesvcs.IGameServiceListener;
 import de.golfgl.gdxgamesvcs.leaderboard.IFetchLeaderBoardEntriesResponseListener;
 import de.golfgl.gdxgamesvcs.leaderboard.ILeaderBoardEntry;
+import de.tomgrill.gdxdialogs.core.dialogs.GDXButtonDialog;
+import de.tomgrill.gdxdialogs.core.listener.ButtonClickListener;
+import io.github.patpatchpatrick.alphapigeon.AlphaPigeon;
 
 public class AppleGameCenterManager {
 
     public IGameServiceListener gsListener;
     public IGameServiceClient gsClient;
+    public AlphaPigeon game;
     public IFetchLeaderBoardEntriesResponseListener gsLeaderboardListener;
 
-    public AppleGameCenterManager(IGameServiceClient client){
+    public AppleGameCenterManager(AlphaPigeon game, IGameServiceClient client){
+        this.game = game;
         this.gsClient = client;
         gsLeaderboardListener = new IFetchLeaderBoardEntriesResponseListener() {
             @Override
@@ -67,12 +72,21 @@ public class AppleGameCenterManager {
 
     public void showHighScoresUI(){
 
+        //Show Apple GameCenter High Scores UI
+        //If the UI does not load, show an alert message to the user
+
         try {
             Gdx.app.log(gsClient.getPlayerDisplayName(), gsClient.getGameServiceId());
             gsClient.showLeaderboards("apx1");
-            gsClient.fetchLeaderboardEntries("apx1", 100,false,gsLeaderboardListener);
         } catch (GameServiceException e) {
             Gdx.app.log("LEADERBOARD EXCEPTION: ", e.getMessage());
+            GDXButtonDialog bDialog = game.dialogs.newDialog(GDXButtonDialog.class);
+            bDialog.setTitle("Not Logged In To Game Center");
+            bDialog.setMessage("Please log in to Game Center to see Leaderboards");
+
+            bDialog.addButton("Ok");
+
+            bDialog.build().show();
         }
     }
 

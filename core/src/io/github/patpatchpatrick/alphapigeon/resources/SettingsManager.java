@@ -168,6 +168,7 @@ public class SettingsManager {
             fullScreenModeIsOn = isOn;
         }
 
+
     }
 
     public static void increaseTotalNumGames(){
