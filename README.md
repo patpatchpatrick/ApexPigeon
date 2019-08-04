@@ -4,6 +4,8 @@
 
 [<b>Play Online</b>](https://patpatchpatrick.itch.io/alpha-pigeon)
 
+[<img src="https://raw.githubusercontent.com/patpatchpatrick/FiestaAppWebsite/master/docs/images/appStoreBadge.png" width="150">](https://apps.apple.com/us/app/apex-pigeon-fly-dodge-juke/id1467665222?ls=1)
+
 <b>[Download Android Version</b>](https://www.amazon.com/Patrick-Doyle-Alpha-Pigeon/dp/B07PJXBS25/ref=sr_1_1?keywords=alpha+pigeon&qid=1552340070&s=mobile-apps&sr=1-1)
 
 * Disaster has struck.  While the other birds fly away, you (the Apex Pigeon) fly towards it.
